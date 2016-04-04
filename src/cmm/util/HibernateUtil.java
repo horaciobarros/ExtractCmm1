@@ -29,8 +29,60 @@ public class HibernateUtil {
 				throw new ExceptionInInitializerError();
 			} else {
 				AnnotationConfiguration configuration = new AnnotationConfiguration();
-				/*configuration
-						.addAnnotatedClass(esaude.model.EsusTipoatividadecoletiva.class);*/
+				configuration
+						.addAnnotatedClass(cmm.model.Competencias.class);
+				configuration
+				.addAnnotatedClass(cmm.model.Guias.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.GuiasNotasFiscais.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.NotasFiscais.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.NotasFiscaisCanceladas.class);
+				
+				configuration
+				.addAnnotatedClass(cmm.model.NotasFiscaisCondPagamentos.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.NotasFiscaisEmails.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.NotasFiscaisObras.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.NotasFiscaisPrestadores.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.NotasFiscaisServicos.class);
+				
+				configuration
+				.addAnnotatedClass(cmm.model.NotasFiscaisSubst.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.NotasFiscaisTomadores.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.NotasFiscaisXml.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.Pagamentos.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.Prestadores.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.PrestadoresAtividades.class);
+		
+				configuration
+				.addAnnotatedClass(cmm.model.PrestadoresOptanteSimples.class);
+				
+				configuration
+				.addAnnotatedClass(cmm.model.Tomadores.class);
+		
+		
 				SessionFactory sessionFactory = configuration.configure(file)
 						.buildSessionFactory();
 				return sessionFactory;
