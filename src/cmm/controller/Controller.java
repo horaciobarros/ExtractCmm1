@@ -14,7 +14,9 @@ import java.util.Map;
 import cmm.service.ExtractorService;
 
 public class Controller {
+	
 	private ExtractorService extractorService = new ExtractorService();
+	
 	public void importaNfe() { 
 		System.out.println("Leitura de arquivos txt - Início");
 
@@ -50,6 +52,17 @@ public class Controller {
 		}
 
 		System.out.println("Leitura de arquivos txt - Final");
+		
+		System.out.println("Gravação de banco de dados para exportação - inicio");
+		
+		gravaDados();
+		
+		System.out.println("Gravação de banco de dados para exportação - fim");
+	}
+
+	private void gravaDados() {
+		
+		
 	}
 
 	private void processaDados(int index, List<String> dadosList) {

@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cmm.entidadesOrigem.DadosCadastro;
 import cmm.entidadesOrigem.DadosCadastroAcesso;
@@ -19,16 +21,27 @@ public class ExtractorService {
 	File file = null;
 	FileWriter fw = null;
 	BufferedWriter bw = null;
+	Map<Long, PlanoConta> planoContaMap;
+	Map<Long, DadosContador> dadosContadorMap;
+	Map<Long, DadosLivroPrestador>  dadosLivroPrestadorMap;
+	Map<Long, DadosLivroTomador> dadosLivroTomadorMap;
+	Map<String, DadosCadastro> dadosCadastroMap;
+	Map<String, DadosCadastroAcesso> dadosCadastroAcessoMap;
+	Map<String, DadosCadastroAtividade> dadosCadastroAtividadeMap;
+	Map<String, DadosGuia> dadosGuiaMap;
 
 	public void processaPlanoConta(List<String> dadosList) {
 		ativaFileLog("plano_conta");
 
+		planoContaMap = new HashMap<Long, PlanoConta>();
+		
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
 				PlanoConta pc = new PlanoConta(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3],
 						arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8], arrayLinha[9],
 						arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14]);
+				planoContaMap.put(pc.getIdCodigo(), pc);
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
 			}
@@ -40,6 +53,7 @@ public class ExtractorService {
 
 	public void processaDadosContador(List<String> dadosList) {
 		ativaFileLog("dados_contador");
+		dadosContadorMap = new HashMap<Long, DadosContador>();
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
@@ -47,6 +61,7 @@ public class ExtractorService {
 						arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8],
 						arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14],
 						arrayLinha[15], arrayLinha[16], arrayLinha[17], arrayLinha[18], arrayLinha[19]);
+				dadosContadorMap.put(dc.getIdCodigo(), dc);
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
 			}
@@ -58,10 +73,12 @@ public class ExtractorService {
 
 	public void processaDadosCadastroAcesso(List<String> dadosList) {
 		ativaFileLog("dados_cadastro_acesso");
+		dadosCadastroAcessoMap = new HashMap<String, DadosCadastroAcesso>();
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
 				DadosCadastroAcesso dca = new DadosCadastroAcesso(arrayLinha[0], arrayLinha[1]);
+				dadosCadastroAcessoMap.put(dca.getCnpj(), dca);
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
 			}
@@ -73,12 +90,14 @@ public class ExtractorService {
 
 	public void processaDadosCadastroAtividade(List<String> dadosList) {
 		ativaFileLog("dados_cadastro_atividade");
+		dadosCadastroAtividadeMap = new HashMap<String, DadosCadastroAtividade>();
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
 				DadosCadastroAtividade dca = new DadosCadastroAtividade(arrayLinha[0], arrayLinha[1], arrayLinha[2],
 						arrayLinha[3], arrayLinha[4], Double.valueOf(arrayLinha[5]), arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12]);
+				dadosCadastroAtividadeMap.put(dca.getCnpj(), dca);
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
 			}
@@ -90,6 +109,7 @@ public class ExtractorService {
 
 	public void processaDadosCadastro(List<String> dadosList) {
 		ativaFileLog("dados_cadastro");
+		dadosCadastroMap = new HashMap<String, DadosCadastro>();
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
@@ -98,6 +118,7 @@ public class ExtractorService {
 						arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14], arrayLinha[15],
 						arrayLinha[16], arrayLinha[17], arrayLinha[18], arrayLinha[19], arrayLinha[20], arrayLinha[21],
 						arrayLinha[22]);
+				dadosCadastroMap.put(dc.getIdCodigo(), dc);
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
 			}
@@ -109,6 +130,7 @@ public class ExtractorService {
 
 	public void processaDadosGuia(List<String> dadosList) {
 		ativaFileLog("dados_guia");
+		dadosGuiaMap = new HashMap<String, DadosGuia>();
 		int linhaArquivo = 2;
 
 		for (String linha : dadosList) {
@@ -124,6 +146,7 @@ public class ExtractorService {
 						Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]), arrayLinha[31], arrayLinha[32],
 						arrayLinha[33], arrayLinha[34], arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38],
 						arrayLinha[39], arrayLinha[40], arrayLinha[41]);
+				dadosGuiaMap.put(dg.getCodigo(), dg);
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
 			}
@@ -137,6 +160,7 @@ public class ExtractorService {
 
 	public void processaDadosLivroTomador(List<String> dadosList) {
 		ativaFileLog("dados_livro_tomador");
+		dadosLivroTomadorMap = new HashMap<Long, DadosLivroTomador>();
 		int linhaArquivo = 2;
 
 		for (String linha : dadosList) {
@@ -210,6 +234,7 @@ public class ExtractorService {
 						arrayLinha[63],
 						arrayLinha[64], 
 						arrayLinha[65]);
+				dadosLivroTomadorMap.put(dlt.getIdCodigo(), dlt);
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
 				System.out.println(linha);
@@ -224,6 +249,7 @@ public class ExtractorService {
 
 	public void processaDadosLivroPrestador(List<String> dadosList) {
 		ativaFileLog("dados_livro_prestador");
+		dadosLivroPrestadorMap = new HashMap<Long, DadosLivroPrestador>();
 		int linhaArquivo = 2;
 
 		for (String linha : dadosList) {
@@ -296,6 +322,7 @@ public class ExtractorService {
 						arrayLinha[62], 
 						arrayLinha[63], 
 						arrayLinha[64]);
+				dadosLivroPrestadorMap.put(dlp.getIdCodigo(), dlp);
 
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
