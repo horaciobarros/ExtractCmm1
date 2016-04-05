@@ -237,8 +237,6 @@ public class ExtractorService {
 				dadosLivroTomadorMap.put(dlt.getIdCodigo(), dlt);
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
-				System.out.println(linha);
-				e.printStackTrace();
 			}
 
 			linhaArquivo++;
@@ -258,8 +256,8 @@ public class ExtractorService {
 				linha = preparaParaSplit(linha);
 				String[] arrayLinha = linha.split("#");
 				DadosLivroPrestador dlp = new DadosLivroPrestador(
-						Long.valueOf(arrayLinha[0]), 
-						arrayLinha[1],
+						Long.valueOf(arrayLinha[0]),              
+						arrayLinha[1],							
 						arrayLinha[2], 
 						arrayLinha[3], 
 						arrayLinha[4], 
@@ -291,37 +289,37 @@ public class ExtractorService {
 						Double.valueOf(arrayLinha[30]),
 						Double.valueOf(arrayLinha[31]), 
 						Double.valueOf(arrayLinha[32]), 
-						arrayLinha[34], 
-						arrayLinha[35],
+						arrayLinha[33], 
+						arrayLinha[34],
+						arrayLinha[35], 
 						arrayLinha[36], 
 						arrayLinha[37], 
 						arrayLinha[38], 
 						arrayLinha[39], 
-						arrayLinha[40], 
-						arrayLinha[41],
+						arrayLinha[40],
+						arrayLinha[41], 
 						arrayLinha[42], 
 						arrayLinha[43], 
 						arrayLinha[44], 
 						arrayLinha[45], 
-						arrayLinha[46], 
-						arrayLinha[47],
+						arrayLinha[46],
+						arrayLinha[47], 
 						arrayLinha[48], 
 						arrayLinha[49], 
 						arrayLinha[50], 
 						arrayLinha[51], 
-						arrayLinha[52], 
-						arrayLinha[53],
+						arrayLinha[52],
+						arrayLinha[53], 
 						arrayLinha[54], 
 						arrayLinha[55], 
 						arrayLinha[56], 
 						arrayLinha[57], 
-						arrayLinha[58], 
-						arrayLinha[59],
+						arrayLinha[58],
+						arrayLinha[59], 
 						arrayLinha[60], 
 						arrayLinha[61], 
-						arrayLinha[62], 
-						arrayLinha[63], 
-						arrayLinha[64]);
+						arrayLinha[61], 
+						arrayLinha[63]);
 				dadosLivroPrestadorMap.put(dlp.getIdCodigo(), dlp);
 
 			} catch (Exception e) {
@@ -336,8 +334,13 @@ public class ExtractorService {
 
 	private String preparaParaSplit(String linha) {
 		linha = linha.replaceAll("\\|", "#");
+		while (linha.contains("\\|")) {
+			linha = linha.replaceAll("\\|", "#");
+		}
 		linha = linha.replaceAll("##", "# #");
-		linha = linha.replaceAll("##", "# #");
+		while (linha.contains("##")) {
+			linha = linha.replaceAll("##", "# #");
+		}
 		String ultCarac = linha.substring(linha.length() - 1);
 		if (ultCarac.equals("#")) {
 			linha = linha + " ";
