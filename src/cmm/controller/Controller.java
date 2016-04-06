@@ -14,84 +14,77 @@ import java.util.Map;
 import cmm.service.ExtractorService;
 
 public class Controller {
-	
+
 	private ExtractorService extractorService = new ExtractorService();
-	
-	public void importaNfe() { 
+
+	public void importaNfe() {
 		System.out.println("Leitura de arquivos txt - Início");
 
-		List<String> arquivoList = new ArrayList<>(
-				Arrays.asList("plano_conta", "dados_contador", "dados_cadastro_acesso", "dados_cadastro_atividade",
-						"dados_cadastro", "dados_guia", "dados_livro_tomador", "dados_livro_prestador"));
+		/*		Arrays.asList("plano_conta", "dados_contador", "dados_cadastro_acesso", "dados_cadastro_atividade",
+						"dados_cadastro", "dados_guia", "dados_livro_tomador", "dados_livro_prestador")); */
+		
+		// competencias
+		List<String> dadosList = lerArquivo("dados_guia");
+		extractorService.processaDadosGuia(dadosList);
+		
+		
+		
+		
+	}
 
+	public List<String> lerArquivo(String arquivoIn) {
 		File file;
-		for (String arquivoIn : arquivoList) {
-			file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
+		file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
+		try {
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			List<String> dadosList = new ArrayList<String>();
 			try {
-				FileReader fr = new FileReader(file);
-				BufferedReader br = new BufferedReader(fr);
-				System.out.println("Lendo --> " + arquivoList.indexOf(arquivoIn) + " - " + arquivoIn);
-				List<String> dadosList = new ArrayList<String>();
-				try {
-					br.readLine(); // cabeçalho
-					while (br.ready()) {
-						String linha = br.readLine();
-						dadosList.add(linha);
-					}
-					br.close();
-					fr.close();
-					processaDados(arquivoList.indexOf(arquivoIn), dadosList);
-				} catch (IOException e) {
-					e.printStackTrace();
+				br.readLine(); // cabeçalho
+				while (br.ready()) {
+					String linha = br.readLine();
+					dadosList.add(linha);
 				}
-			} catch (FileNotFoundException e) {
+				br.close();
+				fr.close();
+				return dadosList;
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
+		return null;
 
-		System.out.println("Leitura de arquivos txt - Final");
-		
-		System.out.println("Gravação de banco de dados para exportação - inicio");
-		
-		gravaDados();
-		
-		System.out.println("Gravação de banco de dados para exportação - fim");
 	}
 
-	private void gravaDados() {
-		
-		
-	}
 
-	private void processaDados(int index, List<String> dadosList) {
-		if (index == 0) {
+	private void processaDados(String etapa, List<String> dadosList) {
+		if (etapa == "PC") {
 			extractorService.processaPlanoConta(dadosList);
 		}
-		if (index == 1) {
+		if (etapa == "DC") {
 			extractorService.processaDadosContador(dadosList);
 		}
-		if (index == 2) {
+		if (etapa == "CA") {
 			extractorService.processaDadosCadastroAcesso(dadosList);
 		}
-		if (index == 3) {
+		if (etapa == "AT") {
 			extractorService.processaDadosCadastroAtividade(dadosList);
 		}
-		if (index == 4) {
+		if (etapa == "C") {
 			extractorService.processaDadosCadastro(dadosList);
 		}
-		if (index == 5) {
+		if (etapa == "DG") {
 			extractorService.processaDadosGuia(dadosList);
 		}
-		if (index == 6) {
+		if (etapa == "LT") {
 			extractorService.processaDadosLivroTomador(dadosList);
 		}
-		if (index == 7) {
+		if (etapa == "LP") {
 			extractorService.processaDadosLivroPrestador(dadosList);
 		}
-		
-		
+
 	}
 
 }

@@ -23,8 +23,7 @@ public class HibernateUtil {
 				throw new ExceptionInInitializerError();
 			} else {
 				AnnotationConfiguration configuration = new AnnotationConfiguration();
-				configuration
-						.addAnnotatedClass(cmm.model.Competencias.class);
+				configuration.addAnnotatedClass(cmm.model.Competencias.class);
 				configuration
 				.addAnnotatedClass(cmm.model.Guias.class);
 		
@@ -84,7 +83,8 @@ public class HibernateUtil {
 		} catch (Throwable ex) {
 			JOptionPane.showMessageDialog(null,
 					"Erro em configuração do banco! Detalhes no log da aplicação");
-			throw new ExceptionInInitializerError(ex);
+			ex.printStackTrace();
+			return null;
 		}
 	}
 

@@ -2,6 +2,10 @@ package cmm.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Util {
 
@@ -71,6 +75,23 @@ public class Util {
 
 	public static Integer castToInteger(Object value) {
 		return castToInteger(value, null);
+	}
+
+	public String getMes(String mes) {
+		String[] meses = {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"};
+		
+		return meses[Integer.valueOf(mes) -1];
+	}
+
+	public Date getStringToDate(String data) {
+		DateFormat formatter = new SimpleDateFormat("yyyy-dd-MM");
+		try {
+			Date date = (Date)formatter.parse("01/29/02");
+			return date;
+		} catch (ParseException e) {
+		}
+		
+		return null;
 	}
 
 
