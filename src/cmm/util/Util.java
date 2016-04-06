@@ -77,21 +77,30 @@ public class Util {
 		return castToInteger(value, null);
 	}
 
-	public String getMes(String mes) {
+	public String getNomeMes(String mes) {
 		String[] meses = {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"};
 		
 		return meses[Integer.valueOf(mes) -1];
 	}
 
 	public Date getStringToDate(String data) {
-		DateFormat formatter = new SimpleDateFormat("yyyy-dd-MM");
+		DateFormat formatter = new SimpleDateFormat("yyyy-dd-MM hh:mm:ss");
 		try {
-			Date date = (Date)formatter.parse("01/29/02");
+			Date date = (Date)formatter.parse(data);
 			return date;
 		} catch (ParseException e) {
+			e.printStackTrace();
 		}
 		
 		return null;
+	}
+
+	public String getOptantePeloSimplesNacional(String optantePeloSimplesNacional) {
+		return optantePeloSimplesNacional.substring(0, 1);
+	}
+
+	public String getTipoPessoa(String inscricao) {
+		return (inscricao.length() == 11 ? "F" : "J");
 	}
 
 

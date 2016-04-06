@@ -5,32 +5,30 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-
-import cmm.model.Competencias;
+import cmm.model.Prestadores;
 import cmm.util.HibernateUtil;
 
-public class CompetenciasDao {
+public class PrestadoresDao {
 
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
 	Session session;
 
-	public CompetenciasDao() {
+	public PrestadoresDao() {
 
 		sessionFactory = HibernateUtil.getSessionFactory();
 		session = sessionFactory.openSession();
 	}
 
-	public Competencias findByDescricao(String descricao) {
+	public Prestadores findByInscricao(String inscricao) {
 		Query query = sessionFactory.openSession()
-				.createQuery("from Competencias cp  " + " where cp.descricao like '%" + descricao.trim() + "%'");
+				.createQuery("from Prestadores p  " + " where p.inscricaoPrestador like '%" + inscricao.trim() + "%'");
 
 		try {
-			List<Competencias> competencias = query.list();
+			List<Prestadores> prestadores = query.list();
 
-			if (competencias.size() > 0) {
-				return competencias.get(0);
+			if (prestadores.size() > 0) {
+				return prestadores.get(0);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -38,12 +36,17 @@ public class CompetenciasDao {
 		return null;
 	}
 
-	public void save(Competencias cp) {
+	public void save(Prestadores p) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		session.save(cp);
+		session.save(p);
 		session.beginTransaction().commit();
 		session.close();
+	}
+
+	public Prestadores findByInscricaoMunicipal(String inscMunicipal) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

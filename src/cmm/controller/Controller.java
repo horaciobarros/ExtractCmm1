@@ -18,18 +18,49 @@ public class Controller {
 	private ExtractorService extractorService = new ExtractorService();
 
 	public void importaNfe() {
+		
+
+		System.out.println("Limpando o banco...");
+
+		List<String> entidades = Arrays.asList("Guias", "Competencias", "Tomadores", "Prestadores", "GuiasNotasFiscais",
+				"NotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos", "NotasFiscaisEmails",
+				"NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos", "NotasFiscaisSubst",
+				"NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
+				"" + "PrestadoresOptanteSimples");
+
+		// limpando o banco
+		for (String nomeEntidade : entidades) {
+			try {
+				extractorService.excluiDados(nomeEntidade);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
 		System.out.println("Leitura de arquivos txt - Início");
 
-		/*		Arrays.asList("plano_conta", "dados_contador", "dados_cadastro_acesso", "dados_cadastro_atividade",
-						"dados_cadastro", "dados_guia", "dados_livro_tomador", "dados_livro_prestador")); */
+		System.out.println("lendo prestador");
+		// prestador
+		List<String> dadosList = lerArquivo("dados_livro_prestador");
+		extractorService.processaDadosLivroPrestador(dadosList);
+
+		// tomador
+		System.out.println("lendo tomador");
+		dadosList = lerArquivo("dados_livro_tomador");
+		extractorService.processaDadosLivroTomador(dadosList);
 		
+		// Ajustando tomadores e prestadores através do dadosCadastro.txt
+		System.out.println("Ajustando contribuintes");
+		dadosList = lerArquivo("dados_cadastro");
+		extractorService.processaDadosCadastro(dadosList);
+
 		// competencias
-		List<String> dadosList = lerArquivo("dados_guia");
-		extractorService.processaDadosGuia(dadosList);
-		
-		
-		
-		
+		System.out.println("lendo competencias e guias");
+		dadosList = lerArquivo("dados_guia");
+		extractorService.processaDadosGuiaCompetencias(dadosList);
+
+		System.out.println("--- Fim do processo ---");
+
 	}
 
 	public List<String> lerArquivo(String arquivoIn) {
@@ -58,33 +89,5 @@ public class Controller {
 
 	}
 
-
-	private void processaDados(String etapa, List<String> dadosList) {
-		if (etapa == "PC") {
-			extractorService.processaPlanoConta(dadosList);
-		}
-		if (etapa == "DC") {
-			extractorService.processaDadosContador(dadosList);
-		}
-		if (etapa == "CA") {
-			extractorService.processaDadosCadastroAcesso(dadosList);
-		}
-		if (etapa == "AT") {
-			extractorService.processaDadosCadastroAtividade(dadosList);
-		}
-		if (etapa == "C") {
-			extractorService.processaDadosCadastro(dadosList);
-		}
-		if (etapa == "DG") {
-			extractorService.processaDadosGuia(dadosList);
-		}
-		if (etapa == "LT") {
-			extractorService.processaDadosLivroTomador(dadosList);
-		}
-		if (etapa == "LP") {
-			extractorService.processaDadosLivroPrestador(dadosList);
-		}
-
-	}
 
 }
