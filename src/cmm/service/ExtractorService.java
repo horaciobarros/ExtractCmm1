@@ -137,18 +137,24 @@ public class ExtractorService {
 					if (p == null || p.getId() == 0) {
 						p = new Prestadores();
 						p.setAutorizado("S");
-						p.setCelular(dc.getTelefone());
+						if (dc.getTelefone() != null && dc.getTelefone().trim().length() >= 11) {
+							p.setCelular(dc.getTelefone().trim().substring(0, 11));
+							p.setTelefone(dc.getTelefone().trim().substring(0, 11));
+						} else {
+							p.setCelular(dc.getTelefone().trim());
+							p.setTelefone(dc.getTelefone().trim());
+						}
 						p.setEmail(dc.getEmail());
 						p.setEnquadramento("N");
 						p.setInscricaoPrestador(dc.getCnpj());
-						p.setTelefone(dc.getTelefone());
+
 						prestadoresDao.save(p);
 					}
 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
+
 				// ajustando tomadores
 				String inscricaoTomador = dc.getCnpj().trim();
 				Tomadores t = tomadoresDao.findByInscricao(inscricaoTomador);
@@ -157,36 +163,48 @@ public class ExtractorService {
 						t = new Tomadores();
 						t.setCelular(dc.getTelefone());
 						t.setEmail(dc.getEmail());
-					    t.setTelefone(dc.getTelefone());
-					    t.setInscricaoTomador(inscricaoTomador.trim());
-					    t.setBairro(dc.getEnderecoBairro());
-					    t.setCelular(dc.getTelefone());
-					    t.setCep(dc.getEnderecoCep());
-					    t.setComplemento(dc.getEnderecoComplemento());
-					    t.setInscricaoEstadual(dc.getInscricaoEstadual());
-					    t.setInscricaoMunicipal(dc.getInscricaoMunicipal());
-					    t.setMunicipio(dc.getMunicipio());
-					    t.setNome(dc.getRazaoSocial());
-					    t.setNomeFantasia(dc.getNomeFantasia());
-					    t.setNumero(dc.getEnderecoNumero());
-					    t.setOptanteSimples(util.getOptantePeloSimplesNacional(dc.getOptanteSimplesNacional()));
-					    t.setTelefone(dc.getTelefone());
-					    p = prestadoresDao.findByInscricao(dc.getCnpj().trim());
-					    t.setPrestadores(p);
-					    t.setTipoPessoa(util.getTipoPessoa(dc.getCnpj().trim()));
+						t.setInscricaoTomador(inscricaoTomador.trim());
+						t.setBairro(dc.getEnderecoBairro());
+						t.setCep(dc.getEnderecoCep());
+						t.setComplemento(dc.getEnderecoComplemento());
+						t.setInscricaoMunicipal(dc.getInscricaoMunicipal());
+						t.setMunicipio(dc.getMunicipio());
+						t.setNome(dc.getRazaoSocial());
+						t.setNomeFantasia(dc.getNomeFantasia());
+						t.setNumero(dc.getEnderecoNumero());
+						t.setOptanteSimples(util.getOptantePeloSimplesNacional(dc.getOptanteSimplesNacional()));
+						if (dc.getTelefone() != null && dc.getTelefone().trim().length() > 11) {
+							t.setTelefone(dc.getTelefone().trim().substring(0, 11));
+							t.setCelular(dc.getTelefone().trim().substring(0, 11));
+						} else {
+							t.setTelefone(dc.getTelefone().trim());
+							t.setCelular(dc.getTelefone().trim());
+						}
+						p = prestadoresDao.findByInscricao(dc.getCnpj().trim());
+						t.setPrestadores(p);
+						t.setTipoPessoa(util.getTipoPessoa(dc.getCnpj().trim()));
+						if (dc.getInscricaoEstadual() != null && dc.getInscricaoEstadual().length() >= 15) {
+							t.setInscricaoEstadual(dc.getInscricaoEstadual().trim().substring(0, 14));
+						} else {
+							t.setInscricaoEstadual(dc.getInscricaoEstadual());
+						}
 						tomadoresDao.save(t);
 					} else {
-						t.setInscricaoEstadual(dc.getInscricaoEstadual());
-					    t.setInscricaoMunicipal(dc.getInscricaoMunicipal());
-					    p = prestadoresDao.findByInscricao(dc.getCnpj().trim());
-					    t.setPrestadores(p);
-					    tomadoresDao.update(t);
+						if (dc.getInscricaoEstadual() != null && dc.getInscricaoEstadual().length() >= 15) {
+							t.setInscricaoEstadual(dc.getInscricaoEstadual().trim().substring(0, 14));
+						} else {
+							t.setInscricaoEstadual(dc.getInscricaoEstadual());
+						}
+
+						t.setInscricaoMunicipal(dc.getInscricaoMunicipal());
+						p = prestadoresDao.findByInscricao(dc.getCnpj().trim());
+						t.setPrestadores(p);
+						tomadoresDao.update(t);
 					}
 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
 
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
@@ -231,30 +249,34 @@ public class ExtractorService {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
+
 				try {
-				Guias guias =  new Guias();
-				guias.setCompetencias(cp);
-				guias.setDataVencimento(util.getStringToDate(dg.getDataVencimento()));
-				guias.setInscricaoPrestador(dg.getInscMunicipal());
-				guias.setIntegrarGuia("S"); // TODO sanar dúvida
-				guias.setNumeroGuia(Long.valueOf(dg.getNossoNumero()));
-				Tomadores t = tomadoresDao.findByInscricaoMunicipal(dg.getInscMunicipal());
-				guias.setPrestadores(t.getPrestadores());
-				String situacao = "A";
-				if (dg.getValorPago() != null && dg.getValorPago() != Double.valueOf(0)) {
-					situacao = "P";
-				} 
-				if (dg.getDataCancelamento() != null) {
-					situacao = "C";
-				}
-				guias.setSituacao(situacao);
-				
-				guias.setTipo(dg.getTipoGuia().substring(0, 1));
-				guias.setValorDesconto(BigDecimal.valueOf(0.00));
-				guias.setValorGuia(BigDecimal.valueOf(dg.getValorTotal()));
-				guias.setValorImposto(BigDecimal.valueOf(dg.getImposto()));
-				guiasDao.save(guias);
+					Guias guias = new Guias();
+					guias.setCompetencias(cp);
+					guias.setDataVencimento(util.getStringToDate(dg.getDataVencimento()));
+					guias.setInscricaoPrestador(dg.getInscMunicipal());
+					guias.setIntegrarGuia("S"); // TODO sanar dúvida
+					guias.setNumeroGuia(Long.valueOf(dg.getNossoNumero()));
+					Tomadores t = tomadoresDao.findByInscricaoMunicipal(dg.getInscMunicipal());
+					if (t == null) {
+						fillErrorLog(linha, "Tomador não entrado:" + dg.getInscMunicipal());
+					} else {
+						guias.setPrestadores(t.getPrestadores());
+					}
+					String situacao = "A";
+					if (dg.getValorPago() != null && dg.getValorPago() != Double.valueOf(0)) {
+						situacao = "P";
+					}
+					if (dg.getDataCancelamento() != null) {
+						situacao = "C";
+					}
+					guias.setSituacao(situacao);
+
+					guias.setTipo(dg.getTipoGuia().substring(0, 1));
+					guias.setValorDesconto(BigDecimal.valueOf(0.00));
+					guias.setValorGuia(BigDecimal.valueOf(dg.getValorTotal()));
+					guias.setValorImposto(BigDecimal.valueOf(dg.getImposto()));
+					guiasDao.save(guias);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -270,6 +292,7 @@ public class ExtractorService {
 
 	}
 
+	
 	public void processaDadosLivroTomador(List<String> dadosList) {
 		ativaFileLog("dados_livro_tomador");
 		dadosLivroTomadorMap = new HashMap<Long, DadosLivroTomador>();
@@ -303,23 +326,23 @@ public class ExtractorService {
 						t = new Tomadores();
 						t.setCelular(dlt.getTelefoneTomador());
 						t.setEmail(dlt.getEmailTomador());
-					    t.setTelefone(dlt.getTelefoneTomador());
-					    t.setInscricaoTomador(inscricaoTomador.trim());
-					    t.setBairro(dlt.getEnderecoBairroTomador());
-					    t.setCelular(dlt.getTelefoneTomador());
-					    t.setCep(dlt.getCepTomador());
-					    t.setComplemento(dlt.getCepTomador());
-					    t.setInscricaoEstadual(dlt.getInscricaoEstadualTomador());
-					    t.setInscricaoMunicipal(dlt.getInscricaoMunicipalTomador());
-					    t.setMunicipio(dlt.getCidadeTomador());
-					    t.setNome(dlt.getNomeFantasiaTomador());
-					    t.setNomeFantasia(dlt.getNomeFantasiaTomador());
-					    t.setNumero(dlt.getEnderecoNumeroTomador());
-					    t.setOptanteSimples(util.getOptantePeloSimplesNacional(dlt.getOptantePeloSimplesNacional()));
-					    t.setTelefone(dlt.getTelefoneTomador());
-					    Prestadores p = prestadoresDao.findByInscricao(dlt.getCnpjPrestador().trim());
-					    t.setPrestadores(p);
-					    t.setTipoPessoa(util.getTipoPessoa(dlt.getCnpjTomador().trim()));
+						t.setTelefone(dlt.getTelefoneTomador());
+						t.setInscricaoTomador(inscricaoTomador.trim());
+						t.setBairro(dlt.getEnderecoBairroTomador());
+						t.setCelular(dlt.getTelefoneTomador());
+						t.setCep(dlt.getCepTomador());
+						t.setComplemento(dlt.getCepTomador());
+						t.setInscricaoEstadual(dlt.getInscricaoEstadualTomador());
+						t.setInscricaoMunicipal(dlt.getInscricaoMunicipalTomador());
+						t.setMunicipio(dlt.getCidadeTomador());
+						t.setNome(dlt.getNomeFantasiaTomador());
+						t.setNomeFantasia(dlt.getNomeFantasiaTomador());
+						t.setNumero(dlt.getEnderecoNumeroTomador());
+						t.setOptanteSimples(util.getOptantePeloSimplesNacional(dlt.getOptantePeloSimplesNacional()));
+						t.setTelefone(dlt.getTelefoneTomador());
+						Prestadores p = prestadoresDao.findByInscricao(dlt.getCnpjPrestador().trim());
+						t.setPrestadores(p);
+						t.setTipoPessoa(util.getTipoPessoa(dlt.getCnpjTomador().trim()));
 						tomadoresDao.save(t);
 					}
 
@@ -442,8 +465,20 @@ public class ExtractorService {
 
 	}
 	
-	public void excluiDados(String nomeEntidade) {
+	private void fillErrorLog(String linha, String msg) {
+		String linhaAux = linha.replaceAll("#", "|");
+		try {
+			bw.write("erro --> " + " msg:" + linhaAux + "\n");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
 		
+	}
+
+
+	public void excluiDados(String nomeEntidade) {
+
 		dao.excluiDados(nomeEntidade);
 	}
 

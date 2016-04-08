@@ -22,12 +22,18 @@ public class Controller {
 
 		System.out.println("Limpando o banco...");
 
-		List<String> entidades = Arrays.asList("Guias", "Competencias", "Tomadores", "Prestadores", "GuiasNotasFiscais",
+		/*List<String> entidades = Arrays.asList("Guias", "Competencias", "Tomadores", "Prestadores", "GuiasNotasFiscais",
+				"NotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos", "NotasFiscaisEmails",
+				"NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos", "NotasFiscaisSubst",
+				"NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
+				"" + "PrestadoresOptanteSimples");*/
+
+		List<String> entidades = Arrays.asList("Guias", "Competencias", "GuiasNotasFiscais",
 				"NotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos", "NotasFiscaisEmails",
 				"NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos", "NotasFiscaisSubst",
 				"NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
 				"" + "PrestadoresOptanteSimples");
-
+		
 		// limpando o banco
 		for (String nomeEntidade : entidades) {
 			try {
@@ -38,24 +44,28 @@ public class Controller {
 		}
 		
 		System.out.println("Leitura de arquivos txt - Início");
+		List<String> dadosList;
+		
+		/*
+		// Ajustando tomadores e prestadores através do dadosCadastro.txt
+				System.out.println("Ajustando contribuintes");
+				dadosList = lerArquivo("dados_cadastro");
+				extractorService.processaDadosCadastro(dadosList);
 
-		System.out.println("lendo prestador");
+		System.out.println("Lendo prestador");
 		// prestador
-		List<String> dadosList = lerArquivo("dados_livro_prestador");
+		dadosList = lerArquivo("dados_livro_prestador");
 		extractorService.processaDadosLivroPrestador(dadosList);
 
 		// tomador
-		System.out.println("lendo tomador");
+		System.out.println("Lendo tomador");
 		dadosList = lerArquivo("dados_livro_tomador");
 		extractorService.processaDadosLivroTomador(dadosList);
+		*/
 		
-		// Ajustando tomadores e prestadores através do dadosCadastro.txt
-		System.out.println("Ajustando contribuintes");
-		dadosList = lerArquivo("dados_cadastro");
-		extractorService.processaDadosCadastro(dadosList);
 
 		// competencias
-		System.out.println("lendo competencias e guias");
+		System.out.println("Lendo competencias e guias");
 		dadosList = lerArquivo("dados_guia");
 		extractorService.processaDadosGuiaCompetencias(dadosList);
 
