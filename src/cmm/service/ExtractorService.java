@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Map;
 import cmm.dao.CompetenciasDao;
 import cmm.dao.Dao;
 import cmm.dao.GuiasDao;
+import cmm.dao.NotasFiscaisDao;
 import cmm.dao.PrestadoresDao;
 import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosCadastro;
@@ -24,9 +26,12 @@ import cmm.entidadesOrigem.DadosLivroTomador;
 import cmm.entidadesOrigem.PlanoConta;
 import cmm.model.Competencias;
 import cmm.model.Guias;
+import cmm.model.NotasFiscais;
+import cmm.model.NotasFiscaisXml;
 import cmm.model.Prestadores;
 import cmm.model.Tomadores;
 import cmm.util.Util;
+import javassist.CodeConverter.ArrayAccessReplacementMethodNames;
 
 public class ExtractorService {
 	private File file = null;
@@ -46,6 +51,7 @@ public class ExtractorService {
 	private TomadoresDao tomadoresDao = new TomadoresDao();
 	private Dao dao = new Dao();
 	private GuiasDao guiasDao = new GuiasDao();
+	private NotasFiscaisDao notasFiscaisDao = new NotasFiscaisDao();
 
 	public void processaPlanoConta(List<String> dadosList) {
 		ativaFileLog("plano_conta");
@@ -292,7 +298,6 @@ public class ExtractorService {
 
 	}
 
-	
 	public void processaDadosLivroTomador(List<String> dadosList) {
 		ativaFileLog("dados_livro_tomador");
 		dadosLivroTomadorMap = new HashMap<Long, DadosLivroTomador>();
@@ -464,7 +469,7 @@ public class ExtractorService {
 		}
 
 	}
-	
+
 	private void fillErrorLog(String linha, String msg) {
 		String linhaAux = linha.replaceAll("#", "|");
 		try {
@@ -473,13 +478,107 @@ public class ExtractorService {
 			e1.printStackTrace();
 		}
 
-		
 	}
-
 
 	public void excluiDados(String nomeEntidade) {
 
 		dao.excluiDados(nomeEntidade);
+	}
+
+	public void processaDadosNotasFiscais(List<String> dadosList) {
+		ativaFileLog("dados_livro_prestador_notas_fiscais");
+		int linhaArquivo = 2;
+
+		for (String linha : dadosList) {
+			try {
+
+				linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("#");
+				DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
+						arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
+						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13],
+						arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], Double.valueOf(arrayLinha[18]),
+						Double.valueOf(arrayLinha[19]), Double.valueOf(arrayLinha[20]), Double.valueOf(arrayLinha[21]),
+						Double.valueOf(arrayLinha[22]), Double.valueOf(arrayLinha[23]), Double.valueOf(arrayLinha[24]),
+						arrayLinha[25], Double.valueOf(arrayLinha[26]), Double.valueOf(arrayLinha[27]),
+						Double.valueOf(arrayLinha[28]), Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]),
+						Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]), arrayLinha[33], arrayLinha[34],
+						arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40],
+						arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46],
+						arrayLinha[47], arrayLinha[48], arrayLinha[49], arrayLinha[50], arrayLinha[51], arrayLinha[52],
+						arrayLinha[53], arrayLinha[54], arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58],
+						arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[61], arrayLinha[63]);
+
+				String inscricaoPrestador = dlp.getCnpjPrestador().trim();
+				Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
+				try {
+					if (p == null || p.getId() == 0) {
+						// na hora de processar dados_cadastro estas informações
+						// tem que ser verificadas
+						p = new Prestadores();
+						p.setAutorizado("S");
+						p.setCelular(dlp.getTelefonePrestador());
+						p.setEmail(dlp.getEmailPrestador());
+						p.setEnquadramento("N");
+						p.setInscricaoPrestador(inscricaoPrestador.trim());
+						p.setTelefone(dlp.getTelefonePrestador());
+						prestadoresDao.save(p);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				NotasFiscais nf = new NotasFiscais();
+				nf.setDataHoraEmissao(util.getStringToDate(dlp.getDataEmissao()));
+				nf.setInscricaoPrestador(dlp.getCnpjPrestador());
+				nf.setInscricaoTomador(dlp.getCnpjTomador());
+				nf.setNaturezaOperacao(dlp.getNaturezaOperacao());
+				nf.setNomePrestador(dlp.getRazaoSocialPrestador());
+				nf.setNomeTomador(dlp.getRazaoSocialTomador());
+				nf.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
+				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0,1));
+				nf.setPrestadores(p);
+				nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
+				nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
+				nf.setValorInss(BigDecimal.valueOf(dlp.getValorInss()));
+				nf.setValorIr(BigDecimal.valueOf(dlp.getValorIr()));
+				nf.setValorLiquido(BigDecimal.valueOf(dlp.getValorTotalNfse()));
+				nf.setValorOutrasRetencoes(BigDecimal.valueOf(dlp.getValorOutrasRetencoes()));
+				nf.setValorTotalIssOptante(BigDecimal.valueOf(dlp.getValorIss()));
+				nf.setValorTotalServico(BigDecimal.valueOf(dlp.getValorTotalNfse()));
+				nf.setValorTotalIss(BigDecimal.valueOf(dlp.getValorIss()));
+				nf.setSituacao(dlp.getStatusNota().trim().substring(0, 1));
+				nf.setSituacaoTributaria(dlp.getRegimeTributacao().trim().substring(0, 1));
+				nf.setDataHoraEmissao(util.getStringToDate(dlp.getDataEmissao()));
+				if (dlp.getCodigoVerificacao() != null) {
+					if (dlp.getCodigoVerificacao().length() > 9) {
+						nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim().substring(0, 9));
+					} else {
+						nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim());
+					}
+				} 
+				nf.setNaturezaOperacao("1"); //TODO resolver
+				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
+				nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
+				List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(), nf.getValorIr());
+				BigDecimal descontos = util.getSumOfBigDecimal(lista);
+				nf.setValorLiquido(util.getSubtract(nf.getValorTotalBaseCalculo(), descontos));
+				nf.setValorTotalDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
+				nf.setServicoPrestadoForaPais("N");
+				nf.setDataHoraRps(nf.getDataHoraEmissao());
+				
+				notasFiscaisDao.save(nf);
+				
+				
+			} catch (Exception e) {
+				fillErrorLog(linha, e);
+				//e.printStackTrace();
+			}
+			linhaArquivo++;
+
+		}
+		closeFileLog();
+
 	}
 
 }

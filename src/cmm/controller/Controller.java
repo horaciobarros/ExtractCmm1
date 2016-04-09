@@ -18,22 +18,24 @@ public class Controller {
 	private ExtractorService extractorService = new ExtractorService();
 
 	public void importaNfe() {
-		
 
 		System.out.println("Limpando o banco...");
 
-		/*List<String> entidades = Arrays.asList("Guias", "Competencias", "Tomadores", "Prestadores", "GuiasNotasFiscais",
-				"NotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos", "NotasFiscaisEmails",
-				"NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos", "NotasFiscaisSubst",
-				"NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
-				"" + "PrestadoresOptanteSimples");*/
+		/*
+		 * List<String> entidades = Arrays.asList("Guias", "Competencias",
+		 * "Tomadores", "Prestadores", "GuiasNotasFiscais", "NotasFiscais",
+		 * "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
+		 * "NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores",
+		 * "NotasFiscaisServicos", "NotasFiscaisSubst", "NotasFiscaisTomadores",
+		 * "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades", "" +
+		 * "PrestadoresOptanteSimples");
+		 */
 
-		List<String> entidades = Arrays.asList("Guias", "Competencias", "GuiasNotasFiscais",
-				"NotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos", "NotasFiscaisEmails",
-				"NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos", "NotasFiscaisSubst",
-				"NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
-				"" + "PrestadoresOptanteSimples");
-		
+		List<String> entidades = Arrays.asList("Guias", "Competencias", "GuiasNotasFiscais", "NotasFiscais",
+				"NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos", "NotasFiscaisEmails", "NotasFiscaisObras",
+				"NotasFiscaisPrestadores", "NotasFiscaisServicos", "NotasFiscaisSubst", "NotasFiscaisTomadores",
+				"NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades", "" + "PrestadoresOptanteSimples");
+
 		// limpando o banco
 		for (String nomeEntidade : entidades) {
 			try {
@@ -42,32 +44,36 @@ public class Controller {
 				e.printStackTrace();
 			}
 		}
-		
+
 		System.out.println("Leitura de arquivos txt - Início");
 		List<String> dadosList;
-		
+
 		/*
-		// Ajustando tomadores e prestadores através do dadosCadastro.txt
-				System.out.println("Ajustando contribuintes");
-				dadosList = lerArquivo("dados_cadastro");
-				extractorService.processaDadosCadastro(dadosList);
+		 * // Ajustando tomadores e prestadores através do dadosCadastro.txt
+		 * System.out.println("Ajustando contribuintes"); dadosList =
+		 * lerArquivo("dados_cadastro");
+		 * extractorService.processaDadosCadastro(dadosList);
+		 * 
+		 * System.out.println("Lendo prestador"); // prestador dadosList =
+		 * lerArquivo("dados_livro_prestador");
+		 * extractorService.processaDadosLivroPrestador(dadosList);
+		 * 
+		 * // tomador System.out.println("Lendo tomador"); dadosList =
+		 * lerArquivo("dados_livro_tomador");
+		 * extractorService.processaDadosLivroTomador(dadosList);
+		 */
 
-		System.out.println("Lendo prestador");
-		// prestador
-		dadosList = lerArquivo("dados_livro_prestador");
-		extractorService.processaDadosLivroPrestador(dadosList);
-
-		// tomador
-		System.out.println("Lendo tomador");
-		dadosList = lerArquivo("dados_livro_tomador");
-		extractorService.processaDadosLivroTomador(dadosList);
-		*/
-		
-
-		// competencias
+		/*
+		// competencias e guias
 		System.out.println("Lendo competencias e guias");
 		dadosList = lerArquivo("dados_guia");
 		extractorService.processaDadosGuiaCompetencias(dadosList);
+		*/
+
+		// notas fiscais
+		System.out.println("Lendo notas fiscais");
+		dadosList = lerArquivo("dados_livro_prestador");
+		extractorService.processaDadosNotasFiscais(dadosList);
 
 		System.out.println("--- Fim do processo ---");
 
@@ -98,6 +104,5 @@ public class Controller {
 		return null;
 
 	}
-
 
 }

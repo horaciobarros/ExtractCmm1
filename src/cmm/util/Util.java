@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class Util {
 
@@ -101,6 +102,22 @@ public class Util {
 
 	public String getTipoPessoa(String inscricao) {
 		return (inscricao.length() == 11 ? "F" : "J");
+	}
+	
+	public BigDecimal getSumOfBigDecimal(List<BigDecimal> lista) {
+		
+		Double valorAux = Double.valueOf(0);
+		
+		for (BigDecimal valor : lista) {
+			valorAux += valor.doubleValue();
+		}
+		return BigDecimal.valueOf(valorAux);
+		
+	}
+	
+	public BigDecimal getSubtract(BigDecimal valor1, BigDecimal valor2) {
+		
+		return BigDecimal.valueOf(valor1.doubleValue() - valor2.doubleValue());
 	}
 
 
