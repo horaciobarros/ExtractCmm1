@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 
 public class Util {
+	
+	public String CODIGO_IBGE = "3137205";
 
 	public static Long castToLong(Object value, Long defaultValue) {
 		if (value != null) {

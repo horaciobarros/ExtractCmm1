@@ -13,7 +13,10 @@ import java.util.Map;
 import cmm.dao.CompetenciasDao;
 import cmm.dao.Dao;
 import cmm.dao.GuiasDao;
+import cmm.dao.NotasFiscaisCanceladasDao;
 import cmm.dao.NotasFiscaisDao;
+import cmm.dao.NotasFiscaisEmailsDao;
+import cmm.dao.NotasFiscaisServicosDao;
 import cmm.dao.PrestadoresDao;
 import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosCadastro;
@@ -27,6 +30,9 @@ import cmm.entidadesOrigem.PlanoConta;
 import cmm.model.Competencias;
 import cmm.model.Guias;
 import cmm.model.NotasFiscais;
+import cmm.model.NotasFiscaisCanceladas;
+import cmm.model.NotasFiscaisEmails;
+import cmm.model.NotasFiscaisServicos;
 import cmm.model.NotasFiscaisXml;
 import cmm.model.Prestadores;
 import cmm.model.Tomadores;
@@ -52,6 +58,9 @@ public class ExtractorService {
 	private Dao dao = new Dao();
 	private GuiasDao guiasDao = new GuiasDao();
 	private NotasFiscaisDao notasFiscaisDao = new NotasFiscaisDao();
+	private NotasFiscaisServicosDao notasFiscaisServicosDao = new NotasFiscaisServicosDao();
+	private NotasFiscaisCanceladasDao notasFiscaisCanceladasDao = new NotasFiscaisCanceladasDao();
+	private NotasFiscaisEmailsDao notasFiscaisEmailsDao = new NotasFiscaisEmailsDao();
 
 	public void processaPlanoConta(List<String> dadosList) {
 		ativaFileLog("plano_conta");
@@ -527,7 +536,7 @@ public class ExtractorService {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
+
 				NotasFiscais nf = new NotasFiscais();
 				nf.setDataHoraEmissao(util.getStringToDate(dlp.getDataEmissao()));
 				nf.setInscricaoPrestador(dlp.getCnpjPrestador());
@@ -536,7 +545,7 @@ public class ExtractorService {
 				nf.setNomePrestador(dlp.getRazaoSocialPrestador());
 				nf.setNomeTomador(dlp.getRazaoSocialTomador());
 				nf.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
-				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0,1));
+				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
 				nf.setPrestadores(p);
 				nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
 				nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
@@ -556,23 +565,82 @@ public class ExtractorService {
 					} else {
 						nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim());
 					}
-				} 
-				nf.setNaturezaOperacao("1"); //TODO resolver
+				}
+				nf.setNaturezaOperacao("1"); // TODO resolver
 				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
 				nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
-				List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(), nf.getValorIr());
+				List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(),
+						nf.getValorIr());
 				BigDecimal descontos = util.getSumOfBigDecimal(lista);
 				nf.setValorLiquido(util.getSubtract(nf.getValorTotalBaseCalculo(), descontos));
 				nf.setValorTotalDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
 				nf.setServicoPrestadoForaPais("N");
 				nf.setDataHoraRps(nf.getDataHoraEmissao());
-				
+
 				notasFiscaisDao.save(nf);
+
+				// -- serviços
+				try {
+
+					NotasFiscaisServicos nfs = new NotasFiscaisServicos();
+					nfs.setInscricaoPrestador(dlp.getCnpjPrestador());
+					nfs.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
+					nfs.setMunicipioIbge(util.CODIGO_IBGE);
+					nfs.setItemListaServico("0001");
+					nfs.setDescricao(dlp.getDiscriminacaoServico());
+					nfs.setAliquota(BigDecimal.valueOf(dlp.getValorAliquota()));
+					nfs.setValorServico(BigDecimal.valueOf(dlp.getValorServico()));
+					nfs.setQuantidade(BigDecimal.valueOf(1));
+					nfs.setValorServico(BigDecimal.valueOf(dlp.getValorServico()));
+					nfs.setValorDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
+					nfs.setValorDescCondicionado(BigDecimal.valueOf(dlp.getValorDescontoCondicionado()));
+					nfs.setValorDescIncondicionado(BigDecimal.valueOf(dlp.getValorDescontoIncondicionado()));
+					nfs.setValorBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
+					nfs.setAliquota(BigDecimal.valueOf(dlp.getValorAliquota()));
+					nfs.setValorIss(BigDecimal.valueOf(dlp.getValorIss()));
+					nfs.setNotasFiscais(nf);
+					nfs.setValorUnitario(BigDecimal.valueOf(dlp.getValorServico()));
+					notasFiscaisServicosDao.save(nfs);
+				} catch (Exception e) {
+					fillErrorLog(linha, e);
+					e.printStackTrace();
+				}
+
+				// -- canceladas
+				if (dlp.getStatusNota().substring(0, 1).equals("C")) {
+					try {
+						NotasFiscaisCanceladas nfc = new NotasFiscaisCanceladas();
+						nfc.setDatahoracancelamento(util.getStringToDate(dlp.getDataCancelamento()));
+						nfc.setInscricaoPrestador(dlp.getCnpjPrestador());
+						nfc.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
+						nfc.setMotivo(dlp.getMotivoCancelamento());
+						nfc.setNotasFiscais(nf);
+						notasFiscaisCanceladasDao.save(nfc);
+					} catch (Exception e) {
+						fillErrorLog(linha, e);
+						e.printStackTrace();
+					}
+				}
+
+				// email
+				if (dlp.getEmailPrestador() != null && !dlp.getEmailPrestador().isEmpty()) {
+					try {
+						NotasFiscaisEmails nfe = new NotasFiscaisEmails();
+						nfe.setEmail(dlp.getEmailPrestador());
+						nfe.setInscricaoPrestador(dlp.getCnpjPrestador());
+						nfe.setNotasFiscais(nf);
+						nfe.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
+						notasFiscaisEmailsDao.save(nfe);
+					} catch (Exception e) {
+						fillErrorLog(linha, e);
+						e.printStackTrace();
+					}
+
+				}
 				
-				
+
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
-				//e.printStackTrace();
 			}
 			linhaArquivo++;
 
