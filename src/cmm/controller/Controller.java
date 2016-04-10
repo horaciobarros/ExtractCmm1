@@ -63,12 +63,10 @@ public class Controller {
 		 * extractorService.processaDadosLivroTomador(dadosList);
 		 */
 
-		/*
 		// competencias e guias
 		System.out.println("Lendo competencias e guias");
 		dadosList = lerArquivo("dados_guia");
 		extractorService.processaDadosGuiaCompetencias(dadosList);
-		*/
 
 		// notas fiscais
 		System.out.println("Lendo notas fiscais");
