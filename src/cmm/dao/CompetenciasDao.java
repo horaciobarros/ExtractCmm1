@@ -45,5 +45,31 @@ public class CompetenciasDao {
 		session.beginTransaction().commit();
 		session.close();
 	}
+	
+	public List<Competencias> findNaoEnviados() {
+		Transaction tx = session.beginTransaction();
+		Query query = sessionFactory
+				.openSession()
+				.createQuery("from Competencias c where hash is null");
+		List<Competencias> lista = query.list();
+		tx.commit();
 
+		return lista;
+	}
+
+	public void saveHash(List<Competencias> listaAtualizados, String hash){
+		Transaction tx = session.beginTransaction();
+		StringBuilder builder = new StringBuilder();
+		builder.append("update Competencias set hash = '"+hash+"' where ");
+		
+		for (Competencias c : listaAtualizados){
+			builder.append("id = "+c.getId()+" or ");
+		}
+		
+		String sql = builder.toString();
+		sql = sql.toString().substring(0,sql.length()-4);
+		Query query = session.createQuery(sql);
+		query.executeUpdate();
+		tx.commit();
+	}
 }

@@ -33,11 +33,9 @@ import cmm.model.NotasFiscais;
 import cmm.model.NotasFiscaisCanceladas;
 import cmm.model.NotasFiscaisEmails;
 import cmm.model.NotasFiscaisServicos;
-import cmm.model.NotasFiscaisXml;
 import cmm.model.Prestadores;
 import cmm.model.Tomadores;
 import cmm.util.Util;
-import javassist.CodeConverter.ArrayAccessReplacementMethodNames;
 
 public class ExtractorService {
 	private File file = null;
