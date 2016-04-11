@@ -34,7 +34,7 @@ public class NotasFiscaisEmailsDao {
 		Transaction tx = session.beginTransaction();
 		Query query = sessionFactory
 				.openSession()
-				.createQuery("from NotasFiscaisEmails c where hash is null");
+				.createQuery("from NotasFiscaisEmails c where hash is null").setFirstResult(0).setMaxResults(1500);
 		List<NotasFiscaisEmails> lista = query.list();
 		tx.commit();
 
@@ -52,7 +52,7 @@ public class NotasFiscaisEmailsDao {
 		
 		String sql = builder.toString();
 		sql = sql.toString().substring(0,sql.length()-4);
-		Query query = session.createQuery(sql);
+		Query query = session.createQuery(sql).setFirstResult(0).setMaxResults(1000);
 		query.executeUpdate();
 		tx.commit();
 	}

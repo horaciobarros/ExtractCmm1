@@ -73,7 +73,7 @@ public class PrestadoresDao {
 		
 		String sql = builder.toString();
 		sql = sql.toString().substring(0,sql.length()-4);
-		Query query = session.createQuery(sql);
+		Query query = session.createQuery(sql).setFirstResult(0).setMaxResults(1000);
 		query.executeUpdate();
 		tx.commit();
 	}
