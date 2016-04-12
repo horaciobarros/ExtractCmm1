@@ -29,10 +29,10 @@ public class Controller {
 		 * "PrestadoresOptanteSimples");
 		 */
 
-		List<String> entidades = Arrays.asList("Guias", "Competencias", "GuiasNotasFiscais", 
+		List<String> entidades = Arrays.asList("GuiasNotasFiscais", 
 				"NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos", "NotasFiscaisEmails", "NotasFiscaisObras",
 				"NotasFiscaisPrestadores", "NotasFiscaisServicos", "NotasFiscaisSubst", "NotasFiscaisTomadores",
-				"NotasFiscaisXml", "NotasFiscais", "Pagamentos", "PrestadoresAtividades", "" + "PrestadoresOptanteSimples");
+				"NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades", "" + "PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais");
 
 		// limpando o banco
 		for (String nomeEntidade : entidades) {

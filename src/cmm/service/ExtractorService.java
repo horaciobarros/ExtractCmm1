@@ -16,6 +16,7 @@ import cmm.dao.GuiasDao;
 import cmm.dao.NotasFiscaisCanceladasDao;
 import cmm.dao.NotasFiscaisDao;
 import cmm.dao.NotasFiscaisEmailsDao;
+import cmm.dao.NotasFiscaisPrestadoresDao;
 import cmm.dao.NotasFiscaisServicosDao;
 import cmm.dao.PrestadoresDao;
 import cmm.dao.TomadoresDao;
@@ -32,6 +33,7 @@ import cmm.model.Guias;
 import cmm.model.NotasFiscais;
 import cmm.model.NotasFiscaisCanceladas;
 import cmm.model.NotasFiscaisEmails;
+import cmm.model.NotasFiscaisPrestadores;
 import cmm.model.NotasFiscaisServicos;
 import cmm.model.Prestadores;
 import cmm.model.Tomadores;
@@ -59,6 +61,7 @@ public class ExtractorService {
 	private NotasFiscaisServicosDao notasFiscaisServicosDao = new NotasFiscaisServicosDao();
 	private NotasFiscaisCanceladasDao notasFiscaisCanceladasDao = new NotasFiscaisCanceladasDao();
 	private NotasFiscaisEmailsDao notasFiscaisEmailsDao = new NotasFiscaisEmailsDao();
+	private NotasFiscaisPrestadoresDao notasFiscaisPrestadoresDao = new NotasFiscaisPrestadoresDao();
 
 	public void processaPlanoConta(List<String> dadosList) {
 		ativaFileLog("plano_conta");
@@ -231,7 +234,6 @@ public class ExtractorService {
 	public void processaDadosGuiaCompetencias(List<String> dadosList) {
 		ativaFileLog("dados_guia");
 		dadosGuiaMap = new HashMap<String, DadosGuia>();
-		Map<String, Competencias> competenciasMap = new HashMap<String, Competencias>();
 		int linhaArquivo = 2;
 
 		for (String linha : dadosList) {
@@ -272,7 +274,7 @@ public class ExtractorService {
 					guias.setNumeroGuia(Long.valueOf(dg.getNossoNumero()));
 					Tomadores t = tomadoresDao.findByInscricaoMunicipal(dg.getInscMunicipal());
 					if (t == null) {
-						fillErrorLog(linha, "Tomador não entrado:" + dg.getInscMunicipal());
+						fillErrorLog(linha, "Tomador não encontrado:" + dg.getInscMunicipal());
 					} else {
 						guias.setPrestadores(t.getPrestadores());
 					}
@@ -635,7 +637,35 @@ public class ExtractorService {
 					}
 
 				}
-				
+
+				// notas-fiscais-cond-pagamentos ??
+
+				// notas-fiscais-obras ??
+
+				// notas-fiscais-prestadores
+				try {
+					NotasFiscaisPrestadores nfp = new NotasFiscaisPrestadores();
+					nfp.setBairro(dlp.getEnderecoBairroPrestador());
+					nfp.setCelular(dlp.getTelefonePrestador());
+					nfp.setCep(dlp.getCepPrestador());
+					nfp.setComplemento(dlp.getEnderecoComplementoPrestador());
+					nfp.setEmail(dlp.getTelefonePrestador());
+					nfp.setEndereco(dlp.getEnderecoPrestador());
+					nfp.setInscricaoPrestador(dlp.getCnpjPrestador());
+					nfp.setNome(dlp.getRazaoSocialPrestador());
+					nfp.setNomeFantasia(dlp.getNomeFantasiaPrestador());
+					nfp.setNotasFiscais(nf);
+					nfp.setNumero(dlp.getEnderecoNumeroPrestador());
+					nfp.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
+					nfp.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
+					nfp.setCep(dlp.getCepPrestador());
+					nfp.setTipoPessoa(util.getTipoPessoa(dlp.getCnpjPrestador()));
+					notasFiscaisPrestadoresDao.save(nfp);
+
+				} catch (Exception e) {
+					fillErrorLog(linha, e);
+					e.printStackTrace();
+				}
 
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
