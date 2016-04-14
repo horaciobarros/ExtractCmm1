@@ -18,6 +18,7 @@ import cmm.dao.NotasFiscaisDao;
 import cmm.dao.NotasFiscaisEmailsDao;
 import cmm.dao.NotasFiscaisPrestadoresDao;
 import cmm.dao.NotasFiscaisServicosDao;
+import cmm.dao.PagamentosDao;
 import cmm.dao.PrestadoresDao;
 import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosCadastro;
@@ -35,6 +36,7 @@ import cmm.model.NotasFiscaisCanceladas;
 import cmm.model.NotasFiscaisEmails;
 import cmm.model.NotasFiscaisPrestadores;
 import cmm.model.NotasFiscaisServicos;
+import cmm.model.Pagamentos;
 import cmm.model.Prestadores;
 import cmm.model.Tomadores;
 import cmm.util.Util;
@@ -62,6 +64,7 @@ public class ExtractorService {
 	private NotasFiscaisCanceladasDao notasFiscaisCanceladasDao = new NotasFiscaisCanceladasDao();
 	private NotasFiscaisEmailsDao notasFiscaisEmailsDao = new NotasFiscaisEmailsDao();
 	private NotasFiscaisPrestadoresDao notasFiscaisPrestadoresDao = new NotasFiscaisPrestadoresDao();
+	private PagamentosDao pagamentosDao = new PagamentosDao();
 
 	public void processaPlanoConta(List<String> dadosList) {
 		ativaFileLog("plano_conta");
@@ -272,17 +275,17 @@ public class ExtractorService {
 					guias.setInscricaoPrestador(dg.getInscMunicipal());
 					guias.setIntegrarGuia("S"); // TODO sanar dúvida
 					guias.setNumeroGuia(Long.valueOf(dg.getNossoNumero()));
-					Tomadores t = tomadoresDao.findByInscricaoMunicipal(dg.getInscMunicipal());
-					if (t == null) {
-						fillErrorLog(linha, "Tomador não encontrado:" + dg.getInscMunicipal());
+					Prestadores prestadores = prestadoresDao.findByInscricao(dg.getCnpj().trim());
+					if (prestadores == null) {
+						fillErrorLog(linha, "Prestador não encontrado:" + dg.getInscMunicipal());
 					} else {
-						guias.setPrestadores(t.getPrestadores());
+						guias.setPrestadores(prestadores);
 					}
 					String situacao = "A";
 					if (dg.getValorPago() != null && dg.getValorPago() != Double.valueOf(0)) {
 						situacao = "P";
 					}
-					if (dg.getDataCancelamento() != null) {
+					if (dg.getDataCancelamento() != null && !dg.getDataCancelamento().isEmpty()) {
 						situacao = "C";
 					}
 					guias.setSituacao(situacao);
@@ -292,6 +295,26 @@ public class ExtractorService {
 					guias.setValorGuia(BigDecimal.valueOf(dg.getValorTotal()));
 					guias.setValorImposto(BigDecimal.valueOf(dg.getImposto()));
 					guiasDao.save(guias);
+
+					// pagamentos
+					if (guias.getSituacao().equals("P")) {
+						try {
+							Pagamentos p = new Pagamentos();
+							p.setDataPagamento(util.getStringToDate(dg.getDataPagamento()));
+							p.setGuias(guias);
+							p.setNumeroGuia(guias.getNumeroGuia());
+							p.setNumeroPagamento(Long.valueOf(dg.getNossoNumero()));
+							p.setTipoPagamento(dg.getBaixaTipo().substring(0, 1));
+							p.setValorCorrecao(BigDecimal.valueOf(dg.getCorrecaoMonetaria()));
+							p.setValorJuro(BigDecimal.valueOf(dg.getJuros()));
+							p.setValorMulta(BigDecimal.valueOf(dg.getMulta()));
+							p.setValorPago(BigDecimal.valueOf(dg.getValorPago()));
+							pagamentosDao.save(p);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
