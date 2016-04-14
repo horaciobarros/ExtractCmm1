@@ -285,7 +285,7 @@ public class ExtractorService {
 					if (dg.getValorPago() != null && dg.getValorPago() != Double.valueOf(0)) {
 						situacao = "P";
 					}
-					if (dg.getDataCancelamento() != null && !dg.getDataCancelamento().isEmpty()) {
+					if (dg.getDataCancelamento() != null && !dg.getDataCancelamento().trim().isEmpty()) {
 						situacao = "C";
 					}
 					guias.setSituacao(situacao);
@@ -299,10 +299,11 @@ public class ExtractorService {
 					// pagamentos
 					if (guias.getSituacao().equals("P")) {
 						try {
+							System.out.println("Gravando pagamentos: " + dg.getValorPago() + " - " + dg.getDataCancelamento());
 							Pagamentos p = new Pagamentos();
 							p.setDataPagamento(util.getStringToDate(dg.getDataPagamento()));
 							p.setGuias(guias);
-							p.setNumeroGuia(guias.getNumeroGuia());
+							p.setNumeroGuia(Long.valueOf(dg.getNossoNumero().trim()));
 							p.setNumeroPagamento(Long.valueOf(dg.getNossoNumero()));
 							p.setTipoPagamento(dg.getBaixaTipo().substring(0, 1));
 							p.setValorCorrecao(BigDecimal.valueOf(dg.getCorrecaoMonetaria()));
@@ -311,6 +312,7 @@ public class ExtractorService {
 							p.setValorPago(BigDecimal.valueOf(dg.getValorPago()));
 							pagamentosDao.save(p);
 						} catch (Exception e) {
+							System.out.println(guias.getNumeroGuia());
 							e.printStackTrace();
 						}
 					}
