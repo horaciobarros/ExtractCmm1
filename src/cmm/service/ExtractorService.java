@@ -299,12 +299,11 @@ public class ExtractorService {
 					// pagamentos
 					if (guias.getSituacao().equals("P")) {
 						try {
-							System.out.println("Gravando pagamentos: " + dg.getValorPago() + " - " + dg.getDataCancelamento());
 							Pagamentos p = new Pagamentos();
 							p.setDataPagamento(util.getStringToDate(dg.getDataPagamento()));
 							p.setGuias(guias);
-							p.setNumeroGuia(Long.valueOf(dg.getNossoNumero().trim()));
-							p.setNumeroPagamento(Long.valueOf(dg.getNossoNumero()));
+							p.setNumeroGuia(Long.valueOf(dg.getParcela()));
+							p.setNumeroPagamento(Long.valueOf(dg.getParcela()));
 							p.setTipoPagamento(dg.getBaixaTipo().substring(0, 1));
 							p.setValorCorrecao(BigDecimal.valueOf(dg.getCorrecaoMonetaria()));
 							p.setValorJuro(BigDecimal.valueOf(dg.getJuros()));
@@ -312,7 +311,7 @@ public class ExtractorService {
 							p.setValorPago(BigDecimal.valueOf(dg.getValorPago()));
 							pagamentosDao.save(p);
 						} catch (Exception e) {
-							System.out.println(guias.getNumeroGuia());
+							System.out.println(dg.getNossoNumero().trim());
 							e.printStackTrace();
 						}
 					}
