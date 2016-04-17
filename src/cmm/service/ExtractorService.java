@@ -453,7 +453,7 @@ public class ExtractorService {
 
 	}
 
-	private String preparaParaSplit(String linha) {
+	public String preparaParaSplit(String linha) {
 		linha = linha.replaceAll("\\|", "#");
 		while (linha.contains("\\|")) {
 			linha = linha.replaceAll("\\|", "#");
@@ -462,9 +462,13 @@ public class ExtractorService {
 		while (linha.contains("##")) {
 			linha = linha.replaceAll("##", "# #");
 		}
-		String ultCarac = linha.substring(linha.length() - 1);
-		if (ultCarac.equals("#")) {
-			linha = linha + " ";
+		try {
+			String ultCarac = linha.substring(linha.length() - 1);
+			if (ultCarac.equals("#")) {
+				linha = linha + " ";
+			}
+		} catch (Exception e) {
+
 		}
 		return linha;
 	}
