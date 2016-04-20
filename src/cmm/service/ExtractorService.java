@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,9 @@ import cmm.dao.NotasFiscaisEmailsDao;
 import cmm.dao.NotasFiscaisPrestadoresDao;
 import cmm.dao.NotasFiscaisServicosDao;
 import cmm.dao.PagamentosDao;
+import cmm.dao.PrestadoresAtividadesDao;
 import cmm.dao.PrestadoresDao;
+import cmm.dao.PrestadoresOptanteSimplesDao;
 import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosCadastro;
 import cmm.entidadesOrigem.DadosCadastroAcesso;
@@ -38,6 +41,8 @@ import cmm.model.NotasFiscaisPrestadores;
 import cmm.model.NotasFiscaisServicos;
 import cmm.model.Pagamentos;
 import cmm.model.Prestadores;
+import cmm.model.PrestadoresAtividades;
+import cmm.model.PrestadoresOptanteSimples;
 import cmm.model.Tomadores;
 import cmm.util.Util;
 
@@ -45,13 +50,6 @@ public class ExtractorService {
 	private File file = null;
 	private FileWriter fw = null;
 	private BufferedWriter bw = null;
-	private Map<Long, PlanoConta> planoContaMap;
-	private Map<Long, DadosContador> dadosContadorMap;
-	private Map<Long, DadosLivroPrestador> dadosLivroPrestadorMap;
-	private Map<Long, DadosLivroTomador> dadosLivroTomadorMap;
-	private Map<String, DadosCadastro> dadosCadastroMap;
-	private Map<String, DadosCadastroAcesso> dadosCadastroAcessoMap;
-	private Map<String, DadosCadastroAtividade> dadosCadastroAtividadeMap;
 	private Map<String, DadosGuia> dadosGuiaMap;
 	private Util util = new Util();
 	private CompetenciasDao competenciasDao = new CompetenciasDao();
@@ -65,11 +63,12 @@ public class ExtractorService {
 	private NotasFiscaisEmailsDao notasFiscaisEmailsDao = new NotasFiscaisEmailsDao();
 	private NotasFiscaisPrestadoresDao notasFiscaisPrestadoresDao = new NotasFiscaisPrestadoresDao();
 	private PagamentosDao pagamentosDao = new PagamentosDao();
+	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
+	private PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
 
 	public void processaPlanoConta(List<String> dadosList) {
 		ativaFileLog("plano_conta");
 
-		planoContaMap = new HashMap<Long, PlanoConta>();
 
 		for (String linha : dadosList) {
 			try {
@@ -88,7 +87,6 @@ public class ExtractorService {
 
 	public void processaDadosContador(List<String> dadosList) {
 		ativaFileLog("dados_contador");
-		dadosContadorMap = new HashMap<Long, DadosContador>();
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
@@ -107,7 +105,6 @@ public class ExtractorService {
 
 	public void processaDadosCadastroAcesso(List<String> dadosList) {
 		ativaFileLog("dados_cadastro_acesso");
-		dadosCadastroAcessoMap = new HashMap<String, DadosCadastroAcesso>();
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
@@ -123,13 +120,29 @@ public class ExtractorService {
 
 	public void processaDadosCadastroAtividade(List<String> dadosList) {
 		ativaFileLog("dados_cadastro_atividade");
-		dadosCadastroAtividadeMap = new HashMap<String, DadosCadastroAtividade>();
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
 				DadosCadastroAtividade dca = new DadosCadastroAtividade(arrayLinha[0], arrayLinha[1], arrayLinha[2],
 						arrayLinha[3], arrayLinha[4], Double.valueOf(arrayLinha[5]), arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12]);
+
+				// atividade prestador{
+				String inscricaoPrestador = dca.getCnpj().trim();
+				Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
+				if (p != null && p.getId() != 0) {
+					try {
+						PrestadoresAtividades pa = new PrestadoresAtividades();
+						pa.setAliquota(BigDecimal.valueOf(dca.getAliquota()));
+						pa.setIcnaes(dca.getAtividadeFederal());
+						pa.setIlistaservicos(dca.getGrupoAtividade());
+						pa.setInscricaoPrestador(dca.getCnpj());
+						pa.setPrestadores(p);
+						prestadoresAtividadesDao.save(pa);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			} catch (Exception e) {
 				fillErrorLog(linha, e);
 			}
@@ -141,7 +154,6 @@ public class ExtractorService {
 
 	public void processaDadosCadastro(List<String> dadosList) {
 		ativaFileLog("dados_cadastro");
-		dadosCadastroMap = new HashMap<String, DadosCadastro>();
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
@@ -168,6 +180,30 @@ public class ExtractorService {
 						p.setInscricaoPrestador(dc.getCnpj());
 
 						prestadoresDao.save(p);
+					}
+
+					// prestadores optantes simples
+					if (dc.getOptanteSimplesNacional().substring(0, 1).equalsIgnoreCase("S")) {
+						try {
+							PrestadoresOptanteSimples pos = new PrestadoresOptanteSimples();
+							String inicioAtividade = dc.getDtInicioAtividade();
+							if (inicioAtividade == null || inicioAtividade.trim().isEmpty()) {
+								inicioAtividade = dc.getDataInclusaoRegistro();
+								
+							}
+							pos.setDataEfeito(util.getStringToDate(inicioAtividade));
+							pos.setDataInicio(pos.getDataEfeito());
+							pos.setInscricaoPrestador(dc.getCnpj());
+							pos.setDescricao(dc.getRegimeTributacao());
+							pos.setMei("N"); // ver com cmm
+							pos.setMotivo("Opção do Contribuinte");
+							pos.setOptante("S");
+							pos.setOrgao("M");
+							pos.setPrestadores(p);
+							prestadoresOptanteSimplesDao.save(pos);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 
 				} catch (Exception e) {
@@ -259,9 +295,9 @@ public class ExtractorService {
 					if (cp == null || cp.getId() == 0) { // acertar datas
 						cp = new Competencias();
 						cp.setDescricao(descricao.trim());
-						cp.setDataInicio(util.getStringToDate(dg.getDataBoleto()));
-						cp.setDataFim(util.getStringToDate(dg.getDataBoleto()));
-						cp.setDataVencimento(util.getStringToDate(dg.getDataBoleto()));
+						cp.setDataInicio(util.getStringToDateHoursMinutes(dg.getDataBoleto()));
+						cp.setDataFim(util.getStringToDateHoursMinutes(dg.getDataBoleto()));
+						cp.setDataVencimento(util.getStringToDateHoursMinutes(dg.getDataBoleto()));
 						competenciasDao.save(cp);
 					}
 				} catch (Exception e) {
@@ -271,7 +307,7 @@ public class ExtractorService {
 				try {
 					Guias guias = new Guias();
 					guias.setCompetencias(cp);
-					guias.setDataVencimento(util.getStringToDate(dg.getDataVencimento()));
+					guias.setDataVencimento(util.getStringToDateHoursMinutes(dg.getDataVencimento()));
 					guias.setInscricaoPrestador(dg.getInscMunicipal());
 					guias.setIntegrarGuia("S"); // TODO sanar dúvida
 					guias.setNumeroGuia(Long.valueOf(dg.getNossoNumero()));
@@ -300,7 +336,7 @@ public class ExtractorService {
 					if (guias.getSituacao().equals("P")) {
 						try {
 							Pagamentos p = new Pagamentos();
-							p.setDataPagamento(util.getStringToDate(dg.getDataPagamento()));
+							p.setDataPagamento(util.getStringToDateHoursMinutes(dg.getDataPagamento()));
 							p.setGuias(guias);
 							p.setNumeroGuia(Long.valueOf(dg.getParcela()));
 							p.setNumeroPagamento(Long.valueOf(dg.getParcela()));
@@ -333,7 +369,6 @@ public class ExtractorService {
 
 	public void processaDadosLivroTomador(List<String> dadosList) {
 		ativaFileLog("dados_livro_tomador");
-		dadosLivroTomadorMap = new HashMap<Long, DadosLivroTomador>();
 		int linhaArquivo = 2;
 
 		for (String linha : dadosList) {
@@ -400,7 +435,6 @@ public class ExtractorService {
 
 	public void processaDadosLivroPrestador(List<String> dadosList) {
 		ativaFileLog("dados_livro_prestador");
-		dadosLivroPrestadorMap = new HashMap<Long, DadosLivroPrestador>();
 		int linhaArquivo = 2;
 
 		for (String linha : dadosList) {
@@ -449,6 +483,7 @@ public class ExtractorService {
 			linhaArquivo++;
 
 		}
+
 		closeFileLog();
 
 	}
@@ -566,7 +601,7 @@ public class ExtractorService {
 				}
 
 				NotasFiscais nf = new NotasFiscais();
-				nf.setDataHoraEmissao(util.getStringToDate(dlp.getDataEmissao()));
+				nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
 				nf.setInscricaoPrestador(dlp.getCnpjPrestador());
 				nf.setInscricaoTomador(dlp.getCnpjTomador());
 				nf.setNaturezaOperacao(dlp.getNaturezaOperacao());
@@ -586,7 +621,7 @@ public class ExtractorService {
 				nf.setValorTotalIss(BigDecimal.valueOf(dlp.getValorIss()));
 				nf.setSituacao(dlp.getStatusNota().trim().substring(0, 1));
 				nf.setSituacaoTributaria(dlp.getRegimeTributacao().trim().substring(0, 1));
-				nf.setDataHoraEmissao(util.getStringToDate(dlp.getDataEmissao()));
+				nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
 				if (dlp.getCodigoVerificacao() != null) {
 					if (dlp.getCodigoVerificacao().length() > 9) {
 						nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim().substring(0, 9));
@@ -638,12 +673,12 @@ public class ExtractorService {
 				if (dlp.getStatusNota().substring(0, 1).equals("C")) {
 					try {
 						NotasFiscaisCanceladas nfc = new NotasFiscaisCanceladas();
-						nfc.setDatahoracancelamento(util.getStringToDate(dlp.getDataCancelamento()));
+						nfc.setDatahoracancelamento(util.getStringToDateHoursMinutes(dlp.getDataCancelamento()));
 						nfc.setInscricaoPrestador(dlp.getCnpjPrestador());
 						nfc.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 						nfc.setMotivo(dlp.getMotivoCancelamento());
 						nfc.setNotasFiscais(nf);
-						notasFiscaisCanceladasDao.save(nfc);
+
 					} catch (Exception e) {
 						fillErrorLog(linha, e);
 						e.printStackTrace();

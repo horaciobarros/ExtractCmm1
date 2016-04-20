@@ -54,12 +54,12 @@ public class Controller {
 		dadosList = lerArquivo("dados_cadastro");
 		extractorService.processaDadosCadastro(dadosList);
 
-		System.out.println("Lendo prestador"); // prestador 
+		System.out.println("Lendo prestador"); // prestador
 		dadosList = lerArquivo("dados_livro_prestador", 64);
 		extractorService.processaDadosLivroPrestador(dadosList);
 
-		System.out.println("Lendo tomador"); 
-		dadosList = lerArquivo("dados_livro_tomador", 66); 
+		System.out.println("Lendo tomador");
+		dadosList = lerArquivo("dados_livro_tomador", 66);
 		extractorService.processaDadosLivroTomador(dadosList);
 
 		// competencias e guias
@@ -71,6 +71,11 @@ public class Controller {
 		System.out.println("Lendo notas fiscais");
 		dadosList = lerArquivo("dados_livro_prestador");
 		extractorService.processaDadosNotasFiscais(dadosList);
+
+		// atividades prestador
+		System.out.println("Lendo atividades prestador");
+		dadosList = lerArquivo("dados_cadastro_atividade");
+		extractorService.processaDadosCadastroAtividade(dadosList);
 
 		System.out.println("--- Fim do processo ---");
 

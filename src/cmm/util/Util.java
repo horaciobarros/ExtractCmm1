@@ -86,8 +86,20 @@ public class Util {
 		return meses[Integer.valueOf(mes) -1];
 	}
 
-	public Date getStringToDate(String data) {
+	public Date getStringToDateHoursMinutes(String data) {
 		DateFormat formatter = new SimpleDateFormat("yyyy-dd-MM hh:mm:ss");
+		try {
+			Date date = (Date)formatter.parse(data);
+			return date;
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public Date getStringToDate(String data) {
+		DateFormat formatter = new SimpleDateFormat("yyyy-dd-MM");
 		try {
 			Date date = (Date)formatter.parse(data);
 			return date;
