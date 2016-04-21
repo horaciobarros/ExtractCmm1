@@ -19,23 +19,16 @@ public class Controller {
 
 	public void importaNfe() {
 
+		int nivelProcessamento = 2;
+
 		System.out.println("Limpando o banco...");
 
-		/*
-		 * List<String> entidades = Arrays.asList("Guias", "Competencias",
-		 * "Tomadores", "Prestadores", "GuiasNotasFiscais", "NotasFiscais",
-		 * "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
-		 * "NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores",
-		 * "NotasFiscaisServicos", "NotasFiscaisSubst", "NotasFiscaisTomadores",
-		 * "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades", "" +
-		 * "PrestadoresOptanteSimples");
-		 */
-
-		List<String> entidades = Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas",
-				"NotasFiscaisCondPagamentos", "NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores",
-				"NotasFiscaisServicos", "NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos",
-				"PrestadoresAtividades", "" + "PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais",
-				"Tomadores", "Prestadores");
+		List<String> entidades;
+		if (nivelProcessamento == 1) {
+			entidades = processaTudo();
+		} else {
+			entidades = processaNivel2();
+		}
 
 		// limpando o banco
 		for (String nomeEntidade : entidades) {
@@ -49,103 +42,78 @@ public class Controller {
 		System.out.println("Leitura de arquivos txt - Início");
 		List<String> dadosList;
 
-		// Ajustando tomadores e prestadores através do dadosCadastro.txt
-		System.out.println("Ajustando contribuintes");
-		dadosList = lerArquivo("dados_cadastro");
-		extractorService.processaDadosCadastro(dadosList);
+		if (nivelProcessamento == 1) {
+			// Ajustando tomadores e prestadores através do dadosCadastro.txt
+			System.out.println("Ajustando contribuintes");
+			dadosList = extractorService.lerArquivo("dados_cadastro");
+			extractorService.processaDadosCadastro(dadosList);
+			System.out.println("--- Fim de ajustes ---");
 
-		System.out.println("Lendo prestador"); // prestador
-		dadosList = lerArquivo("dados_livro_prestador", 64);
-		extractorService.processaDadosLivroPrestador(dadosList);
+			System.out.println("Lendo prestador"); // prestador
+			dadosList = extractorService.lerArquivo("dados_livro_prestador", 64);
+			extractorService.processaDadosLivroPrestador(dadosList);
+			System.out.println("--- Fim de prestador ---");
 
-		System.out.println("Lendo tomador");
-		dadosList = lerArquivo("dados_livro_tomador", 66);
-		extractorService.processaDadosLivroTomador(dadosList);
+			System.out.println("Lendo tomador");
+			dadosList = extractorService.lerArquivo("dados_livro_tomador", 66);
+			extractorService.processaDadosLivroTomador(dadosList);
+			System.out.println("--- Fim de tomador ---");
+		}
 
-		// competencias e guias
-		System.out.println("Lendo competencias e guias");
-		dadosList = lerArquivo("dados_guia");
-		extractorService.processaDadosGuiaCompetencias(dadosList);
+		new Thread() {
+			@Override
+			public void run() {
+				// competencias e guias
+				System.out.println("Lendo competencias e guias");
+				List<String> dadosList;
+				dadosList = extractorService.lerArquivo("dados_guia");
+				extractorService.processaDadosGuiaCompetencias(dadosList);
+				System.out.println("--- Fim de competencias e guias ---");
+			}
+		}.start();
 
-		// notas fiscais
-		System.out.println("Lendo notas fiscais");
-		dadosList = lerArquivo("dados_livro_prestador");
-		extractorService.processaDadosNotasFiscais(dadosList);
+		new Thread() {
+			@Override
+			public void run() {
+				// notas fiscais
+				System.out.println("Lendo notas fiscais");
+				List<String> dadosList;
+				dadosList = extractorService.lerArquivo("dados_livro_prestador");
+				extractorService.processaDadosNotasFiscais(dadosList);
+				System.out.println("--- Fim de notas fiscais ---");
+			}
+		}.start();
 
-		// atividades prestador
-		System.out.println("Lendo atividades prestador");
-		dadosList = lerArquivo("dados_cadastro_atividade");
-		extractorService.processaDadosCadastroAtividade(dadosList);
+		new Thread() {
+			@Override
+			public void run() {
+				List<String> dadosList;
+				// atividades prestador
+				System.out.println("Lendo atividades prestador");
+				dadosList = extractorService.lerArquivo("dados_cadastro_atividade");
+				extractorService.processaDadosCadastroAtividade(dadosList);
+				System.out.println("--- Fim de atividades prestador ---");
+			}
+		}.start();
 
-		System.out.println("--- Fim do processo ---");
+		
+		
 
 	}
 
-	public List<String> lerArquivo(String arquivoIn) {
-		File file;
-		file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
-		try {
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			List<String> dadosList = new ArrayList<String>();
-			try {
-				br.readLine(); // cabeçalho
-				while (br.ready()) {
-					String linha = br.readLine();
-					dadosList.add(linha);
-				}
-				br.close();
-				fr.close();
-				return dadosList;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return null;
+	private List<String> processaTudo() {
+		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
+				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
+				"" + "PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais", "Tomadores", "Prestadores");
 
 	}
 
-	private List<String> lerArquivo(String arquivoIn, int qtdeCampos) {
-		File file, fileWr;
-		file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
-		fileWr = new File("c:/TEMP/lagoa/txts_corrigidos/" + arquivoIn + "_new.txt");
-		try {
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			FileWriter fw = new FileWriter(fileWr);
-			BufferedWriter bw = new BufferedWriter(fw);
-			List<String> dadosList = new ArrayList<String>();
-			try {
-				br.readLine(); // cabeçalho
-				while (br.ready()) {
-					StringBuilder linhaDefinitiva = new StringBuilder();
-					String[] arrayAux = { "", "" };
-
-					while (arrayAux != null && arrayAux.length < qtdeCampos) {
-						String linha = br.readLine();
-						linha = extractorService.preparaParaSplit(linha);
-						linhaDefinitiva.append(linha);
-						arrayAux = linhaDefinitiva.toString().split("#");
-					}
-
-					dadosList.add(linhaDefinitiva.toString());
-					bw.write(linhaDefinitiva.toString() + "\n");
-
-				}
-				br.close();
-				fr.close();
-				bw.close();
-				fw.close();
-				return dadosList;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+	private List<String> processaNivel2() {
+		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
+				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
+				"PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais");
 
 	}
 

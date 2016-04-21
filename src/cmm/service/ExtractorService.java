@@ -1,13 +1,14 @@
 package cmm.service;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,12 +45,10 @@ import cmm.model.Prestadores;
 import cmm.model.PrestadoresAtividades;
 import cmm.model.PrestadoresOptanteSimples;
 import cmm.model.Tomadores;
+import cmm.util.FileLog;
 import cmm.util.Util;
 
 public class ExtractorService {
-	private File file = null;
-	private FileWriter fw = null;
-	private BufferedWriter bw = null;
 	private Map<String, DadosGuia> dadosGuiaMap;
 	private Util util = new Util();
 	private CompetenciasDao competenciasDao = new CompetenciasDao();
@@ -67,7 +66,7 @@ public class ExtractorService {
 	private PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
 
 	public void processaPlanoConta(List<String> dadosList) {
-		ativaFileLog("plano_conta");
+		FileLog log = new FileLog("plano_conta");
 
 
 		for (String linha : dadosList) {
@@ -77,16 +76,16 @@ public class ExtractorService {
 						arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8], arrayLinha[9],
 						arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14]);
 			} catch (Exception e) {
-				fillErrorLog(linha, e);
+				fillErrorLog(linha, e, log.getBw());
 			}
 
 		}
-		closeFileLog();
+		log.close();
 
 	}
 
 	public void processaDadosContador(List<String> dadosList) {
-		ativaFileLog("dados_contador");
+		FileLog log = new FileLog("dados_contador");
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
@@ -95,31 +94,31 @@ public class ExtractorService {
 						arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14],
 						arrayLinha[15], arrayLinha[16], arrayLinha[17], arrayLinha[18], arrayLinha[19]);
 			} catch (Exception e) {
-				fillErrorLog(linha, e);
+				log.fillError(linha, e);
 			}
 
 		}
-		closeFileLog();
+		log.close();
 
 	}
 
 	public void processaDadosCadastroAcesso(List<String> dadosList) {
-		ativaFileLog("dados_cadastro_acesso");
+		FileLog log = new FileLog("dados_cadastro_acesso");
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
 				DadosCadastroAcesso dca = new DadosCadastroAcesso(arrayLinha[0], arrayLinha[1]);
 			} catch (Exception e) {
-				fillErrorLog(linha, e);
+				log.fillError(linha, e);
 			}
 
 		}
-		closeFileLog();
+		log.close();
 
 	}
 
 	public void processaDadosCadastroAtividade(List<String> dadosList) {
-		ativaFileLog("dados_cadastro_atividade");
+		FileLog log = new FileLog("dados_cadastro_atividade");
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
@@ -144,16 +143,16 @@ public class ExtractorService {
 					}
 				}
 			} catch (Exception e) {
-				fillErrorLog(linha, e);
+				log.fillError(linha, e);
 			}
 
 		}
-		closeFileLog();
+		log.close();
 
 	}
 
 	public void processaDadosCadastro(List<String> dadosList) {
-		ativaFileLog("dados_cadastro");
+		FileLog log = new FileLog("dados_cadastro");
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
@@ -262,20 +261,19 @@ public class ExtractorService {
 				}
 
 			} catch (Exception e) {
-				fillErrorLog(linha, e);
+				log.fillError(linha, e);
 			}
 
 		}
-		closeFileLog();
+		log.close();
 
 	}
 
 	public void processaDadosGuiaCompetencias(List<String> dadosList) {
-		ativaFileLog("dados_guia");
-		dadosGuiaMap = new HashMap<String, DadosGuia>();
-		int linhaArquivo = 2;
+		FileLog log = new FileLog("dados_guia");
 
 		for (String linha : dadosList) {
+			
 			try {
 				linha = preparaParaSplit(linha);
 				String[] arrayLinha = linha.split("#");
@@ -288,7 +286,6 @@ public class ExtractorService {
 						Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]), arrayLinha[31], arrayLinha[32],
 						arrayLinha[33], arrayLinha[34], arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38],
 						arrayLinha[39], arrayLinha[40], arrayLinha[41]);
-				dadosGuiaMap.put(dg.getCodigo(), dg);
 				String descricao = util.getNomeMes(dg.getMes()) + "/" + dg.getAno();
 				Competencias cp = competenciasDao.findByDescricao(descricao);
 				try {
@@ -301,6 +298,7 @@ public class ExtractorService {
 						competenciasDao.save(cp);
 					}
 				} catch (Exception e) {
+					log.fillError(linha, e);
 					e.printStackTrace();
 				}
 
@@ -313,7 +311,7 @@ public class ExtractorService {
 					guias.setNumeroGuia(Long.valueOf(dg.getNossoNumero()));
 					Prestadores prestadores = prestadoresDao.findByInscricao(dg.getCnpj().trim());
 					if (prestadores == null) {
-						fillErrorLog(linha, "Prestador não encontrado:" + dg.getInscMunicipal());
+						log.fillError(linha, "Prestador não encontrado:" + dg.getInscMunicipal());
 					} else {
 						guias.setPrestadores(prestadores);
 					}
@@ -349,6 +347,7 @@ public class ExtractorService {
 						} catch (Exception e) {
 							System.out.println(dg.getNossoNumero().trim());
 							e.printStackTrace();
+							log.fillError(linha, e);
 						}
 					}
 
@@ -356,20 +355,19 @@ public class ExtractorService {
 					e.printStackTrace();
 				}
 			} catch (Exception e) {
-				fillErrorLog(linha, e);
+				e.printStackTrace();
+				log.fillError(linha, e);
 			}
-
-			linhaArquivo++;
 
 		}
 
-		closeFileLog();
+		log.close();
 
 	}
 
 	public void processaDadosLivroTomador(List<String> dadosList) {
-		ativaFileLog("dados_livro_tomador");
-		int linhaArquivo = 2;
+		
+		FileLog log = new FileLog("dados_livro_tomador");
 
 		for (String linha : dadosList) {
 			try {
@@ -420,22 +418,22 @@ public class ExtractorService {
 					}
 
 				} catch (Exception e) {
+					log.fillError(linha, e);
 					e.printStackTrace();
 				}
 
 			} catch (Exception e) {
-				fillErrorLog(linha, e);
+				log.fillError(linha, e);
+				e.printStackTrace();
 			}
 
-			linhaArquivo++;
 		}
-		closeFileLog();
+		log.close();
 
 	}
 
 	public void processaDadosLivroPrestador(List<String> dadosList) {
-		ativaFileLog("dados_livro_prestador");
-		int linhaArquivo = 2;
+		FileLog log = new FileLog("dados_livro_prestador");
 
 		for (String linha : dadosList) {
 			try {
@@ -474,17 +472,18 @@ public class ExtractorService {
 					}
 
 				} catch (Exception e) {
+					log.fillError(linha, e);
 					e.printStackTrace();
 				}
 
 			} catch (Exception e) {
-				fillErrorLog(linha, e);
+				log.fillError(linha, e);
+				e.printStackTrace();
 			}
-			linhaArquivo++;
 
 		}
 
-		closeFileLog();
+		log.close();
 
 	}
 
@@ -508,45 +507,12 @@ public class ExtractorService {
 		return linha;
 	}
 
-	private void closeFileLog() {
-		try {
-			bw.write(" -- fim de arquivo -- \n");
-			bw.close();
-			fw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
-	}
-
-	private void ativaFileLog(String fileLog) {
-		file = new File("c:/TEMP/lagoa/zzz_" + fileLog + "_err.txt");
-		try {
-			fw = new FileWriter(file);
-			bw = new BufferedWriter(fw);
-			bw.write("-- Arquivo " + fileLog + " - inicio \n");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private void fillErrorLog(String linha, Exception e) {
+	private void fillErrorLog(String linha, Exception e, BufferedWriter bw) {
 		String linhaAux = linha.replaceAll("#", "|");
 		try {
-			bw.write("erro --> " + e + " conteudo da linha:" + linhaAux + "\n");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
-	}
-
-	private void fillErrorLog(String linha, String msg) {
-		String linhaAux = linha.replaceAll("#", "|");
-		try {
-			bw.write("erro --> " + " msg:" + linhaAux + "\n");
-		} catch (IOException e1) {
+			bw.write("erro --> " + " conteudo da linha:" + linhaAux + "\n" + e);
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 
@@ -558,8 +524,7 @@ public class ExtractorService {
 	}
 
 	public void processaDadosNotasFiscais(List<String> dadosList) {
-		ativaFileLog("dados_livro_prestador_notas_fiscais");
-		int linhaArquivo = 2;
+		FileLog log = new FileLog("dados_livro_prestador_notas_fiscais");
 
 		for (String linha : dadosList) {
 			try {
@@ -665,7 +630,7 @@ public class ExtractorService {
 					nfs.setValorUnitario(BigDecimal.valueOf(dlp.getValorServico()));
 					notasFiscaisServicosDao.save(nfs);
 				} catch (Exception e) {
-					fillErrorLog(linha, e);
+					log.fillError(linha, e);
 					e.printStackTrace();
 				}
 
@@ -680,7 +645,7 @@ public class ExtractorService {
 						nfc.setNotasFiscais(nf);
 
 					} catch (Exception e) {
-						fillErrorLog(linha, e);
+						log.fillError(linha, e);
 						e.printStackTrace();
 					}
 				}
@@ -695,7 +660,7 @@ public class ExtractorService {
 						nfe.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 						notasFiscaisEmailsDao.save(nfe);
 					} catch (Exception e) {
-						fillErrorLog(linha, e);
+						log.fillError(linha, e);
 						e.printStackTrace();
 					}
 
@@ -726,18 +691,86 @@ public class ExtractorService {
 					notasFiscaisPrestadoresDao.save(nfp);
 
 				} catch (Exception e) {
-					fillErrorLog(linha, e);
+					log.fillError(linha, e);
 					e.printStackTrace();
 				}
 
 			} catch (Exception e) {
-				fillErrorLog(linha, e);
+				log.fillError(linha, e);
 			}
-			linhaArquivo++;
 
 		}
-		closeFileLog();
+		log.close();
 
 	}
+	
+	public List<String> lerArquivo(String arquivoIn) {
+		File file;
+		file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
+		try {
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			List<String> dadosList = new ArrayList<String>();
+			try {
+				br.readLine(); // cabeçalho
+				while (br.ready()) {
+					String linha = br.readLine();
+					dadosList.add(linha);
+				}
+				br.close();
+				fr.close();
+				return dadosList;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+	public List<String> lerArquivo(String arquivoIn, int qtdeCampos) {
+		File file, fileWr;
+		file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
+		fileWr = new File("c:/TEMP/lagoa/txts_corrigidos/" + arquivoIn + "_new.txt");
+		try {
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			FileWriter fw = new FileWriter(fileWr);
+			BufferedWriter bw = new BufferedWriter(fw);
+			List<String> dadosList = new ArrayList<String>();
+			try {
+				br.readLine(); // cabeçalho
+				while (br.ready()) {
+					StringBuilder linhaDefinitiva = new StringBuilder();
+					String[] arrayAux = { "", "" };
+
+					while (arrayAux != null && arrayAux.length < qtdeCampos) {
+						String linha = br.readLine();
+						linha = preparaParaSplit(linha);
+						linhaDefinitiva.append(linha);
+						arrayAux = linhaDefinitiva.toString().split("#");
+					}
+
+					dadosList.add(linhaDefinitiva.toString());
+					bw.write(linhaDefinitiva.toString() + "\n");
+
+				}
+				br.close();
+				fr.close();
+				bw.close();
+				fw.close();
+				return dadosList;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
 
 }
