@@ -34,7 +34,7 @@ public class NotasFiscaisCanceladasDao {
 		Transaction tx = session.beginTransaction();
 		Query query = sessionFactory
 				.openSession()
-				.createQuery("from NotasFiscaisCanceladas c where hash is null");
+				.createQuery("from NotasFiscaisCanceladas c where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<NotasFiscaisCanceladas> lista = query.list();
 		tx.commit();
 
@@ -52,7 +52,7 @@ public class NotasFiscaisCanceladasDao {
 		
 		String sql = builder.toString();
 		sql = sql.toString().substring(0,sql.length()-4);
-		Query query = session.createQuery(sql).setFirstResult(0).setMaxResults(1000);;
+		Query query = session.createQuery(sql);
 		query.executeUpdate();
 		tx.commit();
 	}

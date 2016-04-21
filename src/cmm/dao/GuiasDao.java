@@ -34,7 +34,7 @@ public class GuiasDao {
 		Transaction tx = session.beginTransaction();
 		Query query = sessionFactory
 				.openSession()
-				.createQuery("from Guias c where hash is null");
+				.createQuery("from Guias c where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<Guias> lista = query.list();
 		tx.commit();
 

@@ -34,7 +34,7 @@ public class NotasFiscaisPrestadoresDao {
 		Transaction tx = session.beginTransaction();
 		Query query = sessionFactory
 				.openSession()
-				.createQuery("from NotasFiscaisPrestadores c where hash is null");
+				.createQuery("from NotasFiscaisPrestadores c where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<NotasFiscaisPrestadores> lista = query.list();
 		tx.commit();
 
