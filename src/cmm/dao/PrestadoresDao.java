@@ -55,7 +55,7 @@ public class PrestadoresDao {
 		Transaction tx = session.beginTransaction();
 		Query query = sessionFactory
 				.openSession()
-				.createQuery("from Prestadores p where hash is null");
+				.createQuery("from Prestadores p where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<Prestadores> lista = query.list();
 		tx.commit();
 
@@ -73,7 +73,7 @@ public class PrestadoresDao {
 		
 		String sql = builder.toString();
 		sql = sql.toString().substring(0,sql.length()-4);
-		Query query = session.createQuery(sql).setFirstResult(0).setMaxResults(1000);
+		Query query = session.createQuery(sql);
 		query.executeUpdate();
 		tx.commit();
 	}
