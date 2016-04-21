@@ -14,12 +14,9 @@ public class PrestadoresOptanteSimplesDao {
 
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
-	Session session;
 
 	public PrestadoresOptanteSimplesDao() {
-
 		sessionFactory = HibernateUtil.getSessionFactory();
-		session = sessionFactory.openSession();
 	}
 
 	public void save(PrestadoresOptanteSimples pos) {
@@ -31,17 +28,18 @@ public class PrestadoresOptanteSimplesDao {
 	}
 
 	public List<PrestadoresOptanteSimples> findNaoEnviados() {
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = sessionFactory
-				.openSession()
+		Query query = session
 				.createQuery("from PrestadoresOptanteSimples pos where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<PrestadoresOptanteSimples> lista = query.list();
-		tx.commit();
+		tx.commit();session.close();
 
 		return lista;
 	}
 	
 	public void saveHash(List<PrestadoresOptanteSimples> listaAtualizados, String hash){
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
 		builder.append("update PrestadoresOptanteSimples set hash = '"+hash+"' where ");
@@ -54,7 +52,7 @@ public class PrestadoresOptanteSimplesDao {
 		sql = sql.toString().substring(0,sql.length()-4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();
+		tx.commit();session.close();
 	}
 
 }

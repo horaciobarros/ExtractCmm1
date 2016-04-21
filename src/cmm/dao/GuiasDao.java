@@ -14,12 +14,9 @@ public class GuiasDao {
 
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
-	Session session;
 
 	public GuiasDao() {
-
 		sessionFactory = HibernateUtil.getSessionFactory();
-		session = sessionFactory.openSession();
 	}
 
 	public void save(Guias g) {
@@ -31,17 +28,18 @@ public class GuiasDao {
 	}
 	
 	public List<Guias> findNaoEnviados() {
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = sessionFactory
-				.openSession()
+		Query query = session
 				.createQuery("from Guias c where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<Guias> lista = query.list();
-		tx.commit();
+		tx.commit();session.close();
 
 		return lista;
 	}
 
 	public void saveHash(List<Guias> listaAtualizados, String hash){
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
 		builder.append("update Guias set hash = '"+hash+"' where ");
@@ -54,7 +52,7 @@ public class GuiasDao {
 		sql = sql.toString().substring(0,sql.length()-4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();
+		tx.commit();session.close();
 	}
 	
 }

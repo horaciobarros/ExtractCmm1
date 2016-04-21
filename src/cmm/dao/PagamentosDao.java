@@ -14,12 +14,9 @@ public class PagamentosDao {
 
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
-	Session session;
 
 	public PagamentosDao() {
-
 		sessionFactory = HibernateUtil.getSessionFactory();
-		session = sessionFactory.openSession();
 	}
 
 	public void save(Pagamentos p) {
@@ -31,17 +28,18 @@ public class PagamentosDao {
 	}
 	
 	public List<Pagamentos> findNaoEnviados() {
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = sessionFactory
-				.openSession()
+		Query query = session
 				.createQuery("from Pagamentos c where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<Pagamentos> lista = query.list();
-		tx.commit();
+		tx.commit();session.close();
 
 		return lista;
 	}
 
 	public void saveHash(List<Pagamentos> listaAtualizados, String hash){
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
 		builder.append("update Pagamentos set hash = '"+hash+"' where ");
@@ -54,7 +52,7 @@ public class PagamentosDao {
 		sql = sql.toString().substring(0,sql.length()-4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();
+		tx.commit();session.close();
 	}
 
 }

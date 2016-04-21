@@ -14,12 +14,9 @@ public class TomadoresDao {
 
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
-	Session session;
 
 	public TomadoresDao() {
-
 		sessionFactory = HibernateUtil.getSessionFactory();
-		session = sessionFactory.openSession();
 	}
 
 	public Tomadores findByInscricao(String inscricao) {
@@ -80,17 +77,18 @@ public class TomadoresDao {
 	}
 	
 	public List<Tomadores> findNaoEnviados() {
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = sessionFactory
-				.openSession()
+		Query query = session
 				.createQuery("from Tomadores c where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<Tomadores> lista = query.list();
-		tx.commit();
+		tx.commit();session.close();
 
 		return lista;
 	}
 
 	public void saveHash(List<Tomadores> listaAtualizados, String hash){
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
 		builder.append("update Tomadores set hash = '"+hash+"' where ");
@@ -103,6 +101,6 @@ public class TomadoresDao {
 		sql = sql.toString().substring(0,sql.length()-4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();
+		tx.commit();session.close();
 	}
 }

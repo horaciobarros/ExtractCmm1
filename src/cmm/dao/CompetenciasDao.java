@@ -14,12 +14,9 @@ public class CompetenciasDao {
 
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
-	Session session;
-
+	
 	public CompetenciasDao() {
-
 		sessionFactory = HibernateUtil.getSessionFactory();
-		session = sessionFactory.openSession();
 	}
 
 	public Competencias findByDescricao(String descricao) {
@@ -47,17 +44,18 @@ public class CompetenciasDao {
 	}
 	
 	public List<Competencias> findNaoEnviados() {
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = sessionFactory
-				.openSession()
-				.createQuery("from Competencias c where hash is null").setFirstResult(0).setMaxResults(1);;
+		Query query = session
+				.createQuery("from Competencias c where hash is null").setFirstResult(0).setMaxResults(1000);;
 		List<Competencias> lista = query.list();
-		tx.commit();
+		tx.commit();session.close();
 
 		return lista;
 	}
 
 	public void saveHash(List<Competencias> listaAtualizados, String hash){
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
 		builder.append("update Competencias set hash = '"+hash+"' where ");
@@ -70,6 +68,6 @@ public class CompetenciasDao {
 		sql = sql.toString().substring(0,sql.length()-4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();
+		tx.commit();session.close();
 	}
 }

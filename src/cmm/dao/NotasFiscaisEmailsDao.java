@@ -14,12 +14,9 @@ public class NotasFiscaisEmailsDao {
 	
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
-	Session session;
 	
 	public NotasFiscaisEmailsDao() {
-
 		sessionFactory = HibernateUtil.getSessionFactory();
-		session = sessionFactory.openSession();
 	}
 	
 	public void save(NotasFiscaisEmails nfe) {
@@ -31,17 +28,18 @@ public class NotasFiscaisEmailsDao {
 	}
 	
 	public List<NotasFiscaisEmails> findNaoEnviados() {
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = sessionFactory
-				.openSession()
+		Query query = session
 				.createQuery("from NotasFiscaisEmails c where hash is null").setFirstResult(0).setMaxResults(1500);
 		List<NotasFiscaisEmails> lista = query.list();
-		tx.commit();
+		tx.commit();session.close();
 
 		return lista;
 	}
 
 	public void saveHash(List<NotasFiscaisEmails> listaAtualizados, String hash){
+		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
 		builder.append("update NotasFiscaisEmails set hash = '"+hash+"' where ");
@@ -54,7 +52,7 @@ public class NotasFiscaisEmailsDao {
 		sql = sql.toString().substring(0,sql.length()-4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();
+		tx.commit();session.close();
 	}
 
 }
