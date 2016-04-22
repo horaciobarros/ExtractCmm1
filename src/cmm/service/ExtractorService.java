@@ -262,6 +262,7 @@ public class ExtractorService {
 
 			} catch (Exception e) {
 				log.fillError(linha, e);
+				e.printStackTrace();
 			}
 
 		}
@@ -292,9 +293,9 @@ public class ExtractorService {
 					if (cp == null || cp.getId() == 0) { // acertar datas
 						cp = new Competencias();
 						cp.setDescricao(descricao.trim());
-						cp.setDataInicio(util.getStringToDateHoursMinutes(dg.getDataBoleto()));
-						cp.setDataFim(util.getStringToDateHoursMinutes(dg.getDataBoleto()));
-						cp.setDataVencimento(util.getStringToDateHoursMinutes(dg.getDataBoleto()));
+						cp.setDataInicio(util.getFirstDayOfMonth(dg.getAno(), dg.getMes()));
+						cp.setDataFim(util.getLastDayOfMonth(dg.getAno(), dg.getMes()));
+						cp.setDataVencimento(cp.getDataFim());
 						competenciasDao.save(cp);
 					}
 				} catch (Exception e) {
@@ -697,6 +698,7 @@ public class ExtractorService {
 
 			} catch (Exception e) {
 				log.fillError(linha, e);
+				e.printStackTrace();
 			}
 
 		}
