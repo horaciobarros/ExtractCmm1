@@ -68,7 +68,6 @@ public class ExtractorService {
 	public void processaPlanoConta(List<String> dadosList) {
 		FileLog log = new FileLog("plano_conta");
 
-
 		for (String linha : dadosList) {
 			try {
 				String[] arrayLinha = linha.split("\\|");
@@ -188,7 +187,7 @@ public class ExtractorService {
 							String inicioAtividade = dc.getDtInicioAtividade();
 							if (inicioAtividade == null || inicioAtividade.trim().isEmpty()) {
 								inicioAtividade = dc.getDataInclusaoRegistro();
-								
+
 							}
 							pos.setDataEfeito(util.getStringToDate(inicioAtividade));
 							pos.setDataInicio(pos.getDataEfeito());
@@ -274,7 +273,7 @@ public class ExtractorService {
 		FileLog log = new FileLog("dados_guia");
 
 		for (String linha : dadosList) {
-			
+
 			try {
 				linha = preparaParaSplit(linha);
 				String[] arrayLinha = linha.split("#");
@@ -367,7 +366,7 @@ public class ExtractorService {
 	}
 
 	public void processaDadosLivroTomador(List<String> dadosList) {
-		
+
 		FileLog log = new FileLog("dados_livro_tomador");
 
 		for (String linha : dadosList) {
@@ -416,6 +415,18 @@ public class ExtractorService {
 						t.setPrestadores(p);
 						t.setTipoPessoa(util.getTipoPessoa(dlt.getCnpjTomador().trim()));
 						tomadoresDao.save(t);
+					} else { // registro já existe, atualizar informações não
+								// preenchidas
+						if (t.getInscricaoEstadual() == null || t.getInscricaoEstadual().isEmpty()) {
+							t.setInscricaoEstadual(dlt.getInscricaoEstadualTomador());
+						}
+						if (t.getNomeFantasia() == null || t.getNomeFantasia().isEmpty()) {
+							t.setNomeFantasia(dlt.getNomeFantasiaTomador());
+						}
+						
+
+						tomadoresDao.update(t);
+
 					}
 
 				} catch (Exception e) {
@@ -470,6 +481,25 @@ public class ExtractorService {
 						p.setInscricaoPrestador(inscricaoPrestador.trim());
 						p.setTelefone(dlp.getTelefonePrestador());
 						prestadoresDao.save(p);
+					} else { // preencher campos vazios
+
+						if (p.getCelular() == null || p.getCelular().isEmpty()) {
+							p.setCelular(dlp.getTelefonePrestador());
+						}
+
+						if (p.getTelefone() == null || p.getTelefone().isEmpty()) {
+							p.setTelefone(dlp.getTelefonePrestador());
+						}
+						
+						if (p.getEmail() == null || p.getEmail().isEmpty()) {
+							p.setEmail(dlp.getEmailPrestador());
+						} else {
+							if (!p.getEmail().contains("@")) {
+								p.setEmail(dlp.getEmailPrestador());
+							}
+						}
+						
+
 					}
 
 				} catch (Exception e) {
@@ -507,7 +537,6 @@ public class ExtractorService {
 		}
 		return linha;
 	}
-
 
 	private void fillErrorLog(String linha, Exception e, BufferedWriter bw) {
 		String linhaAux = linha.replaceAll("#", "|");
@@ -586,7 +615,7 @@ public class ExtractorService {
 				nf.setValorTotalServico(BigDecimal.valueOf(dlp.getValorTotalNfse()));
 				nf.setValorTotalIss(BigDecimal.valueOf(dlp.getValorIss()));
 				nf.setSituacao(dlp.getStatusNota().trim().substring(0, 1));
-				nf.setSituacaoTributaria(dlp.getRegimeTributacao().trim().substring(0, 1));
+				nf.setSituacaoTributaria(util.getSituacaoTributaria(dlp));
 				nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
 				if (dlp.getCodigoVerificacao() != null) {
 					if (dlp.getCodigoVerificacao().length() > 9) {
@@ -594,6 +623,8 @@ public class ExtractorService {
 					} else {
 						nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim());
 					}
+				} else {
+					nf.setNumeroVerificacao("000000000");
 				}
 				nf.setNaturezaOperacao("1"); // TODO resolver
 				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
@@ -678,7 +709,7 @@ public class ExtractorService {
 					nfp.setCelular(dlp.getTelefonePrestador());
 					nfp.setCep(dlp.getCepPrestador());
 					nfp.setComplemento(dlp.getEnderecoComplementoPrestador());
-					nfp.setEmail(dlp.getTelefonePrestador());
+					nfp.setEmail(dlp.getEmailPrestador());
 					nfp.setEndereco(dlp.getEnderecoPrestador());
 					nfp.setInscricaoPrestador(dlp.getCnpjPrestador());
 					nfp.setNome(dlp.getRazaoSocialPrestador());
@@ -705,7 +736,7 @@ public class ExtractorService {
 		log.close();
 
 	}
-	
+
 	public List<String> lerArquivo(String arquivoIn) {
 		File file;
 		file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
@@ -773,6 +804,5 @@ public class ExtractorService {
 		return null;
 
 	}
-
 
 }

@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import cmm.entidadesOrigem.DadosLivroPrestador;
+
 public class Util {
 
 	public String CODIGO_IBGE = "3137205";
@@ -147,6 +149,20 @@ public class Util {
 		calendar.set(Calendar.MONTH, (Integer.valueOf(mes) - 1));
 		calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
 		return calendar.getTime();
+	}
+
+	public String getSituacaoTributaria(DadosLivroPrestador dlp) {
+		try {
+			if (dlp.getTipoRetencao().substring(0, 1).equals("R")) {
+				return "R";
+			} else {
+				return "N";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "N";
+			
+		}
 	}
 
 }
