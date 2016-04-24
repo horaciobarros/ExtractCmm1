@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,12 +30,11 @@ public class MainTest {
 
 
 	private List<String> lerArquivo(String arquivoIn, int qtdeCampos) {
-		File file, fileWr;
-		file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
+		File fileWr;
 		fileWr = new File("c:/TEMP/lagoa/txts_corrigidos/" + arquivoIn + "_new.txt");
 		try {
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
+			URL url = new URL("c:/TEMP/lagoa/" + arquivoIn + ".txt");
+			BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
 			FileWriter fw = new FileWriter(fileWr);
 			BufferedWriter bw = new BufferedWriter(fw);
 			List<String> dadosList = new ArrayList<String>();
@@ -55,7 +56,6 @@ public class MainTest {
 
 				}
 				br.close();
-				fr.close();
 				bw.close();
 				fw.close();
 				return dadosList;

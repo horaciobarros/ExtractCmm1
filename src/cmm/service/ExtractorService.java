@@ -306,7 +306,7 @@ public class ExtractorService {
 					Guias guias = new Guias();
 					guias.setCompetencias(cp);
 					guias.setDataVencimento(util.getStringToDateHoursMinutes(dg.getDataVencimento()));
-					guias.setInscricaoPrestador(dg.getInscMunicipal());
+					guias.setInscricaoPrestador(dg.getCnpj());
 					guias.setIntegrarGuia("S"); // TODO sanar dúvida
 					guias.setNumeroGuia(Long.valueOf(dg.getNossoNumero()));
 					Prestadores prestadores = prestadoresDao.findByInscricao(dg.getCnpj().trim());
@@ -324,7 +324,9 @@ public class ExtractorService {
 					}
 					guias.setSituacao(situacao);
 
-					guias.setTipo(dg.getTipoGuia().substring(0, 1));
+					guias.setTipo(dg.getTipoGuia().substring(5, 6));
+					
+					
 					guias.setValorDesconto(BigDecimal.valueOf(0.00));
 					guias.setValorGuia(BigDecimal.valueOf(dg.getValorTotal()));
 					guias.setValorImposto(BigDecimal.valueOf(dg.getImposto()));
@@ -338,7 +340,7 @@ public class ExtractorService {
 							p.setGuias(guias);
 							p.setNumeroGuia(Long.valueOf(dg.getParcela()));
 							p.setNumeroPagamento(Long.valueOf(dg.getParcela()));
-							p.setTipoPagamento(dg.getBaixaTipo().substring(0, 1));
+							p.setTipoPagamento("N");
 							p.setValorCorrecao(BigDecimal.valueOf(dg.getCorrecaoMonetaria()));
 							p.setValorJuro(BigDecimal.valueOf(dg.getJuros()));
 							p.setValorMulta(BigDecimal.valueOf(dg.getMulta()));
@@ -675,6 +677,7 @@ public class ExtractorService {
 						nfc.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 						nfc.setMotivo(dlp.getMotivoCancelamento());
 						nfc.setNotasFiscais(nf);
+						notasFiscaisCanceladasDao.save(nfc);
 
 					} catch (Exception e) {
 						log.fillError(linha, e);
