@@ -11,13 +11,15 @@ public class Controller {
 
 	public void importaNfe() {
 
-		int nivelProcessamento = 1;
+		int nivelProcessamento = 3;
 
 		System.out.println("Limpando o banco...");
 
 		List<String> entidades;
 		if (nivelProcessamento == 1) {
 			entidades = processaTudo();
+		} else if (nivelProcessamento == 3) {
+			entidades = processaNivel3();
 		} else {
 			entidades = processaNivel2();
 		}
@@ -31,11 +33,11 @@ public class Controller {
 			}
 		}
 
-		System.out.println("Leitura de arquivos txt - Início");
+		System.out.println("Leitura de arquivos txt - Inï¿½cio");
 		List<String> dadosList;
 
 		if (nivelProcessamento == 1) {
-			// Ajustando tomadores e prestadores através do dadosCadastro.txt
+			// Ajustando tomadores e prestadores atravï¿½s do dadosCadastro.txt
 			System.out.println("Ajustando contribuintes");
 			dadosList = extractorService.lerArquivo("dados_cadastro");
 			extractorService.processaDadosCadastro(dadosList);
@@ -52,17 +54,31 @@ public class Controller {
 			System.out.println("--- Fim de tomador ---");
 		}
 
-		new Thread() {
-			@Override
-			public void run() {
-				// competencias e guias
-				System.out.println("Lendo competencias e guias");
-				List<String> dadosList;
-				dadosList = extractorService.lerArquivo("dados_guia");
-				extractorService.processaDadosGuiaCompetencias(dadosList);
-				System.out.println("--- Fim de competencias e guias ---");
-			}
-		}.start();
+		if (nivelProcessamento == 1 || nivelProcessamento == 2) {
+			new Thread() {
+				@Override
+				public void run() {
+					// competencias e guias
+					System.out.println("Lendo competencias e guias");
+					List<String> dadosList;
+					dadosList = extractorService.lerArquivo("dados_guia");
+					extractorService.processaDadosGuiaCompetencias(dadosList);
+					System.out.println("--- Fim de competencias e guias ---");
+				}
+			}.start();
+
+			new Thread() {
+				@Override
+				public void run() {
+					List<String> dadosList;
+					// atividades prestador
+					System.out.println("Lendo atividades prestador");
+					dadosList = extractorService.lerArquivo("dados_cadastro_atividade");
+					extractorService.processaDadosCadastroAtividade(dadosList);
+					System.out.println("--- Fim de atividades prestador ---");
+				}
+			}.start();
+		}
 
 		new Thread() {
 			@Override
@@ -76,21 +92,12 @@ public class Controller {
 			}
 		}.start();
 
-		new Thread() {
-			@Override
-			public void run() {
-				List<String> dadosList;
-				// atividades prestador
-				System.out.println("Lendo atividades prestador");
-				dadosList = extractorService.lerArquivo("dados_cadastro_atividade");
-				extractorService.processaDadosCadastroAtividade(dadosList);
-				System.out.println("--- Fim de atividades prestador ---");
-			}
-		}.start();
+	}
 
-		
-		
-
+	private List<String> processaNivel3() {
+		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
+				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais");
 	}
 
 	private List<String> processaTudo() {
