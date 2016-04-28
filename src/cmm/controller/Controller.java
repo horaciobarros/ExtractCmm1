@@ -5,6 +5,11 @@ import java.util.List;
 
 import cmm.service.ExtractorService;
 
+/**
+ * 
+ * @author jway
+ *
+ */
 public class Controller {
 
 	private ExtractorService extractorService = new ExtractorService();
@@ -17,11 +22,11 @@ public class Controller {
 
 		List<String> entidades;
 		if (nivelProcessamento == 1) {
-			entidades = processaTudo();
+			entidades = excluiParaProcessarTudo();
 		} else if (nivelProcessamento == 3) {
-			entidades = processaNivel3();
+			entidades = excluiParaProcessarNivel3();
 		} else {
-			entidades = processaNivel2();
+			entidades = excluiParaProcessarNivel2();
 		}
 
 		// limpando o banco
@@ -94,13 +99,13 @@ public class Controller {
 
 	}
 
-	private List<String> processaNivel3() {
+	private List<String> excluiParaProcessarNivel3() {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
 				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais");
 	}
 
-	private List<String> processaTudo() {
+	private List<String> excluiParaProcessarTudo() {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
 				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
@@ -108,7 +113,7 @@ public class Controller {
 
 	}
 
-	private List<String> processaNivel2() {
+	private List<String> excluiParaProcessarNivel2() {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
 				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",

@@ -26,33 +26,49 @@ public class GuiasDao {
 		session.beginTransaction().commit();
 		session.close();
 	}
-	
+
 	public List<Guias> findNaoEnviados() {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = session
-				.createQuery("from Guias c where hash is null").setFirstResult(0).setMaxResults(1000);
+		Query query = session.createQuery("from Guias c where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<Guias> lista = query.list();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 
 		return lista;
 	}
 
-	public void saveHash(List<Guias> listaAtualizados, String hash){
+	public void saveHash(List<Guias> listaAtualizados, String hash) {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
-		builder.append("update Guias set hash = '"+hash+"' where ");
-		
-		for (Guias c : listaAtualizados){
-			builder.append("id = "+c.getId()+" or ");
+		builder.append("update Guias set hash = '" + hash + "' where ");
+
+		for (Guias c : listaAtualizados) {
+			builder.append("id = " + c.getId() + " or ");
 		}
-		
+
 		String sql = builder.toString();
-		sql = sql.toString().substring(0,sql.length()-4);
+		sql = sql.toString().substring(0, sql.length() - 4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 	}
-	
+
+	public Guias findByNumeroGuia(String nossoNumero) {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session.createQuery("from Guias c where numeroGuia = '" + nossoNumero.trim() + "'");
+		List<Guias> lista = query.list();
+		tx.commit();
+		session.close();
+
+		if (lista.size() > 0) {
+			return lista.get(0);
+		} else {
+			return null;
+		}
+	}
+
 }
