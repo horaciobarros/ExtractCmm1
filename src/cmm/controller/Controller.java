@@ -1,6 +1,5 @@
 package cmm.controller;
 
-import java.util.Arrays;
 import java.util.List;
 
 import cmm.service.ExtractorService;
@@ -22,11 +21,11 @@ public class Controller {
 
 		List<String> entidades;
 		if (nivelProcessamento == 1) {
-			entidades = excluiParaProcessarTudo();
+			entidades = extractorService.excluiParaProcessarTudo();
 		} else if (nivelProcessamento == 3) {
-			entidades = excluiParaProcessarNivel3();
+			entidades = extractorService.excluiParaProcessarNivel3();
 		} else {
-			entidades = excluiParaProcessarNivel2();
+			entidades = extractorService.excluiParaProcessarNivel2();
 		}
 
 		// limpando o banco
@@ -38,7 +37,7 @@ public class Controller {
 			}
 		}
 
-		System.out.println("Leitura de arquivos txt - In�cio");
+		System.out.println("Leitura de arquivos txt - Início");
 		List<String> dadosList;
 
 		if (nivelProcessamento == 1) {
@@ -60,65 +59,25 @@ public class Controller {
 		}
 
 		if (nivelProcessamento == 1 || nivelProcessamento == 2) {
-			new Thread() {
-				@Override
-				public void run() {
-					// competencias e guias
-					System.out.println("Lendo competencias e guias");
-					List<String> dadosList;
-					dadosList = extractorService.lerArquivo("dados_guia");
-					extractorService.processaDadosGuiaCompetencias(dadosList);
-					System.out.println("--- Fim de competencias e guias ---");
-				}
-			}.start();
+			// competencias e guias
+			System.out.println("Lendo competencias e guias");
+			dadosList = extractorService.lerArquivo("dados_guia");
+			extractorService.processaDadosGuiaCompetencias(dadosList);
+			System.out.println("--- Fim de competencias e guias ---");
 
-			new Thread() {
-				@Override
-				public void run() {
-					List<String> dadosList;
-					// atividades prestador
-					System.out.println("Lendo atividades prestador");
-					dadosList = extractorService.lerArquivo("dados_cadastro_atividade");
-					extractorService.processaDadosCadastroAtividade(dadosList);
-					System.out.println("--- Fim de atividades prestador ---");
-				}
-			}.start();
+			// atividades prestador
+			System.out.println("Lendo atividades prestador");
+			dadosList = extractorService.lerArquivo("dados_cadastro_atividade");
+			extractorService.processaDadosCadastroAtividade(dadosList);
+			System.out.println("--- Fim de atividades prestador ---");
+
 		}
 
-		new Thread() {
-			@Override
-			public void run() {
-				// notas fiscais
-				System.out.println("Lendo notas fiscais");
-				List<String> dadosList;
-				dadosList = extractorService.lerArquivo("dados_livro_prestador", 64);
-				extractorService.processaDadosNotasFiscais(dadosList);
-				System.out.println("--- Fim de notas fiscais ---");
-			}
-		}.start();
-
-	}
-
-	private List<String> excluiParaProcessarNivel3() {
-		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
-				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
-				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais");
-	}
-
-	private List<String> excluiParaProcessarTudo() {
-		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
-				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
-				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
-				"" + "PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais", "Tomadores", "Prestadores");
-
-	}
-
-	private List<String> excluiParaProcessarNivel2() {
-		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
-				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
-				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
-				"PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais");
-
+		// notas fiscais
+		System.out.println("Lendo notas fiscais");
+		dadosList = extractorService.lerArquivo("dados_livro_prestador", 64);
+		extractorService.processaDadosNotasFiscais(dadosList);
+		System.out.println("--- Fim de notas fiscais ---");
 	}
 
 }

@@ -647,112 +647,7 @@ public class ExtractorService {
 
 				notasFiscaisDao.save(nf);
 
-				// -- servi�os
-				try {
-
-					NotasFiscaisServicos nfs = new NotasFiscaisServicos();
-					nfs.setInscricaoPrestador(dlp.getCnpjPrestador());
-					nfs.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
-					nfs.setMunicipioIbge(util.CODIGO_IBGE);
-					nfs.setItemListaServico("0001");
-					nfs.setDescricao(dlp.getDiscriminacaoServico());
-					nfs.setAliquota(BigDecimal.valueOf(dlp.getValorAliquota()));
-					nfs.setValorServico(BigDecimal.valueOf(dlp.getValorServico()));
-					nfs.setQuantidade(BigDecimal.valueOf(1));
-					nfs.setValorServico(BigDecimal.valueOf(dlp.getValorServico()));
-					nfs.setValorDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
-					nfs.setValorDescCondicionado(BigDecimal.valueOf(dlp.getValorDescontoCondicionado()));
-					nfs.setValorDescIncondicionado(BigDecimal.valueOf(dlp.getValorDescontoIncondicionado()));
-					nfs.setValorBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
-					nfs.setAliquota(BigDecimal.valueOf(dlp.getValorAliquota()));
-					nfs.setValorIss(BigDecimal.valueOf(dlp.getValorIss()));
-					nfs.setNotasFiscais(nf);
-					nfs.setValorUnitario(BigDecimal.valueOf(dlp.getValorServico()));
-					notasFiscaisServicosDao.save(nfs);
-				} catch (Exception e) {
-					log.fillError(linha, e);
-					e.printStackTrace();
-				}
-
-				// -- canceladas
-				if (dlp.getStatusNota().substring(0, 1).equals("C")) {
-					try {
-						NotasFiscaisCanceladas nfc = new NotasFiscaisCanceladas();
-						nfc.setDatahoracancelamento(util.getStringToDateHoursMinutes(dlp.getDataCancelamento()));
-						nfc.setInscricaoPrestador(dlp.getCnpjPrestador());
-						nfc.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
-						nfc.setMotivo(dlp.getMotivoCancelamento());
-						nfc.setNotasFiscais(nf);
-						notasFiscaisCanceladasDao.save(nfc);
-
-					} catch (Exception e) {
-						log.fillError(linha, e);
-						e.printStackTrace();
-					}
-				}
-
-				// email
-				if (dlp.getEmailPrestador() != null && !dlp.getEmailPrestador().isEmpty()) {
-					try {
-						NotasFiscaisEmails nfe = new NotasFiscaisEmails();
-						nfe.setEmail(dlp.getEmailPrestador());
-						nfe.setInscricaoPrestador(dlp.getCnpjPrestador());
-						nfe.setNotasFiscais(nf);
-						nfe.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
-						notasFiscaisEmailsDao.save(nfe);
-					} catch (Exception e) {
-						log.fillError(linha, e);
-						e.printStackTrace();
-					}
-
-				}
-
-				// notas-fiscais-cond-pagamentos ??
-
-				// notas-fiscais-obras ??
-
-				// notas-fiscais-prestadores
-				try {
-					NotasFiscaisPrestadores nfp = new NotasFiscaisPrestadores();
-					nfp.setBairro(dlp.getEnderecoBairroPrestador());
-					nfp.setCelular(dlp.getTelefonePrestador());
-					nfp.setCep(dlp.getCepPrestador());
-					nfp.setComplemento(dlp.getEnderecoComplementoPrestador());
-					nfp.setEmail(dlp.getEmailPrestador());
-					nfp.setEndereco(dlp.getEnderecoPrestador());
-					nfp.setInscricaoPrestador(dlp.getCnpjPrestador());
-					nfp.setNome(dlp.getRazaoSocialPrestador());
-					nfp.setNomeFantasia(dlp.getNomeFantasiaPrestador());
-					nfp.setNotasFiscais(nf);
-					nfp.setNumero(dlp.getEnderecoNumeroPrestador());
-					nfp.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
-					nfp.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
-					nfp.setCep(dlp.getCepPrestador());
-					nfp.setTipoPessoa(util.getTipoPessoa(dlp.getCnpjPrestador()));
-					notasFiscaisPrestadoresDao.save(nfp);
-
-				} catch (Exception e) {
-					log.fillError(linha, e);
-					e.printStackTrace();
-				}
-
-				// guias x notas fiscais
-				Guias g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
-				if (g != null) {
-					try {
-						GuiasNotasFiscais gnf = new GuiasNotasFiscais();
-						gnf.setGuias(g);
-						gnf.setInscricaoPrestador(p.getInscricaoPrestador());
-						//gnf.setNumeroGuia(g.getNumeroGuia());
-						gnf.setNumeroGuia(g.getId()); // acertar depois
-						gnf.setNumeroNota(nf.getNumeroNota());
-						guiasNotasFiscaisDao.save(gnf);
-					} catch (Exception e) {
-						log.fillError(linha, e);
-						e.printStackTrace();
-					}
-
-				}
+				processaDemaisTiposNotas(p, nf, dlp, log, linha);
 
 			} catch (Exception e) {
 				log.fillError(linha, e);
@@ -761,6 +656,47 @@ public class ExtractorService {
 
 		}
 		log.close();
+
+	}
+
+	private void processaDemaisTiposNotas(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
+			String linha) {
+		// -- serviços
+		NotasThreadService nfServico = new NotasThreadService(p, nf, dlp, log, linha, "S");
+		Thread s = new Thread(nfServico);
+		s.start();
+
+		// -- canceladas
+		if (dlp.getStatusNota().substring(0, 1).equals("C")) {
+			NotasThreadService nfCanceladas = new NotasThreadService(p, nf, dlp, log, linha, "C");
+			Thread c = new Thread(nfCanceladas);
+			c.start();
+		}
+
+		// email
+		if (dlp.getEmailPrestador() != null && !dlp.getEmailPrestador().isEmpty()) {
+			NotasThreadService nfEmail = new NotasThreadService(p, nf, dlp, log, linha, "E");
+			Thread e = new Thread(nfEmail);
+			e.start();
+		}
+
+		// notas-fiscais-cond-pagamentos ??
+
+		// notas-fiscais-obras ??
+
+		// notas-fiscais-prestadores
+		NotasThreadService nfPrestadores = new NotasThreadService(p, nf, dlp, log, linha, "P");
+		Thread prestadoresThread = new Thread(nfPrestadores);
+		prestadoresThread.start();
+		
+		// guias x notas fiscais
+		Guias g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
+		if (g != null) {
+			NotasThreadService nfGuias = new NotasThreadService(p, nf, dlp, log, linha, "G", g);
+			Thread gThread = new Thread(nfGuias);
+			gThread.start();
+			
+		}
 
 	}
 
@@ -824,6 +760,28 @@ public class ExtractorService {
 			e.printStackTrace();
 		}
 		return null;
+
+	}
+
+	public List<String> excluiParaProcessarNivel3() {
+		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
+				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais");
+	}
+
+	public List<String> excluiParaProcessarTudo() {
+		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
+				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
+				"" + "PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais", "Tomadores", "Prestadores");
+
+	}
+
+	public List<String> excluiParaProcessarNivel2() {
+		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
+				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
+				"PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais");
 
 	}
 
