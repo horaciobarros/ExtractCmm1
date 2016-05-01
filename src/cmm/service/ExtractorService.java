@@ -8,17 +8,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import cmm.dao.CompetenciasDao;
 import cmm.dao.Dao;
 import cmm.dao.GuiasDao;
-import cmm.dao.GuiasNotasFiscaisDao;
-import cmm.dao.NotasFiscaisCanceladasDao;
 import cmm.dao.NotasFiscaisDao;
-import cmm.dao.NotasFiscaisEmailsDao;
-import cmm.dao.NotasFiscaisPrestadoresDao;
-import cmm.dao.NotasFiscaisServicosDao;
 import cmm.dao.PagamentosDao;
 import cmm.dao.PrestadoresAtividadesDao;
 import cmm.dao.PrestadoresDao;
@@ -35,10 +29,6 @@ import cmm.entidadesOrigem.PlanoConta;
 import cmm.model.Competencias;
 import cmm.model.Guias;
 import cmm.model.NotasFiscais;
-import cmm.model.NotasFiscaisCanceladas;
-import cmm.model.NotasFiscaisEmails;
-import cmm.model.NotasFiscaisPrestadores;
-import cmm.model.NotasFiscaisServicos;
 import cmm.model.Pagamentos;
 import cmm.model.Prestadores;
 import cmm.model.PrestadoresAtividades;
@@ -49,7 +39,6 @@ import cmm.util.Util;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import cmm.model.GuiasNotasFiscais;
 
 /**
  * 
@@ -57,7 +46,6 @@ import cmm.model.GuiasNotasFiscais;
  *
  */
 public class ExtractorService {
-	private Map<String, DadosGuia> dadosGuiaMap;
 	private Util util = new Util();
 	private CompetenciasDao competenciasDao = new CompetenciasDao();
 	private PrestadoresDao prestadoresDao = new PrestadoresDao();
@@ -65,14 +53,9 @@ public class ExtractorService {
 	private Dao dao = new Dao();
 	private GuiasDao guiasDao = new GuiasDao();
 	private NotasFiscaisDao notasFiscaisDao = new NotasFiscaisDao();
-	private NotasFiscaisServicosDao notasFiscaisServicosDao = new NotasFiscaisServicosDao();
-	private NotasFiscaisCanceladasDao notasFiscaisCanceladasDao = new NotasFiscaisCanceladasDao();
-	private NotasFiscaisEmailsDao notasFiscaisEmailsDao = new NotasFiscaisEmailsDao();
-	private NotasFiscaisPrestadoresDao notasFiscaisPrestadoresDao = new NotasFiscaisPrestadoresDao();
 	private PagamentosDao pagamentosDao = new PagamentosDao();
 	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
 	private PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
-	private GuiasNotasFiscaisDao guiasNotasFiscaisDao = new GuiasNotasFiscaisDao();
 
 	public void processaPlanoConta(List<String> dadosList) {
 		FileLog log = new FileLog("plano_conta");
@@ -173,20 +156,25 @@ public class ExtractorService {
 				Prestadores p = prestadoresDao.findByInscricao(dc.getCnpj().trim());
 				try {
 					if (p == null || p.getId() == 0) {
-						p = new Prestadores();
-						p.setAutorizado("S");
-						if (dc.getTelefone() != null && dc.getTelefone().trim().length() >= 11) {
-							p.setCelular(dc.getTelefone().trim().substring(0, 11));
-							p.setTelefone(dc.getTelefone().trim().substring(0, 11));
-						} else {
-							p.setCelular(dc.getTelefone().trim());
-							p.setTelefone(dc.getTelefone().trim());
-						}
-						p.setEmail(dc.getEmail());
-						p.setEnquadramento("N");
-						p.setInscricaoPrestador(dc.getCnpj());
+						try {
+							p = new Prestadores();
+							p.setAutorizado("S");
+							if (dc.getTelefone() != null && dc.getTelefone().trim().length() >= 11) {
+								p.setCelular(dc.getTelefone().trim().substring(0, 11));
+								p.setTelefone(dc.getTelefone().trim().substring(0, 11));
+							} else {
+								p.setCelular(dc.getTelefone().trim());
+								p.setTelefone(dc.getTelefone().trim());
+							}
+							p.setEmail(dc.getEmail());
+							p.setEnquadramento("N");
+							p.setInscricaoPrestador(dc.getCnpj());
 
-						prestadoresDao.save(p);
+							prestadoresDao.save(p);
+						} catch (Exception e) {
+							log.fillError(linha, e);
+							e.printStackTrace();
+						}
 					}
 
 					// prestadores optantes simples
@@ -209,6 +197,7 @@ public class ExtractorService {
 							pos.setPrestadores(p);
 							prestadoresOptanteSimplesDao.save(pos);
 						} catch (Exception e) {
+							log.fillError(linha, e);
 							e.printStackTrace();
 						}
 					}
@@ -688,14 +677,14 @@ public class ExtractorService {
 		NotasThreadService nfPrestadores = new NotasThreadService(p, nf, dlp, log, linha, "P");
 		Thread prestadoresThread = new Thread(nfPrestadores);
 		prestadoresThread.start();
-		
+
 		// guias x notas fiscais
 		Guias g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
 		if (g != null) {
 			NotasThreadService nfGuias = new NotasThreadService(p, nf, dlp, log, linha, "G", g);
 			Thread gThread = new Thread(nfGuias);
 			gThread.start();
-			
+
 		}
 
 	}
