@@ -1,5 +1,6 @@
 package cmm.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -54,6 +55,18 @@ public class GuiasNotasFiscaisDao {
 		query.executeUpdate();
 		tx.commit();
 		session.close();
+	}
+
+	public List<GuiasNotasFiscais> findPorNumeroGuia(
+			Long numeroGuia) {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session.createQuery("from GuiasNotasFiscais gnf where numeroGuia = " + numeroGuia + "");
+		List<GuiasNotasFiscais> lista = query.list();
+		tx.commit();
+		session.close();
+
+		return lista;
 	}
 
 }
