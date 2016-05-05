@@ -82,7 +82,7 @@ public class Util {
 	}
 
 	public String getNomeMes(String mes) {
-		String[] meses = { "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro",
+		String[] meses = { "Janeiro", "Fevereiro", "MarÃ§o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro",
 				"Outubro", "Novembro", "Dezembro" };
 
 		return meses[Integer.valueOf(mes) - 1];
@@ -138,6 +138,7 @@ public class Util {
 
 	public Date getFirstDayOfMonth(String ano, String mes) {
 		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.YEAR, (Integer.valueOf(ano)));
 		calendar.set(Calendar.MONTH, (Integer.valueOf(mes) - 1));
 		calendar.set(Calendar.DAY_OF_MONTH, 1);
 		return calendar.getTime();

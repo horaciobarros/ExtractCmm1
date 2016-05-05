@@ -43,11 +43,6 @@ public class PrestadoresDao {
 		session.close();
 	}
 
-	public Prestadores findByInscricaoMunicipal(String inscMunicipal) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public List<Prestadores> findNaoEnviados() {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
@@ -58,6 +53,19 @@ public class PrestadoresDao {
 
 		return lista;
 	}
+	
+	public List<Prestadores> findAll() {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session
+				.createQuery("from Prestadores p ");
+		List<Prestadores> lista = query.list();
+		tx.commit();
+		session.close();
+
+		return lista;
+	}
+
 	
 	public void saveHash(List<Prestadores> listaAtualizados, String hash){
 		Session session = sessionFactory.openSession();

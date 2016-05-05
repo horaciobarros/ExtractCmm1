@@ -76,6 +76,7 @@ public class Controller {
 		// notas fiscais
 		System.out.println("Lendo notas fiscais");
 		dadosList = extractorService.lerArquivo("dados_livro_prestador", 64);
+		System.out.println("Processando notas fiscais");
 		extractorService.processaDadosNotasFiscais(dadosList);
 		System.out.println("--- Fim de notas fiscais ---");
 	}

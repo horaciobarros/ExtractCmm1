@@ -9,6 +9,7 @@ import cmm.dao.NotasFiscaisDao;
 import cmm.dao.NotasFiscaisEmailsDao;
 import cmm.dao.NotasFiscaisPrestadoresDao;
 import cmm.dao.NotasFiscaisServicosDao;
+import cmm.dao.NotasFiscaisTomadoresDao;
 import cmm.dao.PagamentosDao;
 import cmm.dao.PrestadoresAtividadesDao;
 import cmm.dao.PrestadoresOptanteSimplesDao;
@@ -20,7 +21,9 @@ import cmm.model.NotasFiscaisCanceladas;
 import cmm.model.NotasFiscaisEmails;
 import cmm.model.NotasFiscaisPrestadores;
 import cmm.model.NotasFiscaisServicos;
+import cmm.model.NotasFiscaisTomadores;
 import cmm.model.Prestadores;
+import cmm.model.Tomadores;
 import cmm.util.FileLog;
 import cmm.util.Util;
 
@@ -43,6 +46,8 @@ public class NotasThreadService implements Runnable {
 	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
 	private PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
 	private GuiasNotasFiscaisDao guiasNotasFiscaisDao = new GuiasNotasFiscaisDao();
+	private Tomadores tomadores;
+	private NotasFiscaisTomadoresDao notasFiscaisTomadoresDao = new NotasFiscaisTomadoresDao();
 
 	public NotasThreadService(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log, String linha,
 			String tipoNotaFilha) {
@@ -54,7 +59,7 @@ public class NotasThreadService implements Runnable {
 		this.tipoNotaFilha = tipoNotaFilha;
 
 	}
-	
+
 	public NotasThreadService(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log, String linha,
 			String tipoNotaFilha, Guias guia) {
 		this.p = p;
@@ -67,8 +72,19 @@ public class NotasThreadService implements Runnable {
 
 	}
 
+	public NotasThreadService(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log, String linha,
+			String tipoNotaFilha, Guias guia, Tomadores tomadores) {
+		this.p = p;
+		this.nf = nf;
+		this.dlp = dlp;
+		this.log = log;
+		this.linha = linha;
+		this.tipoNotaFilha = tipoNotaFilha;
+		this.guia = guia;
+		this.tomadores = tomadores;
 
-	
+	}
+
 	@Override
 	public void run() {
 		if (tipoNotaFilha.equals('S')) { // serviços
@@ -115,7 +131,7 @@ public class NotasThreadService implements Runnable {
 			}
 		}
 
-		if (tipoNotaFilha.equals("E")) { // canceladas
+		if (tipoNotaFilha.equals("E")) { // email
 			try {
 				NotasFiscaisEmails nfe = new NotasFiscaisEmails();
 				nfe.setEmail(dlp.getEmailPrestador());
@@ -129,7 +145,7 @@ public class NotasThreadService implements Runnable {
 			}
 		}
 
-		if (tipoNotaFilha.equals("P")) { // canceladas
+		if (tipoNotaFilha.equals("P")) { // prestadores
 			try {
 				NotasFiscaisPrestadores nfp = new NotasFiscaisPrestadores();
 				nfp.setBairro(dlp.getEnderecoBairroPrestador());
@@ -155,7 +171,7 @@ public class NotasThreadService implements Runnable {
 			}
 		}
 
-		if (tipoNotaFilha.equals("G")) { // canceladas
+		if (tipoNotaFilha.equals("G")) { // guias
 			try {
 				GuiasNotasFiscais gnf = new GuiasNotasFiscais();
 				gnf.setGuias(guia);
@@ -168,6 +184,41 @@ public class NotasThreadService implements Runnable {
 				log.fillError(linha, e);
 				e.printStackTrace();
 			}
+		}
+
+		if (tipoNotaFilha.equals("T")) {
+			try {
+				NotasFiscaisTomadores nft = new NotasFiscaisTomadores();
+				nft.setBairro(tomadores.getBairro());
+				nft.setCelular(tomadores.getCelular());
+				nft.setCep(tomadores.getCep());
+				nft.setComplemento(tomadores.getComplemento());
+				nft.setEmail(tomadores.getEmail());
+				nft.setEndereco(tomadores.getEndereco());
+				nft.setInscricaoEstadual(tomadores.getInscricaoEstadual());
+				nft.setInscricaoMunicipal(tomadores.getInscricaoMunicipal());
+				nft.setInscricaoPrestador(nf.getInscricaoPrestador());
+				nft.setInscricaoTomador(tomadores.getInscricaoTomador());
+				nft.setMunicipio(tomadores.getMunicipio());
+				if (tomadores.getMunicipioIbge() != null) {
+					nft.setMunicipioIbge(Long.toString(tomadores.getMunicipioIbge()));
+				}
+				nft.setNome(tomadores.getNome());
+				nft.setNomeFantasia(tomadores.getNomeFantasia());
+				if (nft.getNomeFantasia() == null) {
+					nft.setNomeFantasia(tomadores.getNome());
+				}
+				nft.setNotasFiscais(nf);
+				nft.setNumero(tomadores.getNumero());
+				nft.setNumeroNota(nf.getNumeroNota());
+				nft.setOptanteSimples(tomadores.getOptanteSimples());
+				nft.setTipoPessoa(tomadores.getTipoPessoa());
+				notasFiscaisTomadoresDao.save(nft);
+			} catch (Exception e) {
+				log.fillError(linha, e);
+				e.printStackTrace();
+			}
+
 		}
 
 	}

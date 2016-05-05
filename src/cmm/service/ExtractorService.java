@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import cmm.dao.CompetenciasDao;
 import cmm.dao.Dao;
@@ -56,6 +58,8 @@ public class ExtractorService {
 	private PagamentosDao pagamentosDao = new PagamentosDao();
 	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
 	private PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
+	private Map<String, Tomadores> mapTomadores = new Hashtable<String, Tomadores>();
+	private Map<String, Prestadores> mapPrestadores = new Hashtable<String, Prestadores>();
 
 	public void processaPlanoConta(List<String> dadosList) {
 		FileLog log = new FileLog("plano_conta");
@@ -124,7 +128,7 @@ public class ExtractorService {
 					try {
 						PrestadoresAtividades pa = new PrestadoresAtividades();
 						pa.setAliquota(BigDecimal.valueOf(dca.getAliquota()));
-						pa.setIcnaes(dca.getAtividadeFederal());
+						// pa.setIcnaes(null);
 						pa.setIlistaservicos(dca.getGrupoAtividade());
 						pa.setInscricaoPrestador(dca.getCnpj());
 						pa.setPrestadores(p);
@@ -191,7 +195,7 @@ public class ExtractorService {
 							pos.setInscricaoPrestador(dc.getCnpj());
 							pos.setDescricao(dc.getRegimeTributacao());
 							pos.setMei("N"); // ver com cmm
-							pos.setMotivo("Op��o do Contribuinte");
+							pos.setMotivo("Opção do Contribuinte");
 							pos.setOptante("S");
 							pos.setOrgao("M");
 							pos.setPrestadores(p);
@@ -222,6 +226,9 @@ public class ExtractorService {
 						t.setMunicipio(dc.getMunicipio());
 						t.setNome(dc.getRazaoSocial());
 						t.setNomeFantasia(dc.getNomeFantasia());
+						if (dc.getNomeFantasia() == null || dc.getNomeFantasia().isEmpty()) {
+							t.setNomeFantasia(t.getNome());
+						}
 						t.setNumero(dc.getEnderecoNumero());
 						t.setOptanteSimples(util.getOptantePeloSimplesNacional(dc.getOptanteSimplesNacional()));
 						if (dc.getTelefone() != null && dc.getTelefone().trim().length() > 11) {
@@ -335,8 +342,8 @@ public class ExtractorService {
 							Pagamentos p = new Pagamentos();
 							p.setDataPagamento(util.getStringToDateHoursMinutes(dg.getDataPagamento()));
 							p.setGuias(guias);
-							p.setNumeroGuia(Long.valueOf(dg.getParcela()));
-							p.setNumeroPagamento(Long.valueOf(dg.getParcela()));
+							p.setNumeroGuia(guias.getId());
+							p.setNumeroPagamento(guias.getId());
 							p.setTipoPagamento("N");
 							p.setValorCorrecao(BigDecimal.valueOf(dg.getCorrecaoMonetaria()));
 							p.setValorJuro(BigDecimal.valueOf(dg.getJuros()));
@@ -407,12 +414,20 @@ public class ExtractorService {
 						t.setMunicipio(dlt.getCidadeTomador());
 						t.setNome(dlt.getNomeFantasiaTomador());
 						t.setNomeFantasia(dlt.getNomeFantasiaTomador());
+
 						t.setNumero(dlt.getEnderecoNumeroTomador());
 						t.setOptanteSimples(util.getOptantePeloSimplesNacional(dlt.getOptantePeloSimplesNacional()));
 						t.setTelefone(dlt.getTelefoneTomador());
 						Prestadores p = prestadoresDao.findByInscricao(dlt.getCnpjPrestador().trim());
 						t.setPrestadores(p);
 						t.setTipoPessoa(util.getTipoPessoa(dlt.getCnpjTomador().trim()));
+						if (t.getNomeFantasia() == null || t.getNomeFantasia().isEmpty()) {
+							t.setNomeFantasia(t.getNome());
+						}
+						if (t.getInscricaoEstadual() != null && t.getInscricaoEstadual().isEmpty()) {
+							t.setInscricaoEstadual(null);
+						}
+
 						tomadoresDao.save(t);
 					} else { // registro j� existe, atualizar informa��es n�o
 								// preenchidas
@@ -426,6 +441,7 @@ public class ExtractorService {
 						tomadoresDao.update(t);
 
 					}
+					mapTomadores.put(t.getInscricaoTomador(), t);
 
 				} catch (Exception e) {
 					log.fillError(linha, e);
@@ -552,6 +568,12 @@ public class ExtractorService {
 
 	public void processaDadosNotasFiscais(List<String> dadosList) {
 		FileLog log = new FileLog("dados_livro_prestador_notas_fiscais");
+		if (this.mapTomadores == null || this.mapTomadores.size() == 0) {
+			buscaTomadores();
+		}
+		if (this.mapPrestadores == null || this.mapPrestadores.size() == 0) {
+			buscaPrestadores();
+		}
 
 		for (String linha : dadosList) {
 			try {
@@ -574,19 +596,10 @@ public class ExtractorService {
 						arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[61], arrayLinha[63]);
 
 				String inscricaoPrestador = dlp.getCnpjPrestador().trim();
-				Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
+				Prestadores p = mapPrestadores.get(inscricaoPrestador);
 				try {
-					if (p == null || p.getId() == 0) {
-						// na hora de processar dados_cadastro estas informa��es
-						// tem que ser verificadas
-						p = new Prestadores();
-						p.setAutorizado("S");
-						p.setCelular(dlp.getTelefonePrestador());
-						p.setEmail(dlp.getEmailPrestador());
-						p.setEnquadramento("N");
-						p.setInscricaoPrestador(inscricaoPrestador.trim());
-						p.setTelefone(dlp.getTelefonePrestador());
-						prestadoresDao.save(p);
+					if (p == null || p.getId() == 0 || !inscricaoPrestador.trim().equals(p.getInscricaoPrestador())) {
+						throw new Exception();
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -636,7 +649,9 @@ public class ExtractorService {
 
 				notasFiscaisDao.save(nf);
 
-				processaDemaisTiposNotas(p, nf, dlp, log, linha);
+				Tomadores t = (Tomadores) mapTomadores.get(nf.getInscricaoTomador().trim());
+				
+				processaDemaisTiposNotas(p, nf, dlp, log, linha, t);
 
 			} catch (Exception e) {
 				log.fillError(linha, e);
@@ -648,8 +663,22 @@ public class ExtractorService {
 
 	}
 
+	private void buscaPrestadores() {
+		for (Prestadores p : prestadoresDao.findAll()) {
+			mapPrestadores.put(p.getInscricaoPrestador(), p);
+		}
+
+	}
+
+	private void buscaTomadores() {
+		for (Tomadores t : tomadoresDao.findAll()) {
+			mapTomadores.put(t.getInscricaoTomador(), t);
+		}
+
+	}
+
 	private void processaDemaisTiposNotas(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
-			String linha) {
+			String linha, Tomadores t) {
 		// -- serviços
 		NotasThreadService nfServico = new NotasThreadService(p, nf, dlp, log, linha, "S");
 		Thread s = new Thread(nfServico);
@@ -685,6 +714,12 @@ public class ExtractorService {
 			Thread gThread = new Thread(nfGuias);
 			gThread.start();
 
+		}
+
+		if (t != null && t.getId() != null) {
+			NotasThreadService nfTomadores = new NotasThreadService(p, nf, dlp, log, linha, "T", g, t);
+			Thread nftThread = new Thread(nfTomadores);
+			nftThread.start();
 		}
 
 	}

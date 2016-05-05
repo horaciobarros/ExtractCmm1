@@ -103,4 +103,20 @@ public class TomadoresDao {
 		query.executeUpdate();
 		tx.commit();session.close();
 	}
+	
+	public List<Tomadores> findAll() {
+		Query query = sessionFactory.openSession()
+				.createQuery("from Tomadores t  ");
+
+		try {
+			List<Tomadores> tomadores = query.list();
+
+			if (tomadores.size() > 0) {
+				return tomadores;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }
