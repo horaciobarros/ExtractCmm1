@@ -87,7 +87,7 @@ public class NotasThreadService implements Runnable {
 
 	@Override
 	public void run() {
-		if (tipoNotaFilha.equals('S')) { // serviços
+		if (tipoNotaFilha.equals("S")) { // serviços
 			try {
 
 				NotasFiscaisServicos nfs = new NotasFiscaisServicos();
