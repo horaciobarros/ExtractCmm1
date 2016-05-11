@@ -2,17 +2,12 @@ package cmm.service;
 
 import java.math.BigDecimal;
 
-import cmm.dao.GuiasDao;
 import cmm.dao.GuiasNotasFiscaisDao;
 import cmm.dao.NotasFiscaisCanceladasDao;
-import cmm.dao.NotasFiscaisDao;
 import cmm.dao.NotasFiscaisEmailsDao;
 import cmm.dao.NotasFiscaisPrestadoresDao;
 import cmm.dao.NotasFiscaisServicosDao;
 import cmm.dao.NotasFiscaisTomadoresDao;
-import cmm.dao.PagamentosDao;
-import cmm.dao.PrestadoresAtividadesDao;
-import cmm.dao.PrestadoresOptanteSimplesDao;
 import cmm.entidadesOrigem.DadosLivroPrestador;
 import cmm.model.Guias;
 import cmm.model.GuiasNotasFiscais;
@@ -36,15 +31,10 @@ public class NotasThreadService implements Runnable {
 	private String tipoNotaFilha;
 	private Guias guia;
 	private Util util = new Util();
-	private GuiasDao guiasDao = new GuiasDao();
-	private NotasFiscaisDao notasFiscaisDao = new NotasFiscaisDao();
 	private NotasFiscaisServicosDao notasFiscaisServicosDao = new NotasFiscaisServicosDao();
 	private NotasFiscaisCanceladasDao notasFiscaisCanceladasDao = new NotasFiscaisCanceladasDao();
 	private NotasFiscaisEmailsDao notasFiscaisEmailsDao = new NotasFiscaisEmailsDao();
 	private NotasFiscaisPrestadoresDao notasFiscaisPrestadoresDao = new NotasFiscaisPrestadoresDao();
-	private PagamentosDao pagamentosDao = new PagamentosDao();
-	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
-	private PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
 	private GuiasNotasFiscaisDao guiasNotasFiscaisDao = new GuiasNotasFiscaisDao();
 	private Tomadores tomadores;
 	private NotasFiscaisTomadoresDao notasFiscaisTomadoresDao = new NotasFiscaisTomadoresDao();

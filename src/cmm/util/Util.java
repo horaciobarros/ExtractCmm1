@@ -89,7 +89,7 @@ public class Util {
 	}
 
 	public Date getStringToDateHoursMinutes(String data) {
-		DateFormat formatter = new SimpleDateFormat("yyyy-dd-MM hh:mm:ss");
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		try {
 			Date date = (Date) formatter.parse(data);
 			return date;
@@ -101,7 +101,7 @@ public class Util {
 	}
 
 	public Date getStringToDate(String data) {
-		DateFormat formatter = new SimpleDateFormat("yyyy-dd-MM");
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		try {
 			Date date = (Date) formatter.parse(data);
 			return date;

@@ -214,12 +214,13 @@ public class ExtractorService {
 				String inscricaoTomador = dc.getCnpj().trim();
 				Tomadores t = tomadoresDao.findByInscricao(inscricaoTomador);
 				try {
-					if (t == null || t.getId() == 0) {
+					if (t == null || t.getId() == null) {
 						t = new Tomadores();
 						t.setCelular(dc.getTelefone());
 						t.setEmail(dc.getEmail());
 						t.setInscricaoTomador(inscricaoTomador.trim());
 						t.setBairro(dc.getEnderecoBairro());
+						t.setEndereco(dc.getEndereco());
 						t.setCep(dc.getEnderecoCep());
 						t.setComplemento(dc.getEnderecoComplemento());
 						t.setInscricaoMunicipal(dc.getInscricaoMunicipal());
@@ -394,7 +395,7 @@ public class ExtractorService {
 						arrayLinha[52], arrayLinha[53], arrayLinha[54], arrayLinha[55], arrayLinha[56], arrayLinha[57],
 						arrayLinha[58], arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63],
 						arrayLinha[64], arrayLinha[65]);
-				String inscricaoTomador = dlt.getCnpjPrestador().trim();
+				String inscricaoTomador = dlt.getCnpjTomador().trim();
 				Tomadores t = tomadoresDao.findByInscricao(inscricaoTomador);
 				try {
 					if (t == null || t.getId() == 0) {
@@ -408,7 +409,7 @@ public class ExtractorService {
 						t.setBairro(dlt.getEnderecoBairroTomador());
 						t.setCelular(dlt.getTelefoneTomador());
 						t.setCep(dlt.getCepTomador());
-						t.setComplemento(dlt.getCepTomador());
+						t.setComplemento(dlt.getEnderecoComplementoTomador());
 						t.setInscricaoEstadual(dlt.getInscricaoEstadualTomador());
 						t.setInscricaoMunicipal(dlt.getInscricaoMunicipalTomador());
 						t.setMunicipio(dlt.getCidadeTomador());
@@ -418,7 +419,7 @@ public class ExtractorService {
 						t.setNumero(dlt.getEnderecoNumeroTomador());
 						t.setOptanteSimples(util.getOptantePeloSimplesNacional(dlt.getOptantePeloSimplesNacional()));
 						t.setTelefone(dlt.getTelefoneTomador());
-						Prestadores p = prestadoresDao.findByInscricao(dlt.getCnpjPrestador().trim());
+						Prestadores p = prestadoresDao.findByInscricao(dlt.getCnpjTomador().trim());
 						t.setPrestadores(p);
 						t.setTipoPessoa(util.getTipoPessoa(dlt.getCnpjTomador().trim()));
 						if (t.getNomeFantasia() == null || t.getNomeFantasia().isEmpty()) {
@@ -431,11 +432,15 @@ public class ExtractorService {
 						tomadoresDao.save(t);
 					} else { // registro j� existe, atualizar informa��es n�o
 								// preenchidas
-						if (t.getInscricaoEstadual() == null || t.getInscricaoEstadual().isEmpty()) {
+						if (t.getInscricaoEstadual() == null || t.getInscricaoEstadual().trim().isEmpty()) {
 							t.setInscricaoEstadual(dlt.getInscricaoEstadualTomador());
 						}
-						if (t.getNomeFantasia() == null || t.getNomeFantasia().isEmpty()) {
+						if (t.getNomeFantasia() == null || t.getNomeFantasia().trim().isEmpty()) {
 							t.setNomeFantasia(dlt.getNomeFantasiaTomador());
+						}
+						
+						if (t.getComplemento() == null || t.getComplemento().trim().isEmpty()) {
+							t.setComplemento(dlt.getEnderecoComplementoTomador());
 						}
 
 						tomadoresDao.update(t);
@@ -636,7 +641,7 @@ public class ExtractorService {
 				} else {
 					nf.setNumeroVerificacao("000000000");
 				}
-				nf.setNaturezaOperacao("1"); // TODO resolver
+				nf.setNaturezaOperacao("1"); // TODO resolver 
 				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
 				nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
 				List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(),
