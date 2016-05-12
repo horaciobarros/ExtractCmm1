@@ -166,4 +166,12 @@ public class Util {
 		}
 	}
 
+	public String trataSeTiverVazio(String value) {
+		if (value == null || value.trim().isEmpty()) {
+			return "0";
+		} 
+		
+		return value;
+	}
+
 }

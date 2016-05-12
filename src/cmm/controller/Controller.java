@@ -15,17 +15,19 @@ public class Controller {
 
 	public void importaNfe() {
 
-		int nivelProcessamento = 3;
+		int nivelProcessamento = 1;
 
 		System.out.println("Limpando o banco...");
 
 		List<String> entidades;
-		if (nivelProcessamento == 1) {
-			entidades = extractorService.excluiParaProcessarTudo();
+		if (nivelProcessamento == 2) {
+			entidades = extractorService.excluiParaProcessarNivel2();
 		} else if (nivelProcessamento == 3) {
 			entidades = extractorService.excluiParaProcessarNivel3();
+		} else if (nivelProcessamento == 4) {
+			entidades = extractorService.excluiParaProcessarNivel4();
 		} else {
-			entidades = extractorService.excluiParaProcessarNivel2();
+			entidades = extractorService.excluiParaProcessarNivel1();
 		}
 
 		// limpando o banco
@@ -52,13 +54,17 @@ public class Controller {
 			extractorService.processaDadosLivroPrestador(dadosList);
 			System.out.println("--- Fim de prestador ---");
 
+		}
+		
+		if (nivelProcessamento == 1 || nivelProcessamento == 2) {
 			System.out.println("Lendo tomador");
 			dadosList = extractorService.lerArquivo("dados_livro_tomador", 66);
 			extractorService.processaDadosLivroTomador(dadosList);
 			System.out.println("--- Fim de tomador ---");
+			
 		}
 
-		if (nivelProcessamento == 1 || nivelProcessamento == 2) {
+		if (nivelProcessamento == 1 || nivelProcessamento == 2 || nivelProcessamento == 3) {
 			// competencias e guias
 			System.out.println("Lendo competencias e guias");
 			dadosList = extractorService.lerArquivo("dados_guia");

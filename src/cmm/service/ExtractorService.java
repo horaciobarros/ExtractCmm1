@@ -159,7 +159,7 @@ public class ExtractorService {
 				// ajustando prestadores
 				Prestadores p = prestadoresDao.findByInscricao(dc.getCnpj().trim());
 				try {
-					if (p == null || p.getId() == 0) {
+					if (p == null || p.getId() == 0 || p.getId() == null) {
 						try {
 							p = new Prestadores();
 							p.setAutorizado("S");
@@ -214,7 +214,7 @@ public class ExtractorService {
 				String inscricaoTomador = dc.getCnpj().trim();
 				Tomadores t = tomadoresDao.findByInscricao(inscricaoTomador);
 				try {
-					if (t == null || t.getId() == null) {
+					if (t == null || t.getId() == null || t.getId() == 0) {
 						t = new Tomadores();
 						t.setCelular(dc.getTelefone());
 						t.setEmail(dc.getEmail());
@@ -383,22 +383,31 @@ public class ExtractorService {
 				DadosLivroTomador dlt = new DadosLivroTomador(Long.valueOf(arrayLinha[0]), arrayLinha[1], arrayLinha[2],
 						arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8],
 						arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14],
-						arrayLinha[15], arrayLinha[16], arrayLinha[17], Double.valueOf(arrayLinha[18]),
-						Double.valueOf(arrayLinha[19]), Double.valueOf(arrayLinha[20]), Double.valueOf(arrayLinha[21]),
-						Double.valueOf(arrayLinha[22]), Double.valueOf(arrayLinha[23]), Double.valueOf(arrayLinha[24]),
-						arrayLinha[25], Double.valueOf(arrayLinha[26]), Double.valueOf(arrayLinha[27]),
-						Double.valueOf(arrayLinha[28]), Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]),
-						Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]), Double.valueOf(arrayLinha[33]),
-						arrayLinha[34], arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39],
-						arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44], arrayLinha[45],
-						arrayLinha[46], arrayLinha[47], arrayLinha[48], arrayLinha[49], arrayLinha[50], arrayLinha[51],
-						arrayLinha[52], arrayLinha[53], arrayLinha[54], arrayLinha[55], arrayLinha[56], arrayLinha[57],
-						arrayLinha[58], arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63],
-						arrayLinha[64], arrayLinha[65]);
+						arrayLinha[15], arrayLinha[16], arrayLinha[17],
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[18])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[19])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[20])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[21])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[22])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[23])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[24])), arrayLinha[25],
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[26])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[27])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[28])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[29])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[30])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[31])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[32])),
+						Double.valueOf(util.trataSeTiverVazio(arrayLinha[33])), arrayLinha[34], arrayLinha[35],
+						arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40], arrayLinha[41],
+						arrayLinha[42], arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46], arrayLinha[47],
+						arrayLinha[48], arrayLinha[49], arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53],
+						arrayLinha[54], arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59],
+						arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64], arrayLinha[65]);
 				String inscricaoTomador = dlt.getCnpjTomador().trim();
 				Tomadores t = tomadoresDao.findByInscricao(inscricaoTomador);
 				try {
-					if (t == null || t.getId() == 0) {
+					if (t == null || t.getId() == null || t.getId() == 0) {
 						// na hora de processar dados_cadastro estas informa��es
 						// tem que ser verificadas
 						t = new Tomadores();
@@ -419,8 +428,15 @@ public class ExtractorService {
 						t.setNumero(dlt.getEnderecoNumeroTomador());
 						t.setOptanteSimples(util.getOptantePeloSimplesNacional(dlt.getOptantePeloSimplesNacional()));
 						t.setTelefone(dlt.getTelefoneTomador());
-						Prestadores p = prestadoresDao.findByInscricao(dlt.getCnpjTomador().trim());
+
+						Prestadores p = prestadoresDao.findByInscricao(dlt.getCnpjPrestador().trim());
+						if (p == null || p.getId() == null || p.getId() == 0) {
+							p = gravaPrestadorPeloLivroTomador(dlt);
+
+						}
+
 						t.setPrestadores(p);
+
 						t.setTipoPessoa(util.getTipoPessoa(dlt.getCnpjTomador().trim()));
 						if (t.getNomeFantasia() == null || t.getNomeFantasia().isEmpty()) {
 							t.setNomeFantasia(t.getNome());
@@ -433,12 +449,16 @@ public class ExtractorService {
 					} else { // registro j� existe, atualizar informa��es n�o
 								// preenchidas
 						if (t.getInscricaoEstadual() == null || t.getInscricaoEstadual().trim().isEmpty()) {
-							t.setInscricaoEstadual(dlt.getInscricaoEstadualTomador());
+							try {
+								t.setInscricaoEstadual(dlt.getInscricaoEstadualTomador().trim());
+							} catch (Exception e) {
+
+							}
 						}
 						if (t.getNomeFantasia() == null || t.getNomeFantasia().trim().isEmpty()) {
 							t.setNomeFantasia(dlt.getNomeFantasiaTomador());
 						}
-						
+
 						if (t.getComplemento() == null || t.getComplemento().trim().isEmpty()) {
 							t.setComplemento(dlt.getEnderecoComplementoTomador());
 						}
@@ -448,6 +468,9 @@ public class ExtractorService {
 					}
 					mapTomadores.put(t.getInscricaoTomador(), t);
 
+				} catch (org.hibernate.exception.ConstraintViolationException e) {
+					log.fillError(linha, e);
+					e.printStackTrace();
 				} catch (Exception e) {
 					log.fillError(linha, e);
 					e.printStackTrace();
@@ -461,6 +484,28 @@ public class ExtractorService {
 		}
 		log.close();
 
+	}
+
+	private Prestadores gravaPrestadorPeloLivroTomador(DadosLivroTomador dlt) {
+		Prestadores p = new Prestadores();
+		try {
+
+			p.setAutorizado("S");
+			try {
+				p.setCelular(dlt.getTelefonePrestador().trim());
+				p.setTelefone(dlt.getTelefonePrestador().trim());
+				p.setEmail(dlt.getEmailPrestador());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			p.setEnquadramento("N");
+			p.setInscricaoPrestador(dlt.getCnpjPrestador());
+
+			prestadoresDao.save(p);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return p;
 	}
 
 	public void processaDadosLivroPrestador(List<String> dadosList) {
@@ -489,7 +534,7 @@ public class ExtractorService {
 				String inscricaoPrestador = dlp.getCnpjPrestador().trim();
 				Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
 				try {
-					if (p == null || p.getId() == 0) {
+					if (p == null || p.getId() == 0 || p.getId() == null) {
 						// na hora de processar dados_cadastro estas informa��es
 						// tem que ser verificadas
 						p = new Prestadores();
@@ -641,7 +686,7 @@ public class ExtractorService {
 				} else {
 					nf.setNumeroVerificacao("000000000");
 				}
-				nf.setNaturezaOperacao("1"); // TODO resolver 
+				nf.setNaturezaOperacao("1"); // TODO resolver
 				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
 				nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
 				List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(),
@@ -655,7 +700,7 @@ public class ExtractorService {
 				notasFiscaisDao.save(nf);
 
 				Tomadores t = (Tomadores) mapTomadores.get(nf.getInscricaoTomador().trim());
-				
+
 				processaDemaisTiposNotas(p, nf, dlp, log, linha, t);
 
 			} catch (Exception e) {
@@ -792,13 +837,7 @@ public class ExtractorService {
 
 	}
 
-	public List<String> excluiParaProcessarNivel3() {
-		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
-				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
-				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais");
-	}
-
-	public List<String> excluiParaProcessarTudo() {
+	public List<String> excluiParaProcessarNivel1() {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
 				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
@@ -810,8 +849,21 @@ public class ExtractorService {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
 				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
-				"PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais");
+				"PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais", "Tomadores");
 
+	}
+
+	public List<String> excluiParaProcessarNivel3() {
+		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
+				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais", "Guias",
+				"Competencias");
+	}
+
+	public List<String> excluiParaProcessarNivel4() {
+		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
+				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais");
 	}
 
 }
