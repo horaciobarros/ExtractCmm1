@@ -72,6 +72,7 @@ public class ExtractorService {
 						arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14]);
 			} catch (Exception e) {
 				fillErrorLog(linha, e, log.getBw());
+				e.printStackTrace();
 			}
 
 		}
@@ -89,6 +90,7 @@ public class ExtractorService {
 						arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14],
 						arrayLinha[15], arrayLinha[16], arrayLinha[17], arrayLinha[18], arrayLinha[19]);
 			} catch (Exception e) {
+				e.printStackTrace();
 				log.fillError(linha, e);
 			}
 
@@ -105,6 +107,7 @@ public class ExtractorService {
 				DadosCadastroAcesso dca = new DadosCadastroAcesso(arrayLinha[0], arrayLinha[1]);
 			} catch (Exception e) {
 				log.fillError(linha, e);
+				e.printStackTrace();
 			}
 
 		}
@@ -138,6 +141,7 @@ public class ExtractorService {
 					}
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				log.fillError(linha, e);
 			}
 
@@ -217,7 +221,8 @@ public class ExtractorService {
 					if (t == null || t.getId() == null || t.getId() == 0) {
 						t = new Tomadores();
 						t.setCelular(dc.getTelefone());
-						t.setEmail(dc.getEmail());
+						t.setEmail(dc.getEmail() != null && dc.getEmail().length() >= 80 ? 
+								dc.getEmail().substring(0,  80) : dc.getEmail());
 						t.setInscricaoTomador(inscricaoTomador.trim());
 						t.setBairro(dc.getEnderecoBairro());
 						t.setEndereco(dc.getEndereco());
@@ -374,7 +379,16 @@ public class ExtractorService {
 
 	public void processaDadosLivroTomador(List<String> dadosList) {
 
+		buscaPrestadores();
+		buscaTomadores();
 		FileLog log = new FileLog("dados_livro_tomador");
+		if (mapPrestadores == null || mapTomadores == null || mapPrestadores.isEmpty() || mapTomadores.isEmpty()) {
+			try {
+				throw new Exception("Erro fatal: Dados de prestadores ou tomadores não foram devidamente alocados na memória!");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 		for (String linha : dadosList) {
 			try {
@@ -405,14 +419,21 @@ public class ExtractorService {
 						arrayLinha[54], arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59],
 						arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64], arrayLinha[65]);
 				String inscricaoTomador = dlt.getCnpjTomador().trim();
-				Tomadores t = tomadoresDao.findByInscricao(inscricaoTomador);
+				Tomadores t = null;
+				try {
+					t = mapTomadores.get(inscricaoTomador.trim());
+				} catch (Exception e) {
+					e.printStackTrace();
+					
+				}
 				try {
 					if (t == null || t.getId() == null || t.getId() == 0) {
 						// na hora de processar dados_cadastro estas informa��es
 						// tem que ser verificadas
 						t = new Tomadores();
 						t.setCelular(dlt.getTelefoneTomador());
-						t.setEmail(dlt.getEmailTomador());
+						t.setEmail(dlt.getEmailTomador() != null && dlt.getEmailTomador().length() >= 80 ? 
+								dlt.getEmailTomador().substring(0,  80) : dlt.getEmailTomador());
 						t.setTelefone(dlt.getTelefoneTomador());
 						t.setInscricaoTomador(inscricaoTomador.trim());
 						t.setBairro(dlt.getEnderecoBairroTomador());
@@ -422,14 +443,19 @@ public class ExtractorService {
 						t.setInscricaoEstadual(dlt.getInscricaoEstadualTomador());
 						t.setInscricaoMunicipal(dlt.getInscricaoMunicipalTomador());
 						t.setMunicipio(dlt.getCidadeTomador());
-						t.setNome(dlt.getNomeFantasiaTomador());
+						t.setNome(dlt.getRazaoSocialTomador());
 						t.setNomeFantasia(dlt.getNomeFantasiaTomador());
 
 						t.setNumero(dlt.getEnderecoNumeroTomador());
 						t.setOptanteSimples(util.getOptantePeloSimplesNacional(dlt.getOptantePeloSimplesNacional()));
 						t.setTelefone(dlt.getTelefoneTomador());
 
-						Prestadores p = prestadoresDao.findByInscricao(dlt.getCnpjPrestador().trim());
+						Prestadores p = null; 
+						try {
+							p = mapPrestadores.get(dlt.getCnpjPrestador().trim());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 						if (p == null || p.getId() == null || p.getId() == 0) {
 							p = gravaPrestadorPeloLivroTomador(dlt);
 
@@ -466,7 +492,7 @@ public class ExtractorService {
 						tomadoresDao.update(t);
 
 					}
-					mapTomadores.put(t.getInscricaoTomador(), t);
+					mapTomadores.put(t.getInscricaoTomador().trim(), t);
 
 				} catch (org.hibernate.exception.ConstraintViolationException e) {
 					log.fillError(linha, e);
@@ -502,6 +528,7 @@ public class ExtractorService {
 			p.setInscricaoPrestador(dlt.getCnpjPrestador());
 
 			prestadoresDao.save(p);
+			mapPrestadores.put(p.getInscricaoPrestador(), p);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -722,7 +749,7 @@ public class ExtractorService {
 
 	private void buscaTomadores() {
 		for (Tomadores t : tomadoresDao.findAll()) {
-			mapTomadores.put(t.getInscricaoTomador(), t);
+			mapTomadores.put(t.getInscricaoTomador().trim(), t);
 		}
 
 	}
@@ -849,7 +876,7 @@ public class ExtractorService {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
 				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
-				"PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais", "Tomadores");
+				"PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais");
 
 	}
 

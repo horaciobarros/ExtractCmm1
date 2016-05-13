@@ -15,7 +15,7 @@ public class Controller {
 
 	public void importaNfe() {
 
-		int nivelProcessamento = 1;
+		int nivelProcessamento = 2;
 
 		System.out.println("Limpando o banco...");
 
@@ -56,7 +56,7 @@ public class Controller {
 
 		}
 		
-		if (nivelProcessamento == 1 || nivelProcessamento == 2) {
+		if (nivelProcessamento <= 2) {
 			System.out.println("Lendo tomador");
 			dadosList = extractorService.lerArquivo("dados_livro_tomador", 66);
 			extractorService.processaDadosLivroTomador(dadosList);
@@ -64,7 +64,7 @@ public class Controller {
 			
 		}
 
-		if (nivelProcessamento == 1 || nivelProcessamento == 2 || nivelProcessamento == 3) {
+		if (nivelProcessamento <= 3) {
 			// competencias e guias
 			System.out.println("Lendo competencias e guias");
 			dadosList = extractorService.lerArquivo("dados_guia");
