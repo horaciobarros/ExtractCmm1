@@ -726,7 +726,7 @@ public class ExtractorService {
 
 				notasFiscaisDao.save(nf);
 
-				Tomadores t = (Tomadores) mapTomadores.get(nf.getInscricaoTomador().trim());
+				Tomadores t = mapTomadores.get(nf.getInscricaoTomador().trim());
 
 				processaDemaisTiposNotas(p, nf, dlp, log, linha, t);
 
