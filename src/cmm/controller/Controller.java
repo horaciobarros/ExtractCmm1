@@ -18,6 +18,7 @@ public class Controller {
 	public void importaNfe() {
 
 		int nivelProcessamento = 4;
+		boolean txtsTratados = true;
 
 		System.out.println("Limpando o banco...");
 
@@ -52,7 +53,7 @@ public class Controller {
 			System.out.println("--- Fim de ajustes ---");
 
 			System.out.println("Lendo prestador"); // prestador
-			dadosList = extractorService.lerArquivo("dados_livro_prestador", 64);
+			dadosList = extractorService.lerArquivo("dados_livro_prestador");
 			extractorService.processaDadosLivroPrestador(dadosList);
 			System.out.println("--- Fim de prestador ---");
 
@@ -60,7 +61,7 @@ public class Controller {
 		
 		if (nivelProcessamento <= 2) {
 			System.out.println("Lendo tomador");
-			dadosList = extractorService.lerArquivo("dados_livro_tomador", 66);
+			dadosList = extractorService.lerArquivo("dados_livro_tomador");
 			extractorService.processaDadosLivroTomador(dadosList);
 			System.out.println("--- Fim de tomador ---");
 			
@@ -83,7 +84,7 @@ public class Controller {
 
 		// notas fiscais
 		System.out.println("Lendo notas fiscais - " + Util.getDateHourMinutes(new Date()));
-		dadosList = extractorService.lerArquivo("dados_livro_prestador", 64);
+		dadosList = extractorService.lerArquivo("dados_livro_prestador");
 		System.out.println("Processando notas fiscais - " + Util.getDateHourMinutes(new Date()));
 		extractorService.processaDadosNotasFiscais(dadosList);
 		System.out.println("--- Fim de notas fiscais ---" + Util.getDateHourMinutes(new Date()));

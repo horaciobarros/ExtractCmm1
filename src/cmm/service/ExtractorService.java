@@ -806,7 +806,7 @@ public class ExtractorService {
 		List<String> dadosList = new ArrayList<String>();
 		try {
 			br = new BufferedReader(
-					new InputStreamReader(new FileInputStream("c:/TEMP/lagoa/" + arquivoIn + ".txt"), "UTF-8"));
+					new InputStreamReader(new FileInputStream("c:/TEMP/lagoa/tratados/" + arquivoIn + ".txt"), "UTF-8"));
 
 			br.readLine(); // cabe�alho
 			while (br.ready()) {
@@ -815,48 +815,6 @@ public class ExtractorService {
 			}
 			br.close();
 			return dadosList;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-
-	}
-
-	public List<String> lerArquivo(String arquivoIn, int qtdeCampos) {
-		File file, fileWr;
-		file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
-		fileWr = new File("c:/TEMP/lagoa/txts_corrigidos/" + arquivoIn + "_new.txt");
-		try {
-			BufferedReader br;
-			OutputStreamWriter bo = new OutputStreamWriter(new FileOutputStream("c:\\temp\\acentos.txt"), "UTF-8");
-			List<String> dadosList = new ArrayList<String>();
-			try {
-				br = new BufferedReader(
-						new InputStreamReader(new FileInputStream("c:/TEMP/lagoa/" + arquivoIn + ".txt"), "UTF-8"));
-				br.readLine(); // cabe�alho
-				while (br.ready()) {
-					StringBuilder linhaDefinitiva = new StringBuilder();
-					String[] arrayAux = { "", "" };
-
-					while (arrayAux != null && arrayAux.length < qtdeCampos) {
-						String linha = br.readLine();
-						linha = preparaParaSplit(linha);
-						linhaDefinitiva.append(linha);
-						arrayAux = linhaDefinitiva.toString().split("#");
-					}
-
-					String linhaAux = linhaDefinitiva.toString();
-					linhaAux = linhaAux.replaceAll("\"", "");
-					dadosList.add(linhaAux);
-					bo.write(linhaAux + "\n");
-
-				}
-				br.close();
-				bo.close();
-				return dadosList;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
