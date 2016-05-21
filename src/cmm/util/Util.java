@@ -173,5 +173,11 @@ public class Util {
 		
 		return value;
 	}
+	
+	public static String getDateHourMinutes(Date data) {
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		
+		return formatter.format(data);
+	}
 
 }

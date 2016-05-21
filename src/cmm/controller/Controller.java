@@ -1,8 +1,10 @@
 package cmm.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import cmm.service.ExtractorService;
+import cmm.util.Util;
 
 /**
  * 
@@ -15,7 +17,7 @@ public class Controller {
 
 	public void importaNfe() {
 
-		int nivelProcessamento = 2;
+		int nivelProcessamento = 4;
 
 		System.out.println("Limpando o banco...");
 
@@ -80,11 +82,11 @@ public class Controller {
 		}
 
 		// notas fiscais
-		System.out.println("Lendo notas fiscais");
+		System.out.println("Lendo notas fiscais - " + Util.getDateHourMinutes(new Date()));
 		dadosList = extractorService.lerArquivo("dados_livro_prestador", 64);
-		System.out.println("Processando notas fiscais");
+		System.out.println("Processando notas fiscais - " + Util.getDateHourMinutes(new Date()));
 		extractorService.processaDadosNotasFiscais(dadosList);
-		System.out.println("--- Fim de notas fiscais ---");
+		System.out.println("--- Fim de notas fiscais ---" + Util.getDateHourMinutes(new Date()));
 	}
 
 }
