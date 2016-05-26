@@ -180,4 +180,17 @@ public class Util {
 		return formatter.format(data);
 	}
 
+	public Date getDecimoDiaMesPosterior(Date dataFim) {
+		System.out.println(dataFim.toString());
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dataFim);
+		calendar.set(Calendar.MONTH, calendar.get(calendar.MONTH) + 1);
+		calendar.set(Calendar.DAY_OF_MONTH, 10);
+
+		return calendar.getTime();
+	}
+
+	public static void main(String args[]){
+		new Util().getDecimoDiaMesPosterior(new Date());
+	}
 }

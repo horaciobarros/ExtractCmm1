@@ -305,7 +305,8 @@ public class ExtractorService {
 						cp.setDescricao(descricao.trim());
 						cp.setDataInicio(util.getFirstDayOfMonth(dg.getAno(), dg.getMes()));
 						cp.setDataFim(util.getLastDayOfMonth(dg.getAno(), dg.getMes()));
-						cp.setDataVencimento(cp.getDataFim());
+						cp.setDataVencimento(util.getDecimoDiaMesPosterior(cp.getDataFim()));
+						
 						competenciasDao.save(cp);
 					}
 				} catch (Exception e) {

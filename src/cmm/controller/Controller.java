@@ -8,7 +8,8 @@ import cmm.util.Util;
 
 /**
  * 
- * @author jway
+ * @author jway 
+ * Lagoa da Prata
  *
  */
 public class Controller {
