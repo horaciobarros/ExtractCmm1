@@ -7,11 +7,13 @@ import cmm.service.ExtractorService;
 public class MainTest {
 
 	public static void main(String args[]) {
-		Util util = new Util();
-		ExtractorService extractorService = new ExtractorService();
 		
-		String data = "2016-01-31";
-		System.out.println(util.getDecimoDiaMesPosterior(util.getStringToDate(data)));
+		String teste = "(31)98706-80-62";
+		
+		teste = teste.replaceAll("\\(", "");
+		teste = teste.replaceAll("\\)", "");
+		teste = teste.replaceAll("-", "");
+		System.out.println(teste);
 		
 		
 	}

@@ -36,6 +36,15 @@ public class TomadoresDao {
 	}
 
 	public void save(Tomadores t) {
+		if (t.getId() != null) {
+			try {
+				throw new Exception("Erro fatal: gravando entidade com id já definido.");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		try {
@@ -46,8 +55,9 @@ public class TomadoresDao {
 		session.beginTransaction().commit();
 		session.close();
 	}
-	
+
 	public void update(Tomadores t) {
+
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		try {
@@ -59,10 +69,9 @@ public class TomadoresDao {
 		session.close();
 	}
 
-
 	public Tomadores findByInscricaoMunicipal(String inscMunicipal) {
-		Query query = sessionFactory.openSession()
-				.createQuery("from Tomadores t  " + " where t.inscricaoMunicipal like '%" + inscMunicipal.trim() + "%'");
+		Query query = sessionFactory.openSession().createQuery(
+				"from Tomadores t  " + " where t.inscricaoMunicipal like '%" + inscMunicipal.trim() + "%'");
 
 		try {
 			List<Tomadores> tomadores = query.list();
@@ -75,38 +84,38 @@ public class TomadoresDao {
 		}
 		return null;
 	}
-	
+
 	public List<Tomadores> findNaoEnviados() {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = session
-				.createQuery("from Tomadores c where hash is null").setFirstResult(0).setMaxResults(1000);
+		Query query = session.createQuery("from Tomadores c where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<Tomadores> lista = query.list();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 
 		return lista;
 	}
 
-	public void saveHash(List<Tomadores> listaAtualizados, String hash){
+	public void saveHash(List<Tomadores> listaAtualizados, String hash) {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
-		builder.append("update Tomadores set hash = '"+hash+"' where ");
-		
-		for (Tomadores c : listaAtualizados){
-			builder.append("id = "+c.getId()+" or ");
+		builder.append("update Tomadores set hash = '" + hash + "' where ");
+
+		for (Tomadores c : listaAtualizados) {
+			builder.append("id = " + c.getId() + " or ");
 		}
-		
+
 		String sql = builder.toString();
-		sql = sql.toString().substring(0,sql.length()-4);
+		sql = sql.toString().substring(0, sql.length() - 4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 	}
-	
+
 	public List<Tomadores> findAll() {
-		Query query = sessionFactory.openSession()
-				.createQuery("from Tomadores t  ");
+		Query query = sessionFactory.openSession().createQuery("from Tomadores t  ");
 
 		try {
 			List<Tomadores> tomadores = query.list();
@@ -119,4 +128,5 @@ public class TomadoresDao {
 		}
 		return null;
 	}
+
 }
