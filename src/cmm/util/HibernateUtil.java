@@ -19,7 +19,7 @@ public class HibernateUtil {
 			if (!file.exists()) {
 				JOptionPane
 						.showMessageDialog(null,
-								"arquivo de configuração do Banco de Dados não encontrado!");
+								"arquivo de configuraï¿½ï¿½o do Banco de Dados nï¿½o encontrado!");
 				throw new ExceptionInInitializerError();
 			} else {
 				AnnotationConfiguration configuration = new AnnotationConfiguration();
@@ -74,15 +74,21 @@ public class HibernateUtil {
 				
 				configuration
 				.addAnnotatedClass(cmm.model.Tomadores.class);
-		
-		
+				
+				configuration
+				.addAnnotatedClass(cmm.model.Pessoa.class);
+				
+				configuration
+				.addAnnotatedClass(cmm.model.MunicipiosIbge.class);
+
+
 				SessionFactory sessionFactory = configuration.configure(file)
 						.buildSessionFactory();
 				return sessionFactory;
 			}
 		} catch (Throwable ex) {
 			JOptionPane.showMessageDialog(null,
-					"Erro em configuração do banco! Detalhes no log da aplicação");
+					"Erro em configuraï¿½ï¿½o do banco! Detalhes no log da aplicaï¿½ï¿½o");
 			ex.printStackTrace();
 			return null;
 		}
