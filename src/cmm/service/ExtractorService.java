@@ -224,13 +224,13 @@ public class ExtractorService {
 						pessoa = trataNumerosTelefones(pessoa);
 						pessoa = anulaCamposVazios(pessoa);
 						pessoaDao.update(pessoa);
-						
+
 					}
-					
-				} catch (Exception e){
-					
+
+				} catch (Exception e) {
+
 				}
-				
+
 				// ajustando prestadores
 				Prestadores p = prestadoresDao.findByInscricao(dc.getCnpj().trim());
 				try {
@@ -359,7 +359,13 @@ public class ExtractorService {
 	public void processaDadosGuiaCompetencias(List<String> dadosList) {
 		FileLog log = new FileLog("dados_guia");
 
+		int linhas = 0;
+		linhasMil = 0;
+
 		for (String linha : dadosList) {
+			linhas++;
+			linhasMil++;
+			mostraProgresso(linhas, dadosList.size());
 
 			try {
 				linha = preparaParaSplit(linha);
@@ -561,7 +567,7 @@ public class ExtractorService {
 						} catch (Exception e) {
 							t.setMunicipioIbge(null);
 						}
-						
+
 						tomadoresDao.save(t);
 					} else { // registro j� existe, atualizar informa��es n�o
 								// preenchidas
@@ -776,7 +782,14 @@ public class ExtractorService {
 			buscaPrestadores();
 		}
 
+		int linhas = 0;
+		linhasMil = 0;
+
 		for (String linha : dadosList) {
+			linhas++;
+			linhasMil++;
+			mostraProgresso(linhas, dadosList.size());
+
 			try {
 
 				linha = preparaParaSplit(linha);
@@ -1048,7 +1061,7 @@ public class ExtractorService {
 
 		return t;
 	}
-	
+
 	private Pessoa anulaCamposVazios(Pessoa pessoa) {
 		if (pessoa.getEmail() != null && pessoa.getEmail().trim().isEmpty()) {
 			pessoa.setEmail(null);
@@ -1090,6 +1103,5 @@ public class ExtractorService {
 
 		return pessoa;
 	}
-
 
 }
