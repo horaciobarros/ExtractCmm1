@@ -211,6 +211,7 @@ public class ExtractorService {
 							pessoa.setInscricaoEstadual(dc.getInscricaoEstadual());
 						}
 						pessoa = trataNumerosTelefones(pessoa);
+						pessoa.setUf(dc.getEnderecoUf());
 						pessoa = anulaCamposVazios(pessoa);
 						pessoaDao.save(pessoa);
 					} else {
@@ -219,7 +220,7 @@ public class ExtractorService {
 						} else {
 							pessoa.setInscricaoEstadual(dc.getInscricaoEstadual());
 						}
-
+						pessoa.setUf(dc.getEnderecoUf());	
 						pessoa.setInscricaoMunicipal(dc.getInscricaoMunicipal());
 						pessoa = trataNumerosTelefones(pessoa);
 						pessoa = anulaCamposVazios(pessoa);
@@ -326,6 +327,12 @@ public class ExtractorService {
 						}
 						t = trataNumerosTelefones(t);
 						t = anulaCamposVazios(t);
+						try {
+							t.setMunicipioIbge(Long.valueOf(municipiosIbgeDao.getCodigo(t.getMunicipio())));
+						} catch (Exception e) {
+							t.setMunicipioIbge(null);
+						}
+
 						tomadoresDao.save(t);
 					} else {
 						if (dc.getInscricaoEstadual() != null && dc.getInscricaoEstadual().length() >= 15) {
@@ -339,6 +346,12 @@ public class ExtractorService {
 						t.setPrestadores(p);
 						t = trataNumerosTelefones(t);
 						t = anulaCamposVazios(t);
+						try {
+							t.setMunicipioIbge(Long.valueOf(municipiosIbgeDao.getCodigo(t.getMunicipio())));
+						} catch (Exception e) {
+							t.setMunicipioIbge(null);
+						}
+
 						tomadoresDao.update(t);
 					}
 

@@ -6,10 +6,11 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "guias")
+@Table(name = "municipios_ibge")
 public class MunicipiosIbge implements Serializable {
 
 	/**
@@ -17,6 +18,7 @@ public class MunicipiosIbge implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@Id
 	@Column(name = "codigo")
 	private String codigo;
 

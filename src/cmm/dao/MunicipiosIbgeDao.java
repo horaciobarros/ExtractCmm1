@@ -8,7 +8,7 @@ import org.hibernate.SessionFactory;
 import cmm.model.MunicipiosIbge;
 import cmm.util.HibernateUtil;
 
-public class MunicipiosIbgeDao {
+public class MunicipiosIbgeDao  {
 	
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
