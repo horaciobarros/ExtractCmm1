@@ -18,9 +18,10 @@ public class MunicipiosIbgeDao  {
 	}
 
 	
-	public String getCodigo(String nomeMunicipio) {
+	public String getCodigoIbge(String nomeMunicipio, String uf) {
 		Query query = sessionFactory.openSession()
-				.createQuery("from MunicipiosIbge m  " + " where upper(m.municipio) like '%" + nomeMunicipio.trim().toUpperCase() + "%'");
+				.createQuery("from MunicipiosIbge m  " + " where upper(m.municipio) like '%" + nomeMunicipio.trim().toUpperCase() + "%' "
+						+ " and upper(m.uf) like '%" + uf.trim().toUpperCase() + "%'");
 
 		try {
 			List<MunicipiosIbge> municipios = query.list();
@@ -35,4 +36,21 @@ public class MunicipiosIbgeDao  {
 	}
 
 
+	public String findUfByCodigoIbge(Long codigo) {
+		Query query = sessionFactory.openSession()
+				.createQuery("from MunicipiosIbge m where m.codigo = " + codigo 
+						);
+
+		try {
+			List<MunicipiosIbge> municipios = query.list();
+
+			if (municipios.size() > 0) {
+				return municipios.get(0).getUf();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 }

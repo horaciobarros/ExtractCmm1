@@ -17,7 +17,7 @@ public class Controller {
 
 	public void importaNfe() {
 
-		int nivelProcessamento = 1;
+		int nivelProcessamento = 2;
 		boolean txtsTratados = true;
 
 		System.out.println("Lagoa da Prata - Limpando o banco...");

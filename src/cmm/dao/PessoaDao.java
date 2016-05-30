@@ -79,4 +79,27 @@ public class PessoaDao {
 		query.executeUpdate();
 		tx.commit();session.close();
 	}
+	
+	public List<Pessoa> findAll() {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session
+				.createQuery("from Pessoa p ");
+		List<Pessoa> lista = query.list();
+		tx.commit();session.close();
+
+		return lista;
+	}
+	
+	public Pessoa ultimoPessoaIdGravado() {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session
+				.createQuery("from Pessoa p order by pessoaId desc").setFirstResult(0).setMaxResults(1);
+		List<Pessoa> lista = query.list();
+		tx.commit();session.close();
+
+		return lista.get(0);
+	}
+
 }
