@@ -95,6 +95,18 @@ public class Pessoa implements Serializable {
 	
 	@Column(name = "uf")
 	private String uf;
+	
+	@Column(name = "sexo")
+	private String sexo;
+
+
+	public String getSexo() {
+		return sexo;
+	}
+
+	public void setSexo(String sexo) {
+		this.sexo = sexo;
+	}
 
 	public String getUf() {
 		return uf;

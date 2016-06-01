@@ -216,6 +216,10 @@ public class ExtractorService {
 						pessoa.setUf(dc.getEnderecoUf());
 						pessoa.setMunicipioIbge(
 								Long.valueOf(municipiosIbgeDao.getCodigoIbge(pessoa.getMunicipio(), pessoa.getUf())));
+						
+						if (pessoa.getTipoPessoa().equals("F")) {
+							pessoa.setSexo("M");
+						}
 						pessoa = anulaCamposVazios(pessoa);
 						pessoaDao.save(pessoa);
 					} else {
@@ -685,6 +689,10 @@ public class ExtractorService {
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
+							if (pessoa.getTipoPessoa().equals("F")) {
+								pessoa.setSexo("M");
+							}
+							
 							pessoa = anulaCamposVazios(pessoa);
 							pessoaDao.save(pessoa);
 						}
