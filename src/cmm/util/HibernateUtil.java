@@ -80,6 +80,12 @@ public class HibernateUtil {
 				
 				configuration
 				.addAnnotatedClass(cmm.model.MunicipiosIbge.class);
+				
+				configuration
+				.addAnnotatedClass(cmm.model.Bairros.class);
+				
+				configuration
+				.addAnnotatedClass(cmm.model.Logradouros.class);
 
 
 				SessionFactory sessionFactory = configuration.configure(file)
