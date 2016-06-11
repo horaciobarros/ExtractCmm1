@@ -2,8 +2,6 @@ package cmm.service;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +64,7 @@ public class ExtractorService {
 	private PessoaDao pessoaDao = new PessoaDao();
 	private int linhasMil = 0;
 	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
+	private int proximoNumeroGuia = 900633961;
 
 	public void processaPlanoConta(List<String> dadosList) {
 		FileLog log = new FileLog("plano_conta");
@@ -180,7 +179,6 @@ public class ExtractorService {
 					if (pessoa == null || pessoa.getId() == null) {
 						pessoa = new Pessoa();
 						pessoa.setPessoaId(Long.valueOf(dc.getIdCodigo()));
-						pessoa.setCelular(dc.getTelefone());
 						pessoa.setEmail(dc.getEmail() != null && dc.getEmail().length() >= 80
 								? dc.getEmail().substring(0, 80) : dc.getEmail());
 						pessoa.setCnpjCpf(cnpjCpf);
@@ -197,6 +195,8 @@ public class ExtractorService {
 						}
 						pessoa.setNumero(dc.getEnderecoNumero());
 						pessoa.setOptanteSimples(util.getOptantePeloSimplesNacional(dc.getOptanteSimplesNacional()));
+
+						dc.setTelefone(util.getLimpaTelefone(dc.getTelefone()));
 						if (dc.getTelefone() != null && dc.getTelefone().trim().length() > 11) {
 							pessoa.setTelefone(dc.getTelefone().trim().substring(0, 11));
 							pessoa.setCelular(dc.getTelefone().trim().substring(0, 11));
@@ -216,22 +216,33 @@ public class ExtractorService {
 						pessoa.setUf(dc.getEnderecoUf());
 						pessoa.setMunicipioIbge(
 								Long.valueOf(municipiosIbgeDao.getCodigoIbge(pessoa.getMunicipio(), pessoa.getUf())));
-						
+
 						if (pessoa.getTipoPessoa().equals("F")) {
 							pessoa.setSexo("M");
 						}
 						pessoa = anulaCamposVazios(pessoa);
 						pessoaDao.save(pessoa);
 					} else {
+
 						if (dc.getInscricaoEstadual() != null && dc.getInscricaoEstadual().length() >= 15) {
 							pessoa.setInscricaoEstadual(dc.getInscricaoEstadual().trim().substring(0, 14));
 						} else {
 							pessoa.setInscricaoEstadual(dc.getInscricaoEstadual());
 						}
 						pessoa.setUf(dc.getEnderecoUf());
+						if (pessoa.getMunicipio() == null) {
+							pessoa.setMunicipio(dc.getMunicipio());
+						}
 						pessoa.setMunicipioIbge(
 								Long.valueOf(municipiosIbgeDao.getCodigoIbge(pessoa.getMunicipio(), pessoa.getUf())));
 						pessoa.setInscricaoMunicipal(dc.getInscricaoMunicipal());
+						if ((pessoa.getTelefone() == null || pessoa.getTelefone().isEmpty())) {
+							pessoa.setTelefone(util.getLimpaTelefone(dc.getTelefone()));
+							if (pessoa.getCelular() == null) {
+								pessoa.setCelular(util.getLimpaTelefone(dc.getTelefone()));
+							}
+						}
+
 						pessoa = trataNumerosTelefones(pessoa);
 						pessoa = anulaCamposVazios(pessoa);
 						pessoaDao.update(pessoa);
@@ -248,7 +259,8 @@ public class ExtractorService {
 					if (p == null || p.getId() == 0 || p.getId() == null) {
 						try {
 							p = new Prestadores();
-							p.setAutorizado("S");
+							p.setAutorizado("N");
+							dc.setTelefone(util.getLimpaTelefone(dc.getTelefone()));
 							if (dc.getTelefone() != null && dc.getTelefone().trim().length() >= 11) {
 								p.setCelular(dc.getTelefone().trim().substring(0, 11));
 								p.setTelefone(dc.getTelefone().trim().substring(0, 11));
@@ -303,7 +315,6 @@ public class ExtractorService {
 				try {
 					if (t == null || t.getId() == null || t.getId() == 0) {
 						t = new Tomadores();
-						t.setCelular(dc.getTelefone());
 						t.setEmail(dc.getEmail() != null && dc.getEmail().length() >= 80
 								? dc.getEmail().substring(0, 80) : dc.getEmail());
 						t.setInscricaoTomador(inscricaoTomador.trim());
@@ -320,6 +331,7 @@ public class ExtractorService {
 						}
 						t.setNumero(dc.getEnderecoNumero());
 						t.setOptanteSimples(util.getOptantePeloSimplesNacional(dc.getOptanteSimplesNacional()));
+						dc.setTelefone(util.getLimpaTelefone(dc.getTelefone()));
 						if (dc.getTelefone() != null && dc.getTelefone().trim().length() > 11) {
 							t.setTelefone(dc.getTelefone().trim().substring(0, 11));
 							t.setCelular(dc.getTelefone().trim().substring(0, 11));
@@ -426,8 +438,12 @@ public class ExtractorService {
 					guias.setCompetencias(cp);
 					guias.setDataVencimento(util.getStringToDateHoursMinutes(dg.getDataVencimento()));
 					guias.setInscricaoPrestador(dg.getCnpj());
-					guias.setIntegrarGuia("S"); // TODO sanar d�vida
-					guias.setNumeroGuia(Long.valueOf(dg.getNossoNumero()));
+					guias.setIntegrarGuia("N"); // TODO sanar d�vida
+
+					proximoNumeroGuia++;
+					guias.setNumeroGuia(Long.valueOf(proximoNumeroGuia));
+					guias.setNumeroGuiaOrigem(dg.getNossoNumero());
+
 					Prestadores prestadores = prestadoresDao.findByInscricao(dg.getCnpj().trim());
 					if (prestadores == null) {
 						log.fillError(linha, "Prestador n�o encontrado:" + dg.getInscMunicipal());
@@ -563,13 +579,15 @@ public class ExtractorService {
 						// na hora de processar dados_cadastro estas informa��es
 						// tem que ser verificadas
 						t = new Tomadores();
+
+						dlt.setTelefoneTomador(util.getLimpaTelefone(dlt.getTelefoneTomador()));
 						t.setCelular(dlt.getTelefoneTomador());
 						t.setEmail(dlt.getEmailTomador() != null && dlt.getEmailTomador().length() >= 80
 								? dlt.getEmailTomador().substring(0, 80) : dlt.getEmailTomador());
 						t.setTelefone(dlt.getTelefoneTomador());
 						t.setInscricaoTomador(inscricaoTomador.trim());
+						t.setEndereco(dlt.getEnderecoTomador());
 						t.setBairro(dlt.getEnderecoBairroTomador());
-						t.setCelular(dlt.getTelefoneTomador());
 						t.setCep(dlt.getCepTomador());
 						t.setComplemento(dlt.getEnderecoComplementoTomador());
 						t.setInscricaoEstadual(dlt.getInscricaoEstadualTomador());
@@ -580,7 +598,6 @@ public class ExtractorService {
 
 						t.setNumero(dlt.getEnderecoNumeroTomador());
 						t.setOptanteSimples(util.getOptantePeloSimplesNacional(dlt.getOptantePeloSimplesNacional()));
-						t.setTelefone(dlt.getTelefoneTomador());
 
 						Prestadores p = null;
 						try {
@@ -649,7 +666,6 @@ public class ExtractorService {
 							proximoPessoaIdGravado++;
 							pessoa = new Pessoa();
 							pessoa.setPessoaId(proximoPessoaIdGravado);
-							pessoa.setCelular(t.getTelefone());
 							pessoa.setEmail(t.getEmail() != null && t.getEmail().length() >= 80
 									? t.getEmail().substring(0, 80) : t.getEmail());
 							pessoa.setCnpjCpf(cnpjCpf);
@@ -692,9 +708,20 @@ public class ExtractorService {
 							if (pessoa.getTipoPessoa().equals("F")) {
 								pessoa.setSexo("M");
 							}
-							
+
 							pessoa = anulaCamposVazios(pessoa);
 							pessoaDao.save(pessoa);
+						} else {
+							if (pessoa.getBairro() == null) {
+								pessoa.setBairro(t.getBairro());
+							}
+							if (pessoa.getEndereco() == null) {
+								pessoa.setEndereco(t.getEndereco());
+							}
+							if (pessoa.getMunicipio() == null) {
+								pessoa.setMunicipio(t.getMunicipio());
+							}
+							pessoaDao.update(pessoa);
 						}
 
 					} catch (Exception e) {
@@ -756,7 +783,8 @@ public class ExtractorService {
 						// na hora de processar dados_cadastro estas informa��es
 						// tem que ser verificadas
 						p = new Prestadores();
-						p.setAutorizado("S");
+						p.setAutorizado("N");
+						dlp.setTelefonePrestador(util.getLimpaTelefone(dlp.getTelefonePrestador()));
 						p.setCelular(dlp.getTelefonePrestador());
 						p.setEmail(dlp.getEmailPrestador());
 						p.setEnquadramento("N");
@@ -1004,15 +1032,23 @@ public class ExtractorService {
 		prestadoresThread.start();
 
 		// guias x notas fiscais
-		Guias g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
-		if (g != null) {
-			NotasThreadService nfGuias = new NotasThreadService(p, nf, dlp, log, linha, "G", g);
-			Thread gThread = new Thread(nfGuias);
-			gThread.start();
+		Guias g = new Guias();
+		if (dlp.getNossoNumero() != null && !dlp.getNossoNumero().trim().isEmpty()) {
+			g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
+			if (g != null) {
+				NotasThreadService nfGuias = new NotasThreadService(p, nf, dlp, log, linha, "G", g);
+				Thread gThread = new Thread(nfGuias);
+				gThread.start();
 
+			} else {
+				System.out.println("Numero de guia não encontrado: " + dlp.getNossoNumero());
+				
+			}
 		}
 
-		if (t != null && t.getId() != null) {
+		if (t != null && t.getId() != null)
+
+		{
 			NotasThreadService nfTomadores = new NotasThreadService(p, nf, dlp, log, linha, "T", g, t);
 			Thread nftThread = new Thread(nfTomadores);
 			nftThread.start();
@@ -1045,7 +1081,8 @@ public class ExtractorService {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
 				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos", "PrestadoresAtividades",
-				"" + "PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais", "Tomadores", "Prestadores", "Pessoa");
+				"" + "PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais", "Tomadores", "Prestadores",
+				"Pessoa");
 
 	}
 
@@ -1060,7 +1097,7 @@ public class ExtractorService {
 	public List<String> excluiParaProcessarNivel3() {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
-				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais", "Guias",
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais", "Pagamentos", "Guias",
 				"Competencias");
 	}
 
@@ -1068,6 +1105,10 @@ public class ExtractorService {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
 				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais");
+	}
+
+	public List<String> excluiGuiasNotasFiscais() {
+		return Arrays.asList("GuiasNotasFiscais");
 	}
 
 	private Prestadores trataNumerosTelefones(Prestadores p) {
@@ -1180,8 +1221,38 @@ public class ExtractorService {
 			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\)", ""));
 			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\-", ""));
 		}
+		
+		if (pessoa.getCelular() != null) {
+			if (pessoa.getCelular().trim().length() < 10) {
+				if (pessoa.getMunicipio().trim().equals("LAGOA DA PRATA")) {
+					pessoa.setCelular(incluiPrefixoLagoa(pessoa.getTelefone()));
+				}
+			} else {
+				if (pessoa.getCelular().substring(0, 1).equals("0")) {
+					pessoa.setCelular(pessoa.getCelular().substring(1));
+				}
+			}
+		}
+		if (pessoa.getTelefone() != null) {
+			if (pessoa.getTelefone().trim().length() < 10) {
+				if (pessoa.getMunicipio().trim().equals("LAGOA DA PRATA")) {
+					pessoa.setTelefone(incluiPrefixoLagoa(pessoa.getTelefone()));
+				}
+			} else {
+				if (pessoa.getTelefone().substring(0, 1).equals("0")) {
+					pessoa.setTelefone(pessoa.getCelular().substring(1));
+				}
+			}
+		}
+
 
 		return pessoa;
+	}
+
+	private String incluiPrefixoLagoa(String telefone) {
+		
+		telefone = "37" + telefone;
+		return telefone;
 	}
 
 }

@@ -59,7 +59,7 @@ public class GuiasDao {
 	public Guias findByNumeroGuia(String nossoNumero) {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = session.createQuery("from Guias c where numeroGuia = '" + nossoNumero.trim() + "'");
+		Query query = session.createQuery("from Guias g where g.numeroGuiaOrigem=" + Long.valueOf(nossoNumero.trim()));
 		List<Guias> lista = query.list();
 		tx.commit();
 		session.close();

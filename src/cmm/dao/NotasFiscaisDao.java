@@ -55,4 +55,15 @@ public class NotasFiscaisDao {
 		tx.commit();session.close();
 	}
 
+	public List<NotasFiscais> findAll() {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session
+				.createQuery("from NotasFiscais nf ");
+		List<NotasFiscais> lista = query.list();
+		tx.commit();session.close();
+
+		return lista;
+	}
+
 }

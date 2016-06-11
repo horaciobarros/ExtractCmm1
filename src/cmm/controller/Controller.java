@@ -3,6 +3,8 @@ package cmm.controller;
 import java.util.Date;
 import java.util.List;
 
+import cmm.dao.NotasFiscaisDao;
+import cmm.model.NotasFiscais;
 import cmm.service.ExtractorService;
 import cmm.util.Util;
 
@@ -14,23 +16,26 @@ import cmm.util.Util;
 public class Controller {
 
 	private ExtractorService extractorService = new ExtractorService();
+	private NotasFiscaisDao notasFiscaisDao = new NotasFiscaisDao();
 
 	public void importaNfe() {
 
-		int nivelProcessamento = 1;
+		int nivelProcessamento = 4;
 		boolean txtsTratados = true;
 
 		System.out.println("Lagoa da Prata - Limpando o banco...");
 
-		List<String> entidades;
+		List<String> entidades = null;
 		if (nivelProcessamento == 2) {
 			entidades = extractorService.excluiParaProcessarNivel2();
 		} else if (nivelProcessamento == 3) {
 			entidades = extractorService.excluiParaProcessarNivel3();
 		} else if (nivelProcessamento == 4) {
 			entidades = extractorService.excluiParaProcessarNivel4();
-		} else {
+		} else if (nivelProcessamento == 1) {
 			entidades = extractorService.excluiParaProcessarNivel1();
+		} else if (nivelProcessamento == 5) {
+			entidades = extractorService.excluiGuiasNotasFiscais();
 		}
 
 		// limpando o banco
@@ -42,16 +47,17 @@ public class Controller {
 			}
 		}
 
-		System.out.println("Lagoa da Prata - Leitura de arquivos txt - Início");
+		System.out.println(
+				"Lagoa da Prata - Leitura de arquivos txt - Início - Processando no nível: " + nivelProcessamento);
 		List<String> dadosList;
 
-		// Ajustando tomadores e prestadores atrav�s do dadosCadastro.txt
-		System.out.println("Ajustando contribuintes");
-		dadosList = extractorService.lerArquivo("dados_cadastro");
-		extractorService.processaDadosCadastro(dadosList);
-		System.out.println("--- Fim de ajustes ---");
-
 		if (nivelProcessamento == 1) {
+
+			// Ajustando tomadores e prestadores atrav�s do dadosCadastro.txt
+			System.out.println("Ajustando contribuintes");
+			dadosList = extractorService.lerArquivo("dados_cadastro");
+			extractorService.processaDadosCadastro(dadosList);
+			System.out.println("--- Fim de ajustes ---");
 
 			System.out.println("Lendo prestador"); // prestador
 			dadosList = extractorService.lerArquivo("dados_livro_prestador");
@@ -87,12 +93,15 @@ public class Controller {
 
 		}
 
-		// notas fiscais
-		System.out.println("Lendo notas fiscais - " + Util.getDateHourMinutes(new Date()));
-		dadosList = extractorService.lerArquivo("dados_livro_prestador");
-		System.out.println("Gravando notas fiscais - " + Util.getDateHourMinutes(new Date()));
-		extractorService.processaDadosNotasFiscais(dadosList);
-		System.out.println("--- Fim de notas fiscais ---" + Util.getDateHourMinutes(new Date()));
+		if (nivelProcessamento <= 4) {
+			// notas fiscais
+			System.out.println("Lendo notas fiscais - " + Util.getDateHourMinutes(new Date()));
+			dadosList = extractorService.lerArquivo("dados_livro_prestador");
+			System.out.println("Gravando notas fiscais - " + Util.getDateHourMinutes(new Date()));
+			extractorService.processaDadosNotasFiscais(dadosList);
+			System.out.println("--- Fim de notas fiscais ---" + Util.getDateHourMinutes(new Date()));
+		}
+
 	}
 
 }

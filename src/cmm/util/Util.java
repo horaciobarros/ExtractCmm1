@@ -181,7 +181,6 @@ public class Util {
 	}
 
 	public Date getDecimoDiaMesPosterior(Date dataFim) {
-		System.out.println(dataFim.toString());
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(dataFim);
 		calendar.set(Calendar.MONTH, calendar.get(calendar.MONTH) + 1);
@@ -192,5 +191,14 @@ public class Util {
 
 	public static void main(String args[]){
 		new Util().getDecimoDiaMesPosterior(new Date());
+	}
+
+	public String getLimpaTelefone(String telefone) {
+		
+		telefone = telefone.replaceAll(" ", "");
+		telefone = telefone.replaceAll("-", "");
+		telefone = telefone.replaceAll("\\(", "");
+		telefone = telefone.replaceAll("\\)", "");
+		return telefone.trim();
 	}
 }
