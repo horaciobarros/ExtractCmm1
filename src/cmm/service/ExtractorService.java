@@ -1042,7 +1042,7 @@ public class ExtractorService {
 
 			} else {
 				System.out.println("Numero de guia não encontrado: " + dlp.getNossoNumero());
-				
+
 			}
 		}
 
@@ -1221,7 +1221,7 @@ public class ExtractorService {
 			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\)", ""));
 			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\-", ""));
 		}
-		
+
 		if (pessoa.getCelular() != null) {
 			if (pessoa.getCelular().trim().length() < 10) {
 				if (pessoa.getMunicipio().trim().equals("LAGOA DA PRATA")) {
@@ -1245,13 +1245,16 @@ public class ExtractorService {
 			}
 		}
 
-
 		return pessoa;
 	}
 
 	private String incluiPrefixoLagoa(String telefone) {
-		
-		telefone = "37" + telefone;
+		if (telefone != null && !telefone.trim().isEmpty()) {
+			telefone = "37" + telefone;
+			if (telefone.trim().length() <= 3) {
+				telefone = null;
+			}
+		}
 		return telefone;
 	}
 
