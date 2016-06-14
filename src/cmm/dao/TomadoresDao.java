@@ -19,9 +19,10 @@ public class TomadoresDao {
 		sessionFactory = HibernateUtil.getSessionFactory();
 	}
 
-	public Tomadores findByInscricao(String inscricao) {
+	public Tomadores findByInscricao(String inscricaoTomador, String inscricaoPrestador) {
 		Query query = sessionFactory.openSession()
-				.createQuery("from Tomadores t  " + " where t.inscricaoTomador like '%" + inscricao.trim() + "%'");
+				.createQuery("select t from Tomadores t  inner join t.prestadores p " + " where t.inscricaoTomador like '%" + inscricaoTomador.trim() + "%' "
+						+ " and p.inscricaoPrestador like '%" + inscricaoPrestador + "%'");
 
 		try {
 			List<Tomadores> tomadores = query.list();

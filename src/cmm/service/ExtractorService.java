@@ -59,8 +59,6 @@ public class ExtractorService {
 	private PagamentosDao pagamentosDao = new PagamentosDao();
 	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
 	private PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
-	private Map<String, Tomadores> mapTomadores = new Hashtable<String, Tomadores>();
-	private Map<String, Prestadores> mapPrestadores = new Hashtable<String, Prestadores>();
 	private PessoaDao pessoaDao = new PessoaDao();
 	private int linhasMil = 0;
 	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
@@ -309,79 +307,6 @@ public class ExtractorService {
 					e.printStackTrace();
 				}
 
-				// ajustando tomadores
-				String inscricaoTomador = dc.getCnpj().trim();
-				Tomadores t = tomadoresDao.findByInscricao(inscricaoTomador);
-				try {
-					if (t == null || t.getId() == null || t.getId() == 0) {
-						t = new Tomadores();
-						t.setEmail(dc.getEmail() != null && dc.getEmail().length() >= 80
-								? dc.getEmail().substring(0, 80) : dc.getEmail());
-						t.setInscricaoTomador(inscricaoTomador.trim());
-						t.setBairro(dc.getEnderecoBairro());
-						t.setEndereco(dc.getEndereco());
-						t.setCep(dc.getEnderecoCep());
-						t.setComplemento(dc.getEnderecoComplemento());
-						t.setInscricaoMunicipal(dc.getInscricaoMunicipal());
-						t.setMunicipio(dc.getMunicipio());
-						t.setNome(dc.getRazaoSocial());
-						t.setNomeFantasia(dc.getNomeFantasia());
-						if (dc.getNomeFantasia() == null || dc.getNomeFantasia().isEmpty()) {
-							t.setNomeFantasia(t.getNome());
-						}
-						t.setNumero(dc.getEnderecoNumero());
-						t.setOptanteSimples(util.getOptantePeloSimplesNacional(dc.getOptanteSimplesNacional()));
-						dc.setTelefone(util.getLimpaTelefone(dc.getTelefone()));
-						if (dc.getTelefone() != null && dc.getTelefone().trim().length() > 11) {
-							t.setTelefone(dc.getTelefone().trim().substring(0, 11));
-							t.setCelular(dc.getTelefone().trim().substring(0, 11));
-						} else {
-							t.setTelefone(dc.getTelefone().trim());
-							t.setCelular(dc.getTelefone().trim());
-						}
-						p = prestadoresDao.findByInscricao(dc.getCnpj().trim());
-						t.setPrestadores(p);
-						t.setTipoPessoa(util.getTipoPessoa(dc.getCnpj().trim()));
-						if (dc.getInscricaoEstadual() != null && dc.getInscricaoEstadual().length() >= 15) {
-							t.setInscricaoEstadual(dc.getInscricaoEstadual().trim().substring(0, 14));
-						} else {
-							t.setInscricaoEstadual(dc.getInscricaoEstadual());
-						}
-						t = trataNumerosTelefones(t);
-						t = anulaCamposVazios(t);
-						try {
-							t.setMunicipioIbge(Long
-									.valueOf(municipiosIbgeDao.getCodigoIbge(t.getMunicipio(), dc.getEnderecoUf())));
-						} catch (Exception e) {
-							t.setMunicipioIbge(null);
-						}
-
-						tomadoresDao.save(t);
-					} else {
-						if (dc.getInscricaoEstadual() != null && dc.getInscricaoEstadual().length() >= 15) {
-							t.setInscricaoEstadual(dc.getInscricaoEstadual().trim().substring(0, 14));
-						} else {
-							t.setInscricaoEstadual(dc.getInscricaoEstadual());
-						}
-
-						t.setInscricaoMunicipal(dc.getInscricaoMunicipal());
-						p = prestadoresDao.findByInscricao(dc.getCnpj().trim());
-						t.setPrestadores(p);
-						t = trataNumerosTelefones(t);
-						t = anulaCamposVazios(t);
-						try {
-							t.setMunicipioIbge(Long
-									.valueOf(municipiosIbgeDao.getCodigoIbge(t.getMunicipio(), dc.getEnderecoUf())));
-						} catch (Exception e) {
-							t.setMunicipioIbge(null);
-						}
-
-						tomadoresDao.update(t);
-					}
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
 
 			} catch (Exception e) {
 				log.fillError(linha, e);
@@ -503,9 +428,6 @@ public class ExtractorService {
 
 	public void processaDadosLivroTomador(List<String> dadosList) {
 
-		buscaPrestadores();
-		buscaTomadores();
-
 		Long proximoPessoaIdGravado = null;
 		Pessoa ultimaPessoa = null;
 		try {
@@ -523,14 +445,6 @@ public class ExtractorService {
 		}
 
 		FileLog log = new FileLog("dados_livro_tomador");
-		if (mapPrestadores == null || mapTomadores == null || mapPrestadores.isEmpty() || mapTomadores.isEmpty()) {
-			try {
-				throw new Exception(
-						"Erro fatal: Dados de prestadores ou tomadores não foram devidamente alocados na memória!");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 
 		int linhas = 0;
 		linhasMil = 0;
@@ -569,7 +483,7 @@ public class ExtractorService {
 				String inscricaoTomador = dlt.getCnpjTomador().trim();
 				Tomadores t = null;
 				try {
-					t = mapTomadores.get(inscricaoTomador.trim());
+					t = tomadoresDao.findByInscricao(inscricaoTomador.trim(), dlt.getCnpjPrestador().trim());
 				} catch (Exception e) {
 					e.printStackTrace();
 
@@ -606,7 +520,31 @@ public class ExtractorService {
 							e.printStackTrace();
 						}
 						if (p == null || p.getId() == null || p.getId() == 0) {
-							throw new Exception("Prestador não encontrado:" + dlt.getCnpjPrestador().trim());
+							if (p == null || p.getId() == 0 || p.getId() == null) {
+								try {
+									p = new Prestadores();
+									p.setAutorizado("N");
+									dlt.setTelefonePrestador(util.getLimpaTelefone(dlt.getTelefonePrestador()));
+									if (dlt.getTelefonePrestador() != null && dlt.getTelefonePrestador().trim().length() >= 11) {
+										p.setCelular(dlt.getTelefonePrestador().trim().substring(0, 11));
+										p.setTelefone(dlt.getTelefonePrestador().trim().substring(0, 11));
+									} else {
+										p.setCelular(dlt.getTelefonePrestador().trim());
+										p.setTelefone(dlt.getTelefonePrestador().trim());
+									}
+									p.setEmail(dlt.getEmailPrestador());
+									p.setEnquadramento("N");
+									p.setInscricaoPrestador(dlt.getCnpjPrestador());
+									p = trataNumerosTelefones(p);
+									p = anulaCamposVazios(p);
+									prestadoresDao.save(p);
+								} catch (Exception e) {
+									log.fillError(linha, e);
+									e.printStackTrace();
+								}
+							}
+
+
 
 						}
 
@@ -656,9 +594,8 @@ public class ExtractorService {
 						tomadoresDao.update(t);
 
 					}
-					mapTomadores.put(t.getInscricaoTomador().trim(), t);
 
-					// incluindo pessoa
+					// incluindo pessoa do tomador
 					String cnpjCpf = dlt.getCnpjTomador().trim();
 					Pessoa pessoa = pessoaDao.findByCnpjCpf(cnpjCpf);
 					try {
@@ -727,6 +664,66 @@ public class ExtractorService {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+					
+					// incluindo pessoa do prestador
+					cnpjCpf = dlt.getCnpjPrestador().trim();
+					pessoa = pessoaDao.findByCnpjCpf(cnpjCpf);
+					try {
+						if (pessoa == null || pessoa.getId() == null) {
+							proximoPessoaIdGravado++;
+							pessoa = new Pessoa();
+							pessoa.setPessoaId(proximoPessoaIdGravado);
+							pessoa.setEmail(dlt.getEmailPrestador() != null && dlt.getEmailPrestador().length() >= 80
+									? dlt.getEmailPrestador().substring(0, 80) : dlt.getEmailPrestador());
+							pessoa.setCnpjCpf(cnpjCpf);
+							pessoa.setBairro(dlt.getEnderecoBairroPrestador());
+							pessoa.setEndereco(dlt.getEnderecoPrestador());
+							pessoa.setCep(dlt.getCepPrestador());
+							pessoa.setComplemento(dlt.getEnderecoComplementoPrestador());
+							pessoa.setInscricaoMunicipal(dlt.getInscricaoMunicipalPrestador());
+							pessoa.setMunicipio(dlt.getCidadePrestador());
+							pessoa.setNome(dlt.getRazaoSocialPrestador());
+							pessoa.setNomeFantasia(dlt.getNomeFantasiaPrestador());
+							if (dlt.getNomeFantasiaPrestador() == null || dlt.getNomeFantasiaPrestador().isEmpty()) {
+								pessoa.setNomeFantasia(dlt.getRazaoSocialPrestador());
+							}
+							pessoa.setNumero(dlt.getEnderecoNumeroPrestador());
+							pessoa.setOptanteSimples(util.getOptantePeloSimplesNacional(dlt.getOptantePeloSimplesNacional()));
+							if (dlt.getTelefonePrestador() != null && dlt.getTelefonePrestador().trim().length() > 11) {
+								pessoa.setTelefone(dlt.getTelefonePrestador().trim().substring(0, 11));
+								pessoa.setCelular(dlt.getTelefonePrestador().trim().substring(0, 11));
+							} else {
+								if (dlt.getTelefonePrestador() != null) {
+									pessoa.setTelefone(dlt.getTelefonePrestador().trim());
+									pessoa.setCelular(dlt.getTelefonePrestador().trim());
+								}
+							}
+							pessoa.setTipoPessoa(util.getTipoPessoa(pessoa.getCnpjCpf().trim()));
+							if (dlt.getInscricaoEstadualPrestador() != null && dlt.getInscricaoEstadualPrestador().length() >= 15) {
+								pessoa.setInscricaoEstadual(dlt.getInscricaoEstadualPrestador().trim().substring(0, 14));
+							} else {
+								pessoa.setInscricaoEstadual(dlt.getInscricaoEstadualPrestador());
+							}
+							pessoa = trataNumerosTelefones(pessoa);
+							pessoa.setUf(dlt.getUfPrestador());
+							try {
+								pessoa.setMunicipioIbge(Long.valueOf(
+										municipiosIbgeDao.getCodigoIbge(pessoa.getMunicipio(), pessoa.getUf())));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+							if (pessoa.getTipoPessoa().equals("F")) {
+								pessoa.setSexo("M");
+							}
+
+							pessoa = anulaCamposVazios(pessoa);
+							pessoaDao.save(pessoa);
+						}
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
 
 				} catch (org.hibernate.exception.ConstraintViolationException e) {
 					log.fillError(linha, e);
@@ -883,12 +880,6 @@ public class ExtractorService {
 
 	public void processaDadosNotasFiscais(List<String> dadosList) {
 		FileLog log = new FileLog("dados_livro_prestador_notas_fiscais");
-		if (this.mapTomadores == null || this.mapTomadores.size() == 0) {
-			buscaTomadores();
-		}
-		if (this.mapPrestadores == null || this.mapPrestadores.size() == 0) {
-			buscaPrestadores();
-		}
 
 		int linhas = 0;
 		linhasMil = 0;
@@ -918,7 +909,7 @@ public class ExtractorService {
 						arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[61], arrayLinha[63]);
 
 				String inscricaoPrestador = dlp.getCnpjPrestador().trim();
-				Prestadores p = mapPrestadores.get(inscricaoPrestador);
+				Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
 				try {
 					if (p == null || p.getId() == 0 || !inscricaoPrestador.trim().equals(p.getInscricaoPrestador())) {
 						throw new Exception();
@@ -971,7 +962,7 @@ public class ExtractorService {
 
 				notasFiscaisDao.save(nf);
 
-				Tomadores t = mapTomadores.get(nf.getInscricaoTomador().trim());
+				Tomadores t = tomadoresDao.findByInscricao(nf.getInscricaoTomador().trim(), nf.getInscricaoPrestador().trim());
 
 				processaDemaisTiposNotas(p, nf, dlp, log, linha, t);
 
@@ -982,22 +973,6 @@ public class ExtractorService {
 
 		}
 		log.close();
-
-	}
-
-	private void buscaPrestadores() {
-		for (Prestadores p : prestadoresDao.findAll()) {
-			mapPrestadores.put(p.getInscricaoPrestador(), p);
-		}
-
-	}
-
-	private void buscaTomadores() {
-		if (tomadoresDao.findAll() != null) {
-			for (Tomadores t : tomadoresDao.findAll()) {
-				mapTomadores.put(t.getInscricaoTomador().trim(), t);
-			}
-		}
 
 	}
 
