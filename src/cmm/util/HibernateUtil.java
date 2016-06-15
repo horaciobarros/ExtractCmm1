@@ -6,6 +6,8 @@ import javax.swing.JOptionPane;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 
+import cmm.model.GuiasNumeracaoCmm;
+
 
 public class HibernateUtil {
 
@@ -86,6 +88,9 @@ public class HibernateUtil {
 				
 				configuration
 				.addAnnotatedClass(cmm.model.Logradouros.class);
+				
+				configuration
+				.addAnnotatedClass(GuiasNumeracaoCmm.class);
 
 
 				SessionFactory sessionFactory = configuration.configure(file)
