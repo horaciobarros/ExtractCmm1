@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import cmm.dao.NotasFiscaisDao;
-import cmm.model.NotasFiscais;
 import cmm.service.ExtractorService;
 import cmm.util.Util;
 
@@ -16,7 +15,6 @@ import cmm.util.Util;
 public class Controller {
 
 	private ExtractorService extractorService = new ExtractorService();
-	private NotasFiscaisDao notasFiscaisDao = new NotasFiscaisDao();
 
 	public void importaNfe() {
 
@@ -63,15 +61,6 @@ public class Controller {
 			System.out.println("Gravando prestador"); // prestador
 			extractorService.processaDadosLivroPrestador(dadosList);
 			System.out.println("--- Fim de prestador ---");
-
-		}
-
-		if (nivelProcessamento <= 2) {
-			System.out.println("Lendo tomador");
-			dadosList = extractorService.lerArquivo("dados_livro_tomador");
-			System.out.println("Gravando tomador");
-			extractorService.processaDadosLivroTomador(dadosList);
-			System.out.println("--- Fim de tomador ---");
 
 		}
 
