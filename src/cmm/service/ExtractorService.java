@@ -57,7 +57,6 @@ public class ExtractorService {
 	private PessoaDao pessoaDao = new PessoaDao();
 	private int linhasMil = 0;
 	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
-	private int proximoNumeroGuia = 900633961;
 
 	public void processaPlanoConta(List<String> dadosList) {
 		FileLog log = new FileLog("plano_conta");
@@ -360,7 +359,8 @@ public class ExtractorService {
 					guias.setInscricaoPrestador(dg.getCnpj());
 					guias.setIntegrarGuia("N"); // TODO sanar d�vida
 
-					proximoNumeroGuia++;
+					String numeroGuia = dg.getNossoNumero().substring(3);
+					int proximoNumeroGuia = 60000000 + Integer.parseInt(numeroGuia); 
 					guias.setNumeroGuia(Long.valueOf(proximoNumeroGuia));
 					guias.setNumeroGuiaOrigem(dg.getNossoNumero());
 
