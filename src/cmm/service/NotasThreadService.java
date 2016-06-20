@@ -77,7 +77,7 @@ public class NotasThreadService implements Runnable {
 
 	@Override
 	public void run() {
-		if (tipoNotaFilha.equals("S")) { // serviços
+		if (tipoNotaFilha.equals("S") && !nf.getSituacao().equals("C")) { // serviços e não cancelada
 			try {
 
 				NotasFiscaisServicos nfs = new NotasFiscaisServicos();
@@ -109,6 +109,9 @@ public class NotasThreadService implements Runnable {
 			try {
 				NotasFiscaisCanceladas nfc = new NotasFiscaisCanceladas();
 				nfc.setDatahoracancelamento(util.getStringToDateHoursMinutes(dlp.getDataCancelamento()));
+				if (nfc.getDatahoracancelamento().getTime() < nf.getDataHoraEmissao().getTime()) {
+					nfc.setDatahoracancelamento(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
+				}
 				nfc.setInscricaoPrestador(dlp.getCnpjPrestador());
 				nfc.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 				nfc.setMotivo(dlp.getMotivoCancelamento());
@@ -124,7 +127,7 @@ public class NotasThreadService implements Runnable {
 		if (tipoNotaFilha.equals("E")) { // email
 			try {
 				NotasFiscaisEmails nfe = new NotasFiscaisEmails();
-				nfe.setEmail(dlp.getEmailPrestador());
+				nfe.setEmail(p.getEmail());
 				nfe.setInscricaoPrestador(dlp.getCnpjPrestador());
 				nfe.setNotasFiscais(nf);
 				nfe.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
@@ -139,10 +142,10 @@ public class NotasThreadService implements Runnable {
 			try {
 				NotasFiscaisPrestadores nfp = new NotasFiscaisPrestadores();
 				nfp.setBairro(dlp.getEnderecoBairroPrestador());
-				nfp.setCelular(dlp.getTelefonePrestador());
+				nfp.setCelular(util.getLimpaTelefone(dlp.getTelefonePrestador()));
 				nfp.setCep(dlp.getCepPrestador());
 				nfp.setComplemento(dlp.getEnderecoComplementoPrestador());
-				nfp.setEmail(dlp.getEmailPrestador());
+				nfp.setEmail(p.getEmail());
 				nfp.setEndereco(dlp.getEnderecoPrestador());
 				nfp.setInscricaoPrestador(dlp.getCnpjPrestador());
 				nfp.setNome(dlp.getRazaoSocialPrestador());
@@ -151,7 +154,6 @@ public class NotasThreadService implements Runnable {
 				nfp.setNumero(dlp.getEnderecoNumeroPrestador());
 				nfp.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 				nfp.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
-				nfp.setCep(dlp.getCepPrestador());
 				nfp.setTipoPessoa(util.getTipoPessoa(dlp.getCnpjPrestador()));
 				notasFiscaisPrestadoresDao.save(nfp);
 

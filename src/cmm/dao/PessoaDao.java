@@ -35,20 +35,22 @@ public class PessoaDao {
 		return null;
 	}
 
-	public void save(Pessoa p) {
+	public Pessoa save(Pessoa p) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		session.save(p);
 		session.beginTransaction().commit();
 		session.close();
+		return p;
 	}
 	
-	public void update(Pessoa p) {
+	public Pessoa update(Pessoa p) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		session.update(p);
 		session.beginTransaction().commit();
 		session.close();
+		return p;
 	}
 	
 	

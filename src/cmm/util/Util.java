@@ -162,21 +162,21 @@ public class Util {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "N";
-			
+
 		}
 	}
 
 	public String trataSeTiverVazio(String value) {
 		if (value == null || value.trim().isEmpty()) {
 			return "0";
-		} 
-		
+		}
+
 		return value;
 	}
-	
+
 	public static String getDateHourMinutes(Date data) {
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		
+
 		return formatter.format(data);
 	}
 
@@ -189,16 +189,45 @@ public class Util {
 		return calendar.getTime();
 	}
 
-	public static void main(String args[]){
+	public static void main(String args[]) {
 		new Util().getDecimoDiaMesPosterior(new Date());
 	}
 
 	public String getLimpaTelefone(String telefone) {
-		
+
 		telefone = telefone.replaceAll(" ", "");
 		telefone = telefone.replaceAll("-", "");
 		telefone = telefone.replaceAll("\\(", "");
 		telefone = telefone.replaceAll("\\)", "");
 		return telefone.trim();
+	}
+
+	public String trataEmail(String email) {
+		if (email != null) {
+			email = email.trim();
+			if (email != null && email.trim().isEmpty()) {
+				email = null;
+			}
+			if (email != null && email.contains(" ")) {
+				if (email.contains("@")) {
+					int posicaoVazia = email.indexOf(" ");
+					if (posicaoVazia > 0) {
+						email = email.substring(0, posicaoVazia);
+					} else {
+						email = email.trim();
+					}
+				} else {
+					email = null;
+				}
+			}
+		}
+		return email;
+	}
+
+	public String completarZerosEsquerda(String conteudo, int qtdeFinalDigitosDaString) {
+		while (conteudo.length() < qtdeFinalDigitosDaString) {
+			conteudo = "0" + conteudo;
+		}
+		return conteudo;
 	}
 }

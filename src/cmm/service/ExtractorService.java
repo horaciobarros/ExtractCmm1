@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import antlr.StringUtils;
 import cmm.dao.CompetenciasDao;
 import cmm.dao.Dao;
 import cmm.dao.GuiasDao;
@@ -213,7 +214,7 @@ public class ExtractorService {
 							pessoa.setSexo("M");
 						}
 						pessoa = anulaCamposVazios(pessoa);
-						pessoaDao.save(pessoa);
+						pessoa = pessoaDao.save(pessoa);
 					} else {
 
 						if (dc.getInscricaoEstadual() != null && dc.getInscricaoEstadual().length() >= 15) {
@@ -237,7 +238,7 @@ public class ExtractorService {
 
 						pessoa = trataNumerosTelefones(pessoa);
 						pessoa = anulaCamposVazios(pessoa);
-						pessoaDao.update(pessoa);
+						pessoa = pessoaDao.update(pessoa);
 
 					}
 
@@ -265,7 +266,7 @@ public class ExtractorService {
 							p.setInscricaoPrestador(dc.getCnpj());
 							p = trataNumerosTelefones(p);
 							p = anulaCamposVazios(p);
-							prestadoresDao.save(p);
+							p = prestadoresDao.save(p);
 						} catch (Exception e) {
 							log.fillError(linha, e);
 							e.printStackTrace();
@@ -300,7 +301,6 @@ public class ExtractorService {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
 
 			} catch (Exception e) {
 				log.fillError(linha, e);
@@ -360,7 +360,7 @@ public class ExtractorService {
 					guias.setIntegrarGuia("N"); // TODO sanar d�vida
 
 					String numeroGuia = dg.getNossoNumero().substring(3);
-					int proximoNumeroGuia = 60000000 + Integer.parseInt(numeroGuia); 
+					int proximoNumeroGuia = 60000000 + Integer.parseInt(numeroGuia);
 					guias.setNumeroGuia(Long.valueOf(proximoNumeroGuia));
 					guias.setNumeroGuiaOrigem(dg.getNossoNumero());
 
@@ -467,7 +467,7 @@ public class ExtractorService {
 						p.setTelefone(dlp.getTelefonePrestador());
 						p = trataNumerosTelefones(p);
 						p = anulaCamposVazios(p);
-						prestadoresDao.save(p);
+						p = prestadoresDao.save(p);
 					} else { // preencher campos vazios
 
 						if (p.getCelular() == null || p.getCelular().isEmpty()) {
@@ -487,7 +487,7 @@ public class ExtractorService {
 						}
 						p = trataNumerosTelefones(p);
 						p = anulaCamposVazios(p);
-						prestadoresDao.update(p);
+						p = prestadoresDao.update(p);
 
 					}
 
@@ -618,14 +618,14 @@ public class ExtractorService {
 				nf.setSituacao(dlp.getStatusNota().trim().substring(0, 1));
 				nf.setSituacaoTributaria(util.getSituacaoTributaria(dlp));
 				nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
-				if (dlp.getCodigoVerificacao() != null) {
+				if (dlp.getCodigoVerificacao() != null && !dlp.getCodigoVerificacao().trim().isEmpty()) {
 					if (dlp.getCodigoVerificacao().length() > 9) {
 						nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim().substring(0, 9));
 					} else {
 						nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim());
 					}
 				} else {
-					nf.setNumeroVerificacao("000000000");
+					nf.setNumeroVerificacao(util.completarZerosEsquerda(dlp.getIdCodigo().toString(), 9));
 				}
 				nf.setNaturezaOperacao("1"); // TODO resolver
 				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
@@ -638,7 +638,7 @@ public class ExtractorService {
 				nf.setServicoPrestadoForaPais("N");
 				nf.setDataHoraRps(nf.getDataHoraEmissao());
 
-				notasFiscaisDao.save(nf);
+				nf = notasFiscaisDao.save(nf);
 
 				processaDemaisTiposNotas(p, nf, dlp, log, linha);
 
@@ -771,9 +771,9 @@ public class ExtractorService {
 	}
 
 	private Prestadores anulaCamposVazios(Prestadores p) {
-		if (p.getEmail() != null && p.getEmail().trim().isEmpty()) {
-			p.setEmail(null);
-		}
+
+		p.setEmail(util.trataEmail(p.getEmail()));
+
 		if (p.getTelefone() != null && p.getTelefone().trim().isEmpty()) {
 			p.setTelefone(null);
 		}
@@ -785,9 +785,7 @@ public class ExtractorService {
 	}
 
 	public Pessoa anulaCamposVazios(Pessoa pessoa) {
-		if (pessoa.getEmail() != null && pessoa.getEmail().trim().isEmpty()) {
-			pessoa.setEmail(null);
-		}
+		pessoa.setEmail(util.trataEmail(pessoa.getEmail()));
 		if (pessoa.getTelefone() != null && pessoa.getTelefone().trim().isEmpty()) {
 			pessoa.setTelefone(null);
 		}
@@ -854,7 +852,7 @@ public class ExtractorService {
 			telefone = "37" + telefone;
 			if (telefone.trim().length() <= 3) {
 				telefone = null;
-			}
+			} 
 		}
 		return telefone;
 	}

@@ -36,7 +36,7 @@ public class PrestadoresDao {
 		return null;
 	}
 
-	public void save(Prestadores p) {
+	public Prestadores save(Prestadores p) {
 		
 		if (p.getId() != null) {
 			try {
@@ -52,15 +52,17 @@ public class PrestadoresDao {
 		session.save(p);
 		session.beginTransaction().commit();
 		session.close();
+		return p;
 	}
 
-	public void update(Prestadores p) {
+	public Prestadores update(Prestadores p) {
 
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		session.update(p);
 		session.beginTransaction().commit();
 		session.close();
+		return p;
 	}
 
 	public List<Prestadores> findNaoEnviados() {

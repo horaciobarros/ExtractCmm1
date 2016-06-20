@@ -18,7 +18,7 @@ public class Controller {
 
 	public void importaNfe() {
 
-		int nivelProcessamento = 3;
+		int nivelProcessamento = 1;
 		boolean txtsTratados = true;
 
 		System.out.println("Lagoa da Prata - Limpando o banco...");
@@ -51,7 +51,7 @@ public class Controller {
 
 		if (nivelProcessamento == 1) {
 
-			System.out.println("Ajustando contribuintes");
+			System.out.println("Gravando contribuintes");
 			dadosList = extractorService.lerArquivo("dados_cadastro");
 			extractorService.processaDadosCadastro(dadosList);
 			System.out.println("--- Fim de ajustes ---");

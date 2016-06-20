@@ -19,12 +19,13 @@ public class NotasFiscaisDao {
 		sessionFactory = HibernateUtil.getSessionFactory();
 	}
 
-	public void save(NotasFiscais nf) {
+	public NotasFiscais save(NotasFiscais nf) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		session.save(nf);
 		session.beginTransaction().commit();
 		session.close();
+		return nf;
 	}
 	
 	public List<NotasFiscais> findNaoEnviados() {
