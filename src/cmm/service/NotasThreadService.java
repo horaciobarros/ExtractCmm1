@@ -77,7 +77,7 @@ public class NotasThreadService implements Runnable {
 
 	@Override
 	public void run() {
-		if (tipoNotaFilha.equals("S") && !nf.getSituacao().equals("C")) { // serviços e não cancelada
+		if (tipoNotaFilha.equals("S") && !nf.getSituacao().equals("C")) { // serviços
 			try {
 
 				NotasFiscaisServicos nfs = new NotasFiscaisServicos();
@@ -86,6 +86,9 @@ public class NotasThreadService implements Runnable {
 				nfs.setMunicipioIbge(util.CODIGO_IBGE);
 				nfs.setItemListaServico("0001");
 				nfs.setDescricao(dlp.getDiscriminacaoServico());
+				if (util.isEmptyOrNull(nfs.getDescricao().trim())) {
+					nfs.setDescricao("Serviços Diversos");
+				}
 				nfs.setAliquota(BigDecimal.valueOf(dlp.getValorAliquota()));
 				nfs.setValorServico(BigDecimal.valueOf(dlp.getValorServico()));
 				nfs.setQuantidade(BigDecimal.valueOf(1));
@@ -98,6 +101,12 @@ public class NotasThreadService implements Runnable {
 				nfs.setValorIss(BigDecimal.valueOf(dlp.getValorIss()));
 				nfs.setNotasFiscais(nf);
 				nfs.setValorUnitario(BigDecimal.valueOf(dlp.getValorServico()));
+				if (nfs.getAliquota().compareTo(BigDecimal.ZERO) == 0) {
+					if (nfs.getValorBaseCalculo().compareTo(nfs.getValorUnitario()) == 0) {
+						System.out.println("Entrei: " + nfs.getValorBaseCalculo() + "=" + nfs.getValorUnitario());
+						nfs.setAliquota(BigDecimal.valueOf(1));
+					}
+				}
 				notasFiscaisServicosDao.save(nfs);
 			} catch (Exception e) {
 				log.fillError(linha, e);
@@ -178,7 +187,7 @@ public class NotasThreadService implements Runnable {
 			}
 		}
 
-		if (tipoNotaFilha.equals("T")) {
+		if (tipoNotaFilha.equals("T") && tomadores != null && tomadores.getId() != null) {
 			try {
 				NotasFiscaisTomadores nft = new NotasFiscaisTomadores();
 				nft.setBairro(tomadores.getBairro());

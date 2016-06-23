@@ -21,7 +21,8 @@ public class TomadoresDao {
 
 	public Tomadores findByInscricao(String inscricaoTomador, String inscricaoPrestador) {
 		Query query = sessionFactory.openSession()
-				.createQuery("select t from Tomadores t  inner join t.prestadores p " + " where t.inscricaoTomador like '%" + inscricaoTomador.trim() + "%' "
+				.createQuery("select t from Tomadores t  inner join t.prestadores p "
+						+ " where t.inscricaoTomador like '%" + inscricaoTomador.trim() + "%' "
 						+ " and p.inscricaoPrestador like '%" + inscricaoPrestador + "%'");
 
 		try {
@@ -36,28 +37,17 @@ public class TomadoresDao {
 		return null;
 	}
 
-	public void save(Tomadores t) {
-		if (t.getId() != null) {
-			try {
-				throw new Exception("Erro fatal: gravando entidade com id já definido.");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+	public Tomadores save(Tomadores t) {
 
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		try {
-			session.save(t);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		session.save(t);
 		session.beginTransaction().commit();
 		session.close();
+		return t;
 	}
 
-	public void update(Tomadores t) {
+	public Tomadores update(Tomadores t) {
 
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
@@ -68,6 +58,7 @@ public class TomadoresDao {
 		}
 		session.beginTransaction().commit();
 		session.close();
+		return t;
 	}
 
 	public Tomadores findByInscricaoMunicipal(String inscMunicipal) {

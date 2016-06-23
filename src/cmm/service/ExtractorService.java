@@ -18,12 +18,14 @@ import cmm.dao.PessoaDao;
 import cmm.dao.PrestadoresAtividadesDao;
 import cmm.dao.PrestadoresDao;
 import cmm.dao.PrestadoresOptanteSimplesDao;
+import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosCadastro;
 import cmm.entidadesOrigem.DadosCadastroAcesso;
 import cmm.entidadesOrigem.DadosCadastroAtividade;
 import cmm.entidadesOrigem.DadosContador;
 import cmm.entidadesOrigem.DadosGuia;
 import cmm.entidadesOrigem.DadosLivroPrestador;
+import cmm.entidadesOrigem.DadosLivroTomador;
 import cmm.entidadesOrigem.PlanoConta;
 import cmm.model.Competencias;
 import cmm.model.Guias;
@@ -58,6 +60,7 @@ public class ExtractorService {
 	private PessoaDao pessoaDao = new PessoaDao();
 	private int linhasMil = 0;
 	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
+	private TomadoresDao tomadoresDao = new TomadoresDao();
 
 	public void processaPlanoConta(List<String> dadosList) {
 		FileLog log = new FileLog("plano_conta");
@@ -615,7 +618,8 @@ public class ExtractorService {
 				nf.setValorTotalIssOptante(BigDecimal.valueOf(dlp.getValorIss()));
 				nf.setValorTotalServico(BigDecimal.valueOf(dlp.getValorTotalNfse()));
 				nf.setValorTotalIss(BigDecimal.valueOf(dlp.getValorIss()));
-				nf.setSituacao(dlp.getStatusNota().trim().substring(0, 1));
+				nf.setSituacaoOriginal(dlp.getStatusNota().trim().substring(0, 1));
+				nf.setSituacao("N");
 				nf.setSituacaoTributaria(util.getSituacaoTributaria(dlp));
 				nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
 				if (dlp.getCodigoVerificacao() != null && !dlp.getCodigoVerificacao().trim().isEmpty()) {
@@ -640,7 +644,48 @@ public class ExtractorService {
 
 				nf = notasFiscaisDao.save(nf);
 
-				processaDemaisTiposNotas(p, nf, dlp, log, linha);
+				// tomadores
+				Tomadores t = null;
+
+				if (!util.isEmptyOrNull(nf.getInscricaoTomador()) && !util.isEmptyOrNull(dlp.getRazaoSocialTomador())) {
+					t = tomadoresDao.findByInscricao(nf.getInscricaoTomador(), nf.getInscricaoPrestador());
+					if (t == null || t.getId() == null) {
+						try {
+							t = new Tomadores();
+							t.setOptanteSimples(util.getOptantePeloSimplesNacional("N"));
+							t.setNome(dlp.getRazaoSocialTomador());
+							t.setNomeFantasia(dlp.getRazaoSocialTomador());
+							t.setPrestadores(nf.getPrestadores());
+							t.setTipoPessoa(util.getTipoPessoa(nf.getInscricaoTomador()));
+							t.setInscricaoTomador(nf.getInscricaoTomador());
+							t.setBairro(dlp.getEnderecoBairroTomador());
+							t.setCep(dlp.getCepTomador());
+							t.setComplemento(dlp.getEnderecoComplementoTomador());
+							t.setEmail(util.trataEmail(dlp.getEmailTomador()));
+							t.setEndereco(dlp.getEnderecoTomador());
+							t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
+							t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
+							t.setMunicipio(dlp.getMunicipioTomador());
+							try {
+								t.setMunicipioIbge(Long.valueOf(municipiosIbgeDao
+										.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
+							} catch (Exception e) {
+
+							}
+
+							trataNumerosTelefones(t);
+							anulaCamposVazios(t);
+
+							t = tomadoresDao.save(t);
+						} catch (Exception e) {
+							e.printStackTrace();
+							t = null;
+						}
+
+					}
+				}
+
+				processaDemaisTiposNotas(p, nf, dlp, log, linha, t);
 
 			} catch (Exception e) {
 				log.fillError(linha, e);
@@ -653,7 +698,7 @@ public class ExtractorService {
 	}
 
 	private void processaDemaisTiposNotas(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
-			String linha) {
+			String linha, Tomadores t) {
 		// -- serviços
 		NotasThreadService nfServico = new NotasThreadService(p, nf, dlp, log, linha, "S");
 		Thread s = new Thread(nfServico);
@@ -695,6 +740,14 @@ public class ExtractorService {
 				System.out.println("Numero de guia não encontrado: " + dlp.getNossoNumero());
 
 			}
+		}
+
+		// notas fiscais tomadores
+
+		if (t != null && t.getId() != null) {
+			NotasThreadService nfTomadores = new NotasThreadService(p, nf, dlp, log, linha, "T", g, t);
+			Thread nftThread = new Thread(nfTomadores);
+			nftThread.start();
 		}
 
 	}
@@ -852,9 +905,50 @@ public class ExtractorService {
 			telefone = "37" + telefone;
 			if (telefone.trim().length() <= 3) {
 				telefone = null;
-			} 
+			}
 		}
 		return telefone;
+	}
+
+	private Tomadores anulaCamposVazios(Tomadores t) {
+
+		t.setEmail(util.trataEmail(t.getEmail()));
+
+		if (t.getTelefone() != null && t.getTelefone().trim().isEmpty()) {
+			t.setTelefone(null);
+		}
+		if (t.getCelular() != null && t.getCelular().trim().isEmpty()) {
+			t.setCelular(null);
+		}
+		
+		if (util.isEmptyOrNull(t.getInscricaoEstadual())) {
+			t.setInscricaoEstadual(null);
+		}
+		if (util.isEmptyOrNull(t.getInscricaoMunicipal())) {
+			t.setInscricaoMunicipal(null);
+		}
+		
+		if (util.isEmptyOrNull(t.getCep())) {
+			t.setCep(null);
+		}
+
+		return t;
+	}
+
+	private Tomadores trataNumerosTelefones(Tomadores t) {
+
+		if (t.getCelular() != null) {
+			t.setCelular(t.getCelular().replaceAll("\\(", ""));
+			t.setCelular(t.getCelular().replaceAll("\\)", ""));
+			t.setCelular(t.getCelular().replaceAll("-", ""));
+		}
+		if (t.getTelefone() != null) {
+			t.setTelefone(t.getTelefone().replaceAll("\\(", ""));
+			t.setTelefone(t.getTelefone().replaceAll("\\)", ""));
+			t.setTelefone(t.getTelefone().replaceAll("\\-", ""));
+		}
+
+		return t;
 	}
 
 }

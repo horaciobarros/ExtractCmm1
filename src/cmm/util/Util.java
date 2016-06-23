@@ -230,4 +230,17 @@ public class Util {
 		}
 		return conteudo;
 	}
+	
+	public boolean isEmptyOrNull(String content) {
+		
+		if (content == null) {
+			return true;
+		} 
+		
+		if (content.trim().isEmpty()) {
+			return true;
+		}
+		
+		return false;
+	}
 }
