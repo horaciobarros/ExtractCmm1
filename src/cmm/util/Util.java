@@ -253,7 +253,7 @@ public class Util {
 	public String trataCep(String cep) {
 		if (!isEmptyOrNull(cep)) {
 			if (cep.length() < 8) {
-				cep = completarZerosDireita(cep, 8 - cep.length());
+				cep = completarZerosDireita(cep, 8);
 				return cep;
 			}
 		}
