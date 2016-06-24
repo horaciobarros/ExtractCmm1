@@ -58,7 +58,7 @@ public class PessoaDao {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		Query query = session
-				.createQuery("from Pessoa p where hash is null").setFirstResult(0).setMaxResults(1);;
+				.createQuery("from Pessoa p where hash is null").setFirstResult(0).setMaxResults(200);
 		List<Pessoa> lista = query.list();
 		tx.commit();session.close();
 

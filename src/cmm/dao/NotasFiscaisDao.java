@@ -32,7 +32,7 @@ public class NotasFiscaisDao {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		Query query = session
-				.createQuery("from NotasFiscais c where hash is null").setFirstResult(0).setMaxResults(500);
+				.createQuery("from NotasFiscais c where hash is null").setFirstResult(0).setMaxResults(300);
 		List<NotasFiscais> lista = query.list();
 		tx.commit();session.close();
 

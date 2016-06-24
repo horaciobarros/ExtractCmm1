@@ -30,7 +30,7 @@ public class NotasFiscaisTomadoresDao {
 	public List<NotasFiscaisTomadores> findNaoEnviados() {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = session.createQuery("from NotasFiscaisTomadores nft where hash is null").setFirstResult(0).setMaxResults(1000);
+		Query query = session.createQuery("from NotasFiscaisTomadores nft where hash is null").setFirstResult(0).setMaxResults(350);
 		List<NotasFiscaisTomadores> lista = query.list();
 		tx.commit();
 		session.close();
