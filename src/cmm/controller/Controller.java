@@ -72,6 +72,9 @@ public class Controller {
 			extractorService.processaDadosGuiaCompetencias(dadosList);
 			System.out.println("--- Fim de competencias e guias ---");
 
+		}
+
+		if (nivelProcessamento <= 4) {
 			// atividades prestador
 			System.out.println("Lendo atividades prestador");
 			dadosList = extractorService.lerArquivo("dados_cadastro_atividade");
@@ -79,9 +82,6 @@ public class Controller {
 			extractorService.processaDadosCadastroAtividade(dadosList);
 			System.out.println("--- Fim de atividades prestador ---");
 
-		}
-
-		if (nivelProcessamento <= 4) {
 			// notas fiscais
 			System.out.println("Lendo notas fiscais - " + Util.getDateHourMinutes(new Date()));
 			dadosList = extractorService.lerArquivo("dados_livro_prestador");

@@ -1,4 +1,4 @@
-package cmm.model; 
+package cmm.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -13,93 +13,111 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-@Entity 
-@Table(name="prestadores_atividades")
+@Entity
+@Table(name = "prestadores_atividades")
 public class PrestadoresAtividades implements Serializable {
 
-   private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @Column(name="id")
-   private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 
-   @ManyToOne
-   @JoinColumn(name = "prestador_id")
-   private Prestadores prestadores;
+	@ManyToOne
+	@JoinColumn(name = "prestador_id")
+	private Prestadores prestadores;
 
-   @Column(name="inscricao_prestador")
-   private String inscricaoPrestador;
+	@Column(name = "inscricao_prestador")
+	private String inscricaoPrestador;
 
-   @Column(name="iListaServicos")
-   private String ilistaservicos;
+	@Column(name = "iListaServicos")
+	private String ilistaservicos;
 
-   @Column(name="iCnaes")
-   private String icnaes;
+	@Column(name = "iCnaes")
+	private String icnaes;
 
-   @Column(name="aliquota")
-   private BigDecimal aliquota;
+	@Column(name = "aliquota")
+	private BigDecimal aliquota;
 
-   @Column(name="dh_envio")
-   private Date dhEnvio;
+	@Column(name = "dh_envio")
+	private Date dhEnvio;
 
-   @Column(name="hash")
-   private String hash;
+	@Column(name = "hash")
+	private String hash;
 
-   public Long getId() { 
-      return id;
-   }
-   public void  setId(Long id) { 
-      this.id = id;
-   }
+	@Column(name = "codigo_atividade")
+	private String codigoAtividade;
 
+	public String getCodigoAtividade() {
+		return codigoAtividade;
+	}
 
-   public  Prestadores  getPrestadores() { 
-      return prestadores;
-   }
-   public void  setPrestadores(Prestadores prestadores) { 
-      this.prestadores = prestadores;
-   }
+	public void setCodigoAtividade(String codigoAtividade) {
+		this.codigoAtividade = codigoAtividade;
+	}
 
-   public String getInscricaoPrestador() { 
-      return inscricaoPrestador;
-   }
-   public void  setInscricaoPrestador(String inscricaoPrestador) { 
-      this.inscricaoPrestador = inscricaoPrestador;
-   }
+	public Long getId() {
+		return id;
+	}
 
-   public String getIlistaservicos() { 
-      return ilistaservicos;
-   }
-   public void  setIlistaservicos(String ilistaservicos) { 
-      this.ilistaservicos = ilistaservicos;
-   }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-   public String getIcnaes() { 
-      return icnaes;
-   }
-   public void  setIcnaes(String icnaes) { 
-      this.icnaes = icnaes;
-   }
+	public Prestadores getPrestadores() {
+		return prestadores;
+	}
 
-   public BigDecimal getAliquota() { 
-      return aliquota;
-   }
-   public void  setAliquota(BigDecimal aliquota) { 
-      this.aliquota = aliquota;
-   }
+	public void setPrestadores(Prestadores prestadores) {
+		this.prestadores = prestadores;
+	}
 
-   public Date getDhEnvio() { 
-      return dhEnvio;
-   }
-   public void  setDhEnvio(Date dhEnvio) { 
-      this.dhEnvio = dhEnvio;
-   }
+	public String getInscricaoPrestador() {
+		return inscricaoPrestador;
+	}
 
-   public String getHash() { 
-      return hash;
-   }
-   public void  setHash(String hash) { 
-      this.hash = hash;
-   }
+	public void setInscricaoPrestador(String inscricaoPrestador) {
+		this.inscricaoPrestador = inscricaoPrestador;
+	}
+
+	public String getIlistaservicos() {
+		return ilistaservicos;
+	}
+
+	public void setIlistaservicos(String ilistaservicos) {
+		this.ilistaservicos = ilistaservicos;
+	}
+
+	public String getIcnaes() {
+		return icnaes;
+	}
+
+	public void setIcnaes(String icnaes) {
+		this.icnaes = icnaes;
+	}
+
+	public BigDecimal getAliquota() {
+		return aliquota;
+	}
+
+	public void setAliquota(BigDecimal aliquota) {
+		this.aliquota = aliquota;
+	}
+
+	public Date getDhEnvio() {
+		return dhEnvio;
+	}
+
+	public void setDhEnvio(Date dhEnvio) {
+		this.dhEnvio = dhEnvio;
+	}
+
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
 }

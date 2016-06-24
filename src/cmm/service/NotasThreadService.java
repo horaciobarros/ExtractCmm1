@@ -8,6 +8,7 @@ import cmm.dao.NotasFiscaisEmailsDao;
 import cmm.dao.NotasFiscaisPrestadoresDao;
 import cmm.dao.NotasFiscaisServicosDao;
 import cmm.dao.NotasFiscaisTomadoresDao;
+import cmm.dao.PrestadoresAtividadesDao;
 import cmm.entidadesOrigem.DadosLivroPrestador;
 import cmm.model.Guias;
 import cmm.model.GuiasNotasFiscais;
@@ -18,6 +19,7 @@ import cmm.model.NotasFiscaisPrestadores;
 import cmm.model.NotasFiscaisServicos;
 import cmm.model.NotasFiscaisTomadores;
 import cmm.model.Prestadores;
+import cmm.model.PrestadoresAtividades;
 import cmm.model.Tomadores;
 import cmm.util.FileLog;
 import cmm.util.Util;
@@ -38,6 +40,7 @@ public class NotasThreadService implements Runnable {
 	private GuiasNotasFiscaisDao guiasNotasFiscaisDao = new GuiasNotasFiscaisDao();
 	private Tomadores tomadores;
 	private NotasFiscaisTomadoresDao notasFiscaisTomadoresDao = new NotasFiscaisTomadoresDao();
+	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
 
 	public NotasThreadService(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log, String linha,
 			String tipoNotaFilha) {
@@ -77,14 +80,19 @@ public class NotasThreadService implements Runnable {
 
 	@Override
 	public void run() {
-		if (tipoNotaFilha.equals("S") && !nf.getSituacao().equals("C")) { // serviços
+		if (tipoNotaFilha.equals("S") && !nf.getSituacaoOriginal().equals("C")) { // serviços
 			try {
 
 				NotasFiscaisServicos nfs = new NotasFiscaisServicos();
 				nfs.setInscricaoPrestador(dlp.getCnpjPrestador());
 				nfs.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 				nfs.setMunicipioIbge(util.CODIGO_IBGE);
-				nfs.setItemListaServico("0001");
+				PrestadoresAtividades pa = prestadoresAtividadesDao.findByInscricao(nfs.getInscricaoPrestador());
+				if (pa == null || pa.getId() == null) {
+					nfs.setItemListaServico("1401");
+				} else {
+					nfs.setItemListaServico(util.completarZerosEsquerda(pa.getCodigoAtividade(), 4));
+				}
 				nfs.setDescricao(dlp.getDiscriminacaoServico());
 				if (util.isEmptyOrNull(nfs.getDescricao().trim())) {
 					nfs.setDescricao("Serviços Diversos");
@@ -103,7 +111,6 @@ public class NotasThreadService implements Runnable {
 				nfs.setValorUnitario(BigDecimal.valueOf(dlp.getValorServico()));
 				if (nfs.getAliquota().compareTo(BigDecimal.ZERO) == 0) {
 					if (nfs.getValorBaseCalculo().compareTo(nfs.getValorUnitario()) == 0) {
-						System.out.println("Entrei: " + nfs.getValorBaseCalculo() + "=" + nfs.getValorUnitario());
 						nfs.setAliquota(BigDecimal.valueOf(1));
 					}
 				}

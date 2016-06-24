@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import cmm.model.Prestadores;
 import cmm.model.PrestadoresAtividades;
 import cmm.util.HibernateUtil;
 
@@ -53,6 +54,24 @@ public class PrestadoresAtividadesDao {
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
 		tx.commit();session.close();
+	}
+	
+	public PrestadoresAtividades findByInscricao(String inscricao) {
+		Query query = sessionFactory.openSession()
+				.createQuery("from PrestadoresAtividades pa  " + " where pa.inscricaoPrestador like '%" + inscricao.trim() + "%'");
+
+		
+		try {
+			List<PrestadoresAtividades> prestadoresAtividadesList = query.list();
+
+			if (prestadoresAtividadesList.size() > 0) {
+				return prestadoresAtividadesList.get(0);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	
 	}
 
 }

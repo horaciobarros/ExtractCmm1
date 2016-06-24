@@ -219,6 +219,12 @@ public class Util {
 				} else {
 					email = null;
 				}
+				if (email.contains(";br")) {
+					email = email.replace(";br", ".br");
+				} else if (email.contains(";")) {
+					 int posicaoPv = email.indexOf(";");
+					 email = email.substring(0, posicaoPv);
+				}
 			}
 		}
 		return email;
@@ -226,7 +232,7 @@ public class Util {
 
 	public String completarZerosEsquerda(String conteudo, int qtdeFinalDigitosDaString) {
 		while (conteudo.length() < qtdeFinalDigitosDaString) {
-			conteudo = "0" + conteudo;
+			conteudo = "0" + conteudo.trim();
 		}
 		return conteudo;
 	}
@@ -242,5 +248,22 @@ public class Util {
 		}
 		
 		return false;
+	}
+
+	public String trataCep(String cep) {
+		if (!isEmptyOrNull(cep)) {
+			if (cep.length() < 8) {
+				cep = completarZerosDireita(cep, 8 - cep.length());
+				return cep;
+			}
+		}
+		return null;
+	}
+
+	public String completarZerosDireita(String conteudo, int qtdeFinalDigitosDaString) {
+		while (conteudo.length() < qtdeFinalDigitosDaString) {
+			conteudo = conteudo.trim() + "0";
+		}
+		return conteudo;
 	}
 }

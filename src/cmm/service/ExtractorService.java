@@ -25,7 +25,6 @@ import cmm.entidadesOrigem.DadosCadastroAtividade;
 import cmm.entidadesOrigem.DadosContador;
 import cmm.entidadesOrigem.DadosGuia;
 import cmm.entidadesOrigem.DadosLivroPrestador;
-import cmm.entidadesOrigem.DadosLivroTomador;
 import cmm.entidadesOrigem.PlanoConta;
 import cmm.model.Competencias;
 import cmm.model.Guias;
@@ -40,7 +39,6 @@ import cmm.util.FileLog;
 import cmm.util.Util;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 
 /**
  * 
@@ -136,6 +134,8 @@ public class ExtractorService {
 						pa.setIlistaservicos(dca.getGrupoAtividade());
 						pa.setInscricaoPrestador(dca.getCnpj());
 						pa.setPrestadores(p);
+						dca.setAtividadeFederal(dca.getAtividadeFederal().replace(".", ""));
+						pa.setCodigoAtividade(dca.getAtividadeFederal());
 						prestadoresAtividadesDao.save(pa);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -659,7 +659,7 @@ public class ExtractorService {
 							t.setTipoPessoa(util.getTipoPessoa(nf.getInscricaoTomador()));
 							t.setInscricaoTomador(nf.getInscricaoTomador());
 							t.setBairro(dlp.getEnderecoBairroTomador());
-							t.setCep(dlp.getCepTomador());
+							t.setCep(util.trataCep(dlp.getCepTomador()));
 							t.setComplemento(dlp.getEnderecoComplementoTomador());
 							t.setEmail(util.trataEmail(dlp.getEmailTomador()));
 							t.setEndereco(dlp.getEnderecoTomador());
@@ -800,7 +800,7 @@ public class ExtractorService {
 	public List<String> excluiParaProcessarNivel4() {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
-				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais");
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais", "PrestadoresAtividades");
 	}
 
 	public List<String> excluiGuiasNotasFiscais() {
