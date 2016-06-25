@@ -131,6 +131,9 @@ public class NotasThreadService implements Runnable {
 				nfc.setInscricaoPrestador(dlp.getCnpjPrestador());
 				nfc.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 				nfc.setMotivo(dlp.getMotivoCancelamento());
+				if (util.isEmptyOrNull(nfc.getMotivo())) {
+					nfc.setMotivo("Dados incorretos");
+				}
 				nfc.setNotasFiscais(nf);
 				notasFiscaisCanceladasDao.save(nfc);
 
@@ -198,10 +201,10 @@ public class NotasThreadService implements Runnable {
 			try {
 				NotasFiscaisTomadores nft = new NotasFiscaisTomadores();
 				nft.setBairro(tomadores.getBairro());
-				nft.setCelular(tomadores.getCelular());
-				nft.setCep(tomadores.getCep());
+				nft.setCelular(util.getLimpaTelefone(tomadores.getCelular()));
+				nft.setCep(util.trataCep(tomadores.getCep()));
 				nft.setComplemento(tomadores.getComplemento());
-				nft.setEmail(tomadores.getEmail());
+				nft.setEmail(util.trataEmail(tomadores.getEmail()));
 				nft.setEndereco(tomadores.getEndereco());
 				nft.setInscricaoEstadual(tomadores.getInscricaoEstadual());
 				nft.setInscricaoMunicipal(tomadores.getInscricaoMunicipal());

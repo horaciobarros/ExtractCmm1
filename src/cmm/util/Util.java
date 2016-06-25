@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import cmm.entidadesOrigem.DadosLivroPrestador;
@@ -117,7 +118,7 @@ public class Util {
 	}
 
 	public String getTipoPessoa(String inscricao) {
-		return (inscricao.length() == 11 ? "F" : "J");
+		return (inscricao.trim().length() == 11 ? "F" : "J");
 	}
 
 	public BigDecimal getSumOfBigDecimal(List<BigDecimal> lista) {
@@ -125,7 +126,9 @@ public class Util {
 		Double valorAux = Double.valueOf(0);
 
 		for (BigDecimal valor : lista) {
-			valorAux += valor.doubleValue();
+			if (valor != null) { 
+				valorAux += valor.doubleValue();
+			}
 		}
 		return BigDecimal.valueOf(valorAux);
 
@@ -194,7 +197,9 @@ public class Util {
 	}
 
 	public String getLimpaTelefone(String telefone) {
-
+		if (telefone == null) {
+			return telefone;
+		}
 		telefone = telefone.replaceAll(" ", "");
 		telefone = telefone.replaceAll("-", "");
 		telefone = telefone.replaceAll("\\(", "");
@@ -256,6 +261,7 @@ public class Util {
 				cep = completarZerosDireita(cep, 8);
 				return cep;
 			}
+			return cep;
 		}
 		return null;
 	}
@@ -266,4 +272,20 @@ public class Util {
 		}
 		return conteudo;
 	}
+	
+	public Date getStringToDateHoursMinutesAdd2hours(String data) {
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		try {
+			Date date = (Date) formatter.parse(data);
+			GregorianCalendar gc = new GregorianCalendar();
+		    gc.setTime(date);
+		    gc.add(Calendar.HOUR,5);
+		    return gc.getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
 }

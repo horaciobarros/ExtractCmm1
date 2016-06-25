@@ -609,11 +609,12 @@ public class ExtractorService {
 				nf.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
 				nf.setPrestadores(p);
-				nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
+				if (util.getTipoPessoa(p.getInscricaoPrestador()).equals("J")) {
+					nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
+				}
 				nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
 				nf.setValorInss(BigDecimal.valueOf(dlp.getValorInss()));
 				nf.setValorIr(BigDecimal.valueOf(dlp.getValorIr()));
-				nf.setValorLiquido(BigDecimal.valueOf(dlp.getValorTotalNfse()));
 				nf.setValorOutrasRetencoes(BigDecimal.valueOf(dlp.getValorOutrasRetencoes()));
 				nf.setValorTotalIssOptante(BigDecimal.valueOf(dlp.getValorIss()));
 				nf.setValorTotalServico(BigDecimal.valueOf(dlp.getValorTotalNfse()));
@@ -621,7 +622,6 @@ public class ExtractorService {
 				nf.setSituacaoOriginal(dlp.getStatusNota().trim().substring(0, 1));
 				nf.setSituacao("N");
 				nf.setSituacaoTributaria(util.getSituacaoTributaria(dlp));
-				nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
 				if (dlp.getCodigoVerificacao() != null && !dlp.getCodigoVerificacao().trim().isEmpty()) {
 					if (dlp.getCodigoVerificacao().length() > 9) {
 						nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim().substring(0, 9));
@@ -637,7 +637,7 @@ public class ExtractorService {
 				List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(),
 						nf.getValorIr());
 				BigDecimal descontos = util.getSumOfBigDecimal(lista);
-				nf.setValorLiquido(util.getSubtract(nf.getValorTotalBaseCalculo(), descontos));
+				nf.setValorLiquido(util.getSubtract(BigDecimal.valueOf(dlp.getValorTotalNfse()), descontos));
 				nf.setValorTotalDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
 				nf.setServicoPrestadoForaPais("N");
 				nf.setDataHoraRps(nf.getDataHoraEmissao());
@@ -666,6 +666,7 @@ public class ExtractorService {
 							t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
 							t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
 							t.setMunicipio(dlp.getMunicipioTomador());
+							t.setCelular(util.getLimpaTelefone(dlp.getTelefoneTomador()));
 							try {
 								t.setMunicipioIbge(Long.valueOf(municipiosIbgeDao
 										.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
