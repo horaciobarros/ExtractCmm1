@@ -208,10 +208,14 @@ public class Util {
 		if (telefone == null) {
 			return telefone;
 		}
+		telefone = telefone.trim();
 		telefone = telefone.replaceAll(" ", "");
 		telefone = telefone.replaceAll("-", "");
 		telefone = telefone.replaceAll("\\(", "");
 		telefone = telefone.replaceAll("\\)", "");
+		if (telefone.length()>=11) {
+			telefone = telefone.substring(0,9);
+		}
 		return telefone.trim();
 	}
 
@@ -229,15 +233,16 @@ public class Util {
 					} else {
 						email = email.trim();
 					}
+					if (email.contains(";br")) {
+						email = email.replace(";br", ".br");
+					} else if (email.contains(";")) {
+						 int posicaoPv = email.indexOf(";");
+						 email = email.substring(0, posicaoPv);
+					}
 				} else {
 					email = null;
 				}
-				if (email.contains(";br")) {
-					email = email.replace(";br", ".br");
-				} else if (email.contains(";")) {
-					 int posicaoPv = email.indexOf(";");
-					 email = email.substring(0, posicaoPv);
-				}
+				
 			}
 		}
 		return email;
@@ -287,7 +292,7 @@ public class Util {
 			Date date = (Date) formatter.parse(data);
 			GregorianCalendar gc = new GregorianCalendar();
 		    gc.setTime(date);
-		    gc.add(Calendar.HOUR,5);
+		    gc.add(Calendar.HOUR,2);
 		    return gc.getTime();
 		} catch (ParseException e) {
 			e.printStackTrace();

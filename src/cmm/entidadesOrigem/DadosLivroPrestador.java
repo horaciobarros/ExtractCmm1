@@ -161,6 +161,91 @@ public class DadosLivroPrestador {
 		this.dataInclusaoRegistro = dataInclusaoRegistro;
 	}
 
+	/**
+	 * criado para tratar desposicionamento do registro no txt
+	 */
+	public DadosLivroPrestador( Long idCodigo, String nossoNumero, String numeroNota, String serieNota, String tipoDocumento, String dataEmissao,
+			 String codigoVerificacao, String naturezaOperacao, String regimeTributacao, String optantePeloSimplesNacional, String statusNota,
+			 String dataCancelamento, String motivoCancelamento, String dataCompetencia, String outrasInformacoes, String codigoAtividadeMunipal,
+			 String codigoCnae, String discriminacaoServico, String aux, Double valorServico, Double valorDeducao, Double valorPis, Double valorCofins,
+			 Double valorInss, Double valorIr, Double valorCsll, String tipoRetencao, Double valorIss, Double valorOutrasRetencoes,
+			 Double valorBaseCalculo, Double valorAliquota, Double valorTotalNfse, Double valorDescontoIncondicionado,
+			 Double valorDescontoCondicionado, String cnpjPrestador, String inscricaoMunicipalPrestador, String inscricaoEstadualPrestador,
+			 String razaoSocialPrestador, String nomeFantasiaPrestador, String enderecoPrestador, String enderecoNumeroPrestador,
+			 String enderecoComplementoPrestador, String enderecoBairroPrestador, String cidadePrestador, String ufPrestador,
+			 String cepPrestador, String telefonePrestador, String emailPrestador, String cnpjTomador, String inscricaoMunicipalTomador,
+			 String inscricaoEstadualTomador, String razaoSocialTomador, String enderecoTomador, String enderecoNumeroTomador,
+			 String enderecoComplementoTomador, String enderecoBairroTomador, String municipioTomador, String ufTomador,
+			 String cepTomador, String telefoneTomador, String emailTomador, String cnpjIntermediario, String inscricaoMunicipalIntermediario,
+			 String razaoSocialIntermediario, String dataInclusaoRegistro) {
+		
+		this.idCodigo = idCodigo;
+		this.nossoNumero = nossoNumero;
+		this.numeroNota = numeroNota;
+		this.serieNota = serieNota;
+		this.tipoDocumento = tipoDocumento;
+		this.dataEmissao = dataEmissao;
+		this.codigoVerificacao = codigoVerificacao;
+		this.naturezaOperacao = naturezaOperacao;
+		this.regimeTributacao = regimeTributacao;
+		this.optantePeloSimplesNacional = optantePeloSimplesNacional;
+		this.statusNota = statusNota;
+		this.dataCancelamento = dataCancelamento;
+		this.motivoCancelamento = motivoCancelamento;
+		this.dataCompetencia = dataCompetencia;
+		this.outrasInformacoes = outrasInformacoes;
+		this.codigoAtividadeMunipal = codigoAtividadeMunipal;
+		this.codigoCnae = codigoCnae;
+		this.discriminacaoServico = discriminacaoServico;
+		this.valorServico = valorServico;
+		this.valorDeducao = valorDeducao;
+		this.valorPis = valorPis;
+		this.valorCofins = valorCofins;
+		this.valorInss = valorInss;
+		this.valorIr = valorIr;
+		this.valorCsll = valorCsll;
+		this.tipoRetencao = tipoRetencao;
+		this.valorIss = valorIss;
+		this.valorOutrasRetencoes = valorOutrasRetencoes;
+		this.valorBaseCalculo = valorBaseCalculo;
+		this.valorAliquota = valorAliquota;
+		this.valorTotalNfse = valorTotalNfse;
+		this.valorDescontoIncondicionado = valorDescontoIncondicionado;
+		this.valorDescontoCondicionado = valorDescontoCondicionado;
+		this.cnpjPrestador = cnpjPrestador;
+		this.inscricaoMunicipalPrestador = inscricaoMunicipalPrestador;
+		this.inscricaoEstadualPrestador = inscricaoEstadualPrestador;
+		this.razaoSocialPrestador = razaoSocialPrestador;
+		this.nomeFantasiaPrestador = nomeFantasiaPrestador;
+		this.enderecoPrestador = enderecoPrestador;
+		this.enderecoNumeroPrestador = enderecoNumeroPrestador;
+		this.enderecoComplementoPrestador = enderecoComplementoPrestador;
+		this.enderecoBairroPrestador = enderecoBairroPrestador;
+		this.cidadePrestador = cidadePrestador;
+		this.ufPrestador = ufPrestador;
+		this.cepPrestador = cepPrestador;
+		this.telefonePrestador = telefonePrestador;
+		this.emailPrestador = emailPrestador;
+		this.cnpjTomador = cnpjTomador;
+		this.inscricaoMunicipalTomador = inscricaoMunicipalTomador;
+		this.inscricaoEstadualTomador = inscricaoEstadualTomador;
+		this.razaoSocialTomador = razaoSocialTomador;
+		this.enderecoTomador = enderecoTomador;
+		this.enderecoNumeroTomador = enderecoNumeroTomador;
+		this.enderecoComplementoTomador = enderecoComplementoTomador;
+		this.enderecoBairroTomador = enderecoBairroTomador;
+		this.municipioTomador = municipioTomador;
+		this.ufTomador = ufTomador;
+		this.cepTomador = cepTomador;
+		this.telefoneTomador = telefoneTomador;
+		this.emailTomador = emailTomador;
+		this.cnpjIntermediario = cnpjIntermediario;
+		this.inscricaoMunicipalIntermediario = inscricaoMunicipalIntermediario;
+		this.razaoSocialIntermediario = razaoSocialIntermediario;
+		this.dataInclusaoRegistro = dataInclusaoRegistro;
+	}
+
+
 	public Long getIdCodigo() {
 		return idCodigo;
 	}

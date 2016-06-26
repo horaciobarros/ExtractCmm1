@@ -110,9 +110,7 @@ public class NotasThreadService implements Runnable {
 				nfs.setNotasFiscais(nf);
 				nfs.setValorUnitario(BigDecimal.valueOf(dlp.getValorServico()));
 				if (nfs.getAliquota().compareTo(BigDecimal.ZERO) == 0) {
-					if (nfs.getValorBaseCalculo().compareTo(nfs.getValorUnitario()) == 0) {
-						nfs.setAliquota(BigDecimal.valueOf(1));
-					}
+					nfs.setAliquota(BigDecimal.valueOf(1));
 				}
 				notasFiscaisServicosDao.save(nfs);
 			} catch (Exception e) {

@@ -2,6 +2,7 @@ package cmm.service;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +39,9 @@ import cmm.model.Tomadores;
 import cmm.util.FileLog;
 import cmm.util.Util;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 /**
  * 
@@ -511,7 +514,7 @@ public class ExtractorService {
 
 	}
 
-	private void mostraProgresso(int linhas, int dadosSize) {
+	public void mostraProgresso(int linhas, int dadosSize) {
 		if (linhasMil == 1000) {
 			double linhasDouble = linhas;
 			double perc = (linhasDouble / dadosSize);
@@ -570,10 +573,11 @@ public class ExtractorService {
 			linhasMil++;
 			mostraProgresso(linhas, dadosList.size());
 
+			linha = preparaParaSplit(linha);
+			String[] arrayLinha = linha.split("#");
+
 			try {
 
-				linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("#");
 				DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
 						arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13],
@@ -589,112 +593,148 @@ public class ExtractorService {
 						arrayLinha[53], arrayLinha[54], arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58],
 						arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[61], arrayLinha[63]);
 
-				String inscricaoPrestador = dlp.getCnpjPrestador().trim();
-				Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
+				processaDlp(dlp, log, linha);
+
+			} catch (NumberFormatException e) {
 				try {
-					if (p == null || p.getId() == 0 || !inscricaoPrestador.trim().equals(p.getInscricaoPrestador())) {
-						throw new Exception();
-					}
-				} catch (Exception e) {
+					String aux = null;
+					DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
+							arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
+							arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12],
+							arrayLinha[13], arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], aux,
+							Double.valueOf(arrayLinha[18]), Double.valueOf(arrayLinha[19]),
+							Double.valueOf(arrayLinha[20]), Double.valueOf(arrayLinha[21]),
+							Double.valueOf(arrayLinha[22]), Double.valueOf(arrayLinha[23]),
+							Double.valueOf(arrayLinha[24]), arrayLinha[25], Double.valueOf(arrayLinha[26]),
+							Double.valueOf(arrayLinha[27]), Double.valueOf(arrayLinha[28]),
+							Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]),
+							Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]), arrayLinha[33],
+							arrayLinha[34], arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38],
+							arrayLinha[39], arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43],
+							arrayLinha[44], arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48],
+							arrayLinha[49], arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53],
+							arrayLinha[54], arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58],
+							arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[61], arrayLinha[63]);
+
+					processaDlp(dlp, log, linha);
+
+				} catch (Exception e2) {
+					log.fillError(linha, e2);
 					e.printStackTrace();
 				}
 
-				NotasFiscais nf = new NotasFiscais();
-				nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
-				nf.setInscricaoPrestador(dlp.getCnpjPrestador());
-				nf.setInscricaoTomador(dlp.getCnpjTomador());
-				nf.setNaturezaOperacao(dlp.getNaturezaOperacao());
-				nf.setNomePrestador(dlp.getRazaoSocialPrestador());
-				nf.setNomeTomador(dlp.getRazaoSocialTomador());
-				nf.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
-				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
-				nf.setPrestadores(p);
-				if (util.getTipoPessoa(p.getInscricaoPrestador()).equals("J")) {
-					nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
-				}
-				nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
-				nf.setValorInss(BigDecimal.valueOf(dlp.getValorInss()));
-				nf.setValorIr(BigDecimal.valueOf(dlp.getValorIr()));
-				nf.setValorOutrasRetencoes(BigDecimal.valueOf(dlp.getValorOutrasRetencoes()));
-				nf.setValorTotalIssOptante(BigDecimal.valueOf(dlp.getValorIss()));
-				nf.setValorTotalServico(BigDecimal.valueOf(dlp.getValorTotalNfse()));
-				nf.setValorTotalIss(BigDecimal.valueOf(dlp.getValorIss()));
-				nf.setSituacaoOriginal(dlp.getStatusNota().trim().substring(0, 1));
-				nf.setSituacao("N");
-				nf.setSituacaoTributaria(util.getSituacaoTributaria(dlp));
-				if (dlp.getCodigoVerificacao() != null && !dlp.getCodigoVerificacao().trim().isEmpty()) {
-					if (dlp.getCodigoVerificacao().length() > 9) {
-						nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim().substring(0, 9));
-					} else {
-						nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim());
-					}
-				} else {
-					nf.setNumeroVerificacao(util.completarZerosEsquerda(dlp.getIdCodigo().toString(), 9));
-				}
-				nf.setNaturezaOperacao("1"); // TODO resolver
-				nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
-				nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
-				List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(),
-						nf.getValorIr());
-				BigDecimal descontos = util.getSumOfBigDecimal(lista);
-				nf.setValorLiquido(util.getSubtract(BigDecimal.valueOf(dlp.getValorTotalNfse()), descontos));
-				nf.setValorTotalDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
-				nf.setServicoPrestadoForaPais("N");
-				nf.setDataHoraRps(nf.getDataHoraEmissao());
-
-				nf = notasFiscaisDao.save(nf);
-
-				// tomadores
-				Tomadores t = null;
-
-				if (!util.isEmptyOrNull(nf.getInscricaoTomador()) && !util.isEmptyOrNull(dlp.getRazaoSocialTomador())) {
-					t = tomadoresDao.findByInscricao(nf.getInscricaoTomador(), nf.getInscricaoPrestador());
-					if (t == null || t.getId() == null) {
-						try {
-							t = new Tomadores();
-							t.setOptanteSimples(util.getOptantePeloSimplesNacional("N"));
-							t.setNome(dlp.getRazaoSocialTomador());
-							t.setNomeFantasia(dlp.getRazaoSocialTomador());
-							t.setPrestadores(nf.getPrestadores());
-							t.setTipoPessoa(util.getTipoPessoa(nf.getInscricaoTomador()));
-							t.setInscricaoTomador(nf.getInscricaoTomador());
-							t.setBairro(dlp.getEnderecoBairroTomador());
-							t.setCep(util.trataCep(dlp.getCepTomador()));
-							t.setComplemento(dlp.getEnderecoComplementoTomador());
-							t.setEmail(util.trataEmail(dlp.getEmailTomador()));
-							t.setEndereco(dlp.getEnderecoTomador());
-							t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
-							t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
-							t.setMunicipio(dlp.getMunicipioTomador());
-							t.setCelular(util.getLimpaTelefone(dlp.getTelefoneTomador()));
-							try {
-								t.setMunicipioIbge(Long.valueOf(municipiosIbgeDao
-										.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
-							} catch (Exception e) {
-
-							}
-
-							trataNumerosTelefones(t);
-							anulaCamposVazios(t);
-
-							t = tomadoresDao.save(t);
-						} catch (Exception e) {
-							e.printStackTrace();
-							t = null;
-						}
-
-					}
-				}
-
-				processaDemaisTiposNotas(p, nf, dlp, log, linha, t);
-
-			} catch (Exception e) {
-				log.fillError(linha, e);
-				e.printStackTrace();
 			}
 
 		}
 		log.close();
+
+	}
+
+	// para notas fiscais
+	private void processaDlp(DadosLivroPrestador dlp, FileLog log, String linha) {
+		String inscricaoPrestador = dlp.getCnpjPrestador().trim();
+		Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
+		try {
+			if (p == null || p.getId() == 0 || !inscricaoPrestador.trim().equals(p.getInscricaoPrestador())) {
+				System.out.println("Prestador não encontrado:" + inscricaoPrestador);
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		NotasFiscais nf = new NotasFiscais();
+		nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
+		nf.setInscricaoPrestador(dlp.getCnpjPrestador());
+		nf.setInscricaoTomador(dlp.getCnpjTomador());
+		nf.setNaturezaOperacao(dlp.getNaturezaOperacao());
+		nf.setNomePrestador(dlp.getRazaoSocialPrestador());
+		nf.setNomeTomador(dlp.getRazaoSocialTomador());
+		nf.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
+		nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
+		nf.setPrestadores(p);
+		if (util.getTipoPessoa(p.getInscricaoPrestador()).equals("J")) {
+			nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
+		}
+		nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
+		nf.setValorInss(BigDecimal.valueOf(dlp.getValorInss()));
+		nf.setValorIr(BigDecimal.valueOf(dlp.getValorIr()));
+		nf.setValorOutrasRetencoes(BigDecimal.valueOf(dlp.getValorOutrasRetencoes()));
+		nf.setValorTotalIssOptante(BigDecimal.valueOf(dlp.getValorIss()));
+		nf.setValorTotalServico(BigDecimal.valueOf(dlp.getValorTotalNfse()));
+		nf.setValorTotalIss(BigDecimal.valueOf(dlp.getValorIss()));
+		nf.setSituacaoOriginal(dlp.getStatusNota().trim().substring(0, 1));
+		nf.setSituacao("N");
+		nf.setSituacaoTributaria(util.getSituacaoTributaria(dlp));
+		if (dlp.getCodigoVerificacao() != null && !dlp.getCodigoVerificacao().trim().isEmpty()) {
+			if (dlp.getCodigoVerificacao().length() > 9) {
+				nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim().substring(0, 9));
+			} else {
+				nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim());
+			}
+		} else {
+			nf.setNumeroVerificacao(util.completarZerosEsquerda(dlp.getIdCodigo().toString(), 9));
+		}
+		nf.setNaturezaOperacao("1"); // TODO resolver
+		nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
+		nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
+		nf.setValorTotalDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
+		nf.setServicoPrestadoForaPais("N");
+		nf.setDataHoraRps(nf.getDataHoraEmissao());
+		List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(),
+				nf.getValorIr());
+		BigDecimal descontos = util.getSumOfBigDecimal(lista);
+
+		nf.setValorLiquido(util.getSubtract(BigDecimal.valueOf(dlp.getValorTotalNfse()), descontos));
+		if (nf.getValorLiquido().compareTo(BigDecimal.ZERO) == -1) {
+			nf.setValorLiquido(nf.getValorLiquido().multiply(BigDecimal.valueOf(-1)));
+		}
+
+		nf = notasFiscaisDao.save(nf);
+
+		// tomadores
+		Tomadores t = null;
+
+		if (!util.isEmptyOrNull(nf.getInscricaoTomador()) && !util.isEmptyOrNull(dlp.getRazaoSocialTomador())) {
+			t = tomadoresDao.findByInscricao(nf.getInscricaoTomador(), nf.getInscricaoPrestador());
+			if (t == null || t.getId() == null) {
+				try {
+					t = new Tomadores();
+					t.setOptanteSimples(util.getOptantePeloSimplesNacional("N"));
+					t.setNome(dlp.getRazaoSocialTomador());
+					t.setNomeFantasia(dlp.getRazaoSocialTomador());
+					t.setPrestadores(nf.getPrestadores());
+					t.setTipoPessoa(util.getTipoPessoa(nf.getInscricaoTomador()));
+					t.setInscricaoTomador(nf.getInscricaoTomador());
+					t.setBairro(dlp.getEnderecoBairroTomador());
+					t.setCep(util.trataCep(dlp.getCepTomador()));
+					t.setComplemento(dlp.getEnderecoComplementoTomador());
+					t.setEmail(util.trataEmail(dlp.getEmailTomador()));
+					t.setEndereco(dlp.getEnderecoTomador());
+					t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
+					t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
+					t.setMunicipio(dlp.getMunicipioTomador());
+					t.setTelefone(util.getLimpaTelefone(dlp.getTelefoneTomador().trim()));
+					try {
+						t.setMunicipioIbge(Long.valueOf(
+								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
+					} catch (Exception e) {
+
+					}
+
+					trataNumerosTelefones(t);
+					anulaCamposVazios(t);
+
+					t = tomadoresDao.save(t);
+				} catch (Exception e) {
+					e.printStackTrace();
+					t = null;
+				}
+
+			}
+		}
+
+		processaDemaisTiposNotas(p, nf, dlp, log, linha, t);
 
 	}
 
@@ -801,7 +841,8 @@ public class ExtractorService {
 	public List<String> excluiParaProcessarNivel4() {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
-				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais", "PrestadoresAtividades");
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais",
+				"PrestadoresAtividades");
 	}
 
 	public List<String> excluiGuiasNotasFiscais() {
@@ -921,14 +962,14 @@ public class ExtractorService {
 		if (t.getCelular() != null && t.getCelular().trim().isEmpty()) {
 			t.setCelular(null);
 		}
-		
+
 		if (util.isEmptyOrNull(t.getInscricaoEstadual())) {
 			t.setInscricaoEstadual(null);
 		}
 		if (util.isEmptyOrNull(t.getInscricaoMunicipal())) {
 			t.setInscricaoMunicipal(null);
 		}
-		
+
 		if (util.isEmptyOrNull(t.getCep())) {
 			t.setCep(null);
 		}
@@ -950,6 +991,48 @@ public class ExtractorService {
 		}
 
 		return t;
+	}
+
+	public List<String> lerArquivo(String arquivoIn, int qtdeCampos) {
+		File file, fileWr;
+		file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
+		fileWr = new File("c:/TEMP/lagoa/txts_corrigidos/" + arquivoIn + "_new.txt");
+		try {
+			BufferedReader br;
+			OutputStreamWriter bo = new OutputStreamWriter(new FileOutputStream("c:\\temp\\acentos.txt"), "UTF-8");
+			List<String> dadosList = new ArrayList<String>();
+			try {
+				br = new BufferedReader(
+						new InputStreamReader(new FileInputStream("c:/TEMP/lagoa/" + arquivoIn + ".txt"), "UTF-8"));
+				br.readLine(); // cabe�alho
+				while (br.ready()) {
+					StringBuilder linhaDefinitiva = new StringBuilder();
+					String[] arrayAux = { "", "" };
+
+					while (arrayAux != null && arrayAux.length < qtdeCampos) {
+						String linha = br.readLine();
+						linha = preparaParaSplit(linha);
+						linhaDefinitiva.append(linha);
+						arrayAux = linhaDefinitiva.toString().split("#");
+					}
+
+					String linhaAux = linhaDefinitiva.toString();
+					linhaAux = linhaAux.replaceAll("\"", "");
+					dadosList.add(linhaAux);
+					bo.write(linhaAux + "\n");
+
+				}
+				br.close();
+				bo.close();
+				return dadosList;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+
 	}
 
 }
