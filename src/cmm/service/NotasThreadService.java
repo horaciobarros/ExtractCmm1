@@ -224,7 +224,7 @@ public class NotasThreadService implements Runnable {
 				nft.setTipoPessoa(tomadores.getTipoPessoa());
 				notasFiscaisTomadoresDao.save(nft);
 			} catch (Exception e) {
-				log.fillError(linha, e);
+				log.fillError(linha, "Erro NotasFiscaisTomadores " + e.getMessage());
 				e.printStackTrace();
 			}
 

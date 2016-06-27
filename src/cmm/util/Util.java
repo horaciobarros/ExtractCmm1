@@ -225,6 +225,9 @@ public class Util {
 			if (email != null && email.trim().isEmpty()) {
 				email = null;
 			}
+			if (!email.contains("@")) {
+				email = null;
+			}
 			if (email != null && email.contains(" ")) {
 				if (email.contains("@")) {
 					int posicaoVazia = email.indexOf(" ");

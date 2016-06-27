@@ -619,8 +619,8 @@ public class ExtractorService {
 					processaDlp(dlp, log, linha);
 
 				} catch (Exception e2) {
-					log.fillError(linha, e2);
-					e.printStackTrace();
+					log.fillError(linha, "Erro NotasFiscais " + e2.getMessage());
+					e2.printStackTrace();
 				}
 
 			}
@@ -727,6 +727,7 @@ public class ExtractorService {
 
 					t = tomadoresDao.save(t);
 				} catch (Exception e) {
+					log.fillError(linha, "Erro Tomadores " + e.getMessage());
 					e.printStackTrace();
 					t = null;
 				}
