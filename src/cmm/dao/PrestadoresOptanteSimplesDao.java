@@ -21,10 +21,17 @@ public class PrestadoresOptanteSimplesDao {
 
 	public void save(PrestadoresOptanteSimples pos) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(pos);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(pos);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 	}
 
 	public List<PrestadoresOptanteSimples> findNaoEnviados() {

@@ -21,10 +21,17 @@ public class NotasFiscaisDao {
 
 	public NotasFiscais save(NotasFiscais nf) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(nf);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(nf);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 		return nf;
 	}
 	

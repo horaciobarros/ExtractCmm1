@@ -21,10 +21,17 @@ public class GuiasDao {
 
 	public void save(Guias g) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(g);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(g);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 	}
 
 	public List<Guias> findNaoEnviados() {

@@ -21,10 +21,17 @@ public class PagamentosDao {
 
 	public void save(Pagamentos p) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(p);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(p);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 	}
 	
 	public List<Pagamentos> findNaoEnviados() {

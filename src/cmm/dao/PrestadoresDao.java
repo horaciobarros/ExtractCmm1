@@ -48,10 +48,17 @@ public class PrestadoresDao {
 		}
 
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(p);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(p);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 		return p;
 	}
 

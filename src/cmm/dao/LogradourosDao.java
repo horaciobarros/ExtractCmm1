@@ -37,10 +37,17 @@ public class LogradourosDao {
 
 	public void save(Logradouros entidade) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(entidade);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(entidade);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 	}
 	
 	public List<Logradouros> findNaoEnviados() {

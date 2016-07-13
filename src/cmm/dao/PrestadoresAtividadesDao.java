@@ -22,10 +22,17 @@ public class PrestadoresAtividadesDao {
 
 	public void save(PrestadoresAtividades pa) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(pa);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(pa);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 	}
 
 	public List<PrestadoresAtividades> findNaoEnviados() {

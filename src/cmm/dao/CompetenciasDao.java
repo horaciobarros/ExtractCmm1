@@ -37,10 +37,17 @@ public class CompetenciasDao {
 
 	public void save(Competencias cp) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(cp);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(cp);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 	}
 	
 	public List<Competencias> findNaoEnviados() {

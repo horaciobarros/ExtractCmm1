@@ -21,10 +21,17 @@ public class NotasFiscaisTomadoresDao {
 
 	public void save(NotasFiscaisTomadores nft) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(nft);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(nft);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 	}
 
 	public List<NotasFiscaisTomadores> findNaoEnviados() {
@@ -54,6 +61,16 @@ public class NotasFiscaisTomadoresDao {
 		query.executeUpdate();
 		tx.commit();
 		session.close();
+	}
+	
+	public void limparHash(){
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();		
+		
+		String sql = "update NotasFiscaisTomadores set hash = null";
+		Query query = session.createQuery(sql);
+		query.executeUpdate();
+		tx.commit();session.close();
 	}
 
 	public NotasFiscaisTomadores findByNumeroGuia(String nossoNumero) {

@@ -21,10 +21,17 @@ public class NotasFiscaisPrestadoresDao {
 
 	public void save(NotasFiscaisPrestadores nfp) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(nfp);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(nfp);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 	}
 	
 	public List<NotasFiscaisPrestadores> findNaoEnviados() {
@@ -50,6 +57,16 @@ public class NotasFiscaisPrestadoresDao {
 		
 		String sql = builder.toString();
 		sql = sql.toString().substring(0,sql.length()-4);
+		Query query = session.createQuery(sql);
+		query.executeUpdate();
+		tx.commit();session.close();
+	}
+	
+	public void limparHash(){
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();		
+		
+		String sql = "update NotasFiscaisPrestadores set hash = null";
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
 		tx.commit();session.close();

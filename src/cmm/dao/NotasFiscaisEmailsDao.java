@@ -21,10 +21,17 @@ public class NotasFiscaisEmailsDao {
 	
 	public void save(NotasFiscaisEmails nfe) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(nfe);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(nfe);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 	}
 	
 	public List<NotasFiscaisEmails> findNaoEnviados() {

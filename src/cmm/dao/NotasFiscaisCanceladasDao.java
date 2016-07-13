@@ -21,10 +21,17 @@ public class NotasFiscaisCanceladasDao {
 	
 	public void save(NotasFiscaisCanceladas nfc) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(nfc);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(nfc);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 	}
 	
 	public List<NotasFiscaisCanceladas> findNaoEnviados() {

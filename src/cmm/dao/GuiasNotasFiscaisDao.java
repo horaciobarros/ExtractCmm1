@@ -22,10 +22,17 @@ public class GuiasNotasFiscaisDao {
 
 	public void save(GuiasNotasFiscais gnf) {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.save(gnf);
-		session.beginTransaction().commit();
-		session.close();
+		try{
+			session.beginTransaction();
+			session.save(gnf);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
 	}
 
 	public List<GuiasNotasFiscais> findNaoEnviados() {
