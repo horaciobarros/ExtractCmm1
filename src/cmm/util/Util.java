@@ -223,7 +223,7 @@ public class Util {
 		if (email != null) {
 			email = email.trim();
 			if (email != null && email.trim().isEmpty()) {
-				email = null;
+				email = null;return email;
 			}
 			if (!email.contains("@")) {
 				email = null;

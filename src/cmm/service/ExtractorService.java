@@ -441,7 +441,7 @@ public class ExtractorService {
 			try {
 
 				linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("#");
+				String[] arrayLinha = linha.split("@@#");
 				DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
 						arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13],
@@ -574,7 +574,7 @@ public class ExtractorService {
 			mostraProgresso(linhas, dadosList.size());
 
 			linha = preparaParaSplit(linha);
-			String[] arrayLinha = linha.split("#");
+			String[] arrayLinha = linha.split("@@#");
 
 			try {
 
@@ -690,7 +690,8 @@ public class ExtractorService {
 			nf.setValorLiquido(nf.getValorLiquido().multiply(BigDecimal.valueOf(-1)));
 		}
 
-		nf = notasFiscaisDao.save(nf);
+
+
 
 		// tomadores
 		Tomadores t = null;
