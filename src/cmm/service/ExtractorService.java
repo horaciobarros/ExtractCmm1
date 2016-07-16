@@ -68,7 +68,8 @@ public class ExtractorService {
 
 		for (String linha : dadosList) {
 			try {
-				String[] arrayLinha = linha.split("\\|");
+				linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@#");
 				PlanoConta pc = new PlanoConta(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3],
 						arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8], arrayLinha[9],
 						arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14]);
@@ -86,7 +87,8 @@ public class ExtractorService {
 		FileLog log = new FileLog("dados_contador");
 		for (String linha : dadosList) {
 			try {
-				String[] arrayLinha = linha.split("\\|");
+				linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@#");
 				DadosContador dc = new DadosContador(Long.valueOf(arrayLinha[0]), arrayLinha[1], arrayLinha[2],
 						arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8],
 						arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14],
@@ -105,7 +107,8 @@ public class ExtractorService {
 		FileLog log = new FileLog("dados_cadastro_acesso");
 		for (String linha : dadosList) {
 			try {
-				String[] arrayLinha = linha.split("\\|");
+				linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@#");
 				DadosCadastroAcesso dca = new DadosCadastroAcesso(arrayLinha[0], arrayLinha[1]);
 			} catch (Exception e) {
 				log.fillError(linha, e);
@@ -121,7 +124,8 @@ public class ExtractorService {
 		FileLog log = new FileLog("dados_cadastro_atividade");
 		for (String linha : dadosList) {
 			try {
-				String[] arrayLinha = linha.split("\\|");
+				linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@#");
 				DadosCadastroAtividade dca = new DadosCadastroAtividade(arrayLinha[0], arrayLinha[1], arrayLinha[2],
 						arrayLinha[3], arrayLinha[4], Double.valueOf(arrayLinha[5]), arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12]);
@@ -165,7 +169,8 @@ public class ExtractorService {
 				mostraProgresso(linhas, dadosList.size());
 			}
 			try {
-				String[] arrayLinha = linha.split("\\|");
+				linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@#");
 				DadosCadastro dc = new DadosCadastro(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3],
 						arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8], arrayLinha[9],
 						arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14], arrayLinha[15],
@@ -250,6 +255,7 @@ public class ExtractorService {
 
 				} catch (Exception e) {
 					e.printStackTrace();
+					log.fillError(linha, e);
 				}
 
 				// ajustando prestadores
@@ -305,6 +311,7 @@ public class ExtractorService {
 					}
 
 				} catch (Exception e) {
+					log.fillError(linha, e);
 					e.printStackTrace();
 				}
 
@@ -331,7 +338,7 @@ public class ExtractorService {
 
 			try {
 				linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("#");
+				String[] arrayLinha = linha.split("@@#");
 				DadosGuia dg = new DadosGuia(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3], arrayLinha[4],
 						arrayLinha[5], arrayLinha[6], Double.valueOf(arrayLinha[7]), Double.valueOf(arrayLinha[8]),
 						Double.valueOf(arrayLinha[9]), Double.valueOf(arrayLinha[10]), Double.valueOf(arrayLinha[11]),
@@ -415,6 +422,7 @@ public class ExtractorService {
 
 				} catch (Exception e) {
 					e.printStackTrace();
+					log.fillError(linha, e);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -450,12 +458,13 @@ public class ExtractorService {
 						Double.valueOf(arrayLinha[22]), Double.valueOf(arrayLinha[23]), Double.valueOf(arrayLinha[24]),
 						arrayLinha[25], Double.valueOf(arrayLinha[26]), Double.valueOf(arrayLinha[27]),
 						Double.valueOf(arrayLinha[28]), Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]),
-						Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]), arrayLinha[33], arrayLinha[34],
-						arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40],
-						arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46],
-						arrayLinha[47], arrayLinha[48], arrayLinha[49], arrayLinha[50], arrayLinha[51], arrayLinha[52],
-						arrayLinha[53], arrayLinha[54], arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58],
-						arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[61], arrayLinha[63]);
+						Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]),Double.valueOf(arrayLinha[33]), arrayLinha[34],
+						arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39],
+						arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44],
+						arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48], arrayLinha[49],
+						arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53], arrayLinha[54],
+						arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59],
+						arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64]);
 
 				String inscricaoPrestador = dlp.getCnpjPrestador().trim();
 				Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
@@ -586,12 +595,13 @@ public class ExtractorService {
 						Double.valueOf(arrayLinha[22]), Double.valueOf(arrayLinha[23]), Double.valueOf(arrayLinha[24]),
 						arrayLinha[25], Double.valueOf(arrayLinha[26]), Double.valueOf(arrayLinha[27]),
 						Double.valueOf(arrayLinha[28]), Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]),
-						Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]), arrayLinha[33], arrayLinha[34],
-						arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40],
-						arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46],
-						arrayLinha[47], arrayLinha[48], arrayLinha[49], arrayLinha[50], arrayLinha[51], arrayLinha[52],
-						arrayLinha[53], arrayLinha[54], arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58],
-						arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[61], arrayLinha[63]);
+						Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]),Double.valueOf(arrayLinha[33]), arrayLinha[34],
+						arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39],
+						arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44],
+						arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48], arrayLinha[49],
+						arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53], arrayLinha[54],
+						arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59],
+						arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64]);
 
 				processaDlp(dlp, log, linha);
 
@@ -608,13 +618,13 @@ public class ExtractorService {
 							Double.valueOf(arrayLinha[24]), arrayLinha[25], Double.valueOf(arrayLinha[26]),
 							Double.valueOf(arrayLinha[27]), Double.valueOf(arrayLinha[28]),
 							Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]),
-							Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]), arrayLinha[33],
-							arrayLinha[34], arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38],
-							arrayLinha[39], arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43],
-							arrayLinha[44], arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48],
-							arrayLinha[49], arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53],
-							arrayLinha[54], arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58],
-							arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[61], arrayLinha[63]);
+							Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]),Double.valueOf(arrayLinha[33]), arrayLinha[34],
+							arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39],
+							arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44],
+							arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48], arrayLinha[49],
+							arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53], arrayLinha[54],
+							arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59],
+							arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64]);
 
 					processaDlp(dlp, log, linha);
 
@@ -690,8 +700,13 @@ public class ExtractorService {
 			nf.setValorLiquido(nf.getValorLiquido().multiply(BigDecimal.valueOf(-1)));
 		}
 
-
-
+		try{
+			nf = notasFiscaisDao.save(nf);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			log.fillError(linha, e);
+		}
 
 		// tomadores
 		Tomadores t = null;
@@ -720,7 +735,8 @@ public class ExtractorService {
 						t.setMunicipioIbge(Long.valueOf(
 								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
 					} catch (Exception e) {
-
+						log.fillError(linha, e);
+						e.printStackTrace();
 					}
 
 					trataNumerosTelefones(t);
@@ -847,8 +863,10 @@ public class ExtractorService {
 				"PrestadoresAtividades");
 	}
 
-	public List<String> excluiGuiasNotasFiscais() {
-		return Arrays.asList("GuiasNotasFiscais");
+	public List<String> excluiParaProcessarNivel5() {
+		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
+				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais");
 	}
 
 	private Prestadores trataNumerosTelefones(Prestadores p) {

@@ -42,6 +42,7 @@ public class DadosLivroPrestador {
 	private Double valorCsll;
 	private String tipoRetencao;
 	private Double valorIss;
+	private Double valorIssRetido;
 	private Double valorOutrasRetencoes;
 	private Double valorBaseCalculo;
 	private Double valorAliquota;
@@ -84,7 +85,7 @@ public class DadosLivroPrestador {
 			 String codigoVerificacao, String naturezaOperacao, String regimeTributacao, String optantePeloSimplesNacional, String statusNota,
 			 String dataCancelamento, String motivoCancelamento, String dataCompetencia, String outrasInformacoes, String codigoAtividadeMunipal,
 			 String codigoCnae, String discriminacaoServico, Double valorServico, Double valorDeducao, Double valorPis, Double valorCofins,
-			 Double valorInss, Double valorIr, Double valorCsll, String tipoRetencao, Double valorIss, Double valorOutrasRetencoes,
+			 Double valorInss, Double valorIr, Double valorCsll, String tipoRetencao, Double valorIss, Double valorIssRetido, Double valorOutrasRetencoes,
 			 Double valorBaseCalculo, Double valorAliquota, Double valorTotalNfse, Double valorDescontoIncondicionado,
 			 Double valorDescontoCondicionado, String cnpjPrestador, String inscricaoMunicipalPrestador, String inscricaoEstadualPrestador,
 			 String razaoSocialPrestador, String nomeFantasiaPrestador, String enderecoPrestador, String enderecoNumeroPrestador,
@@ -122,6 +123,7 @@ public class DadosLivroPrestador {
 		this.valorCsll = valorCsll;
 		this.tipoRetencao = tipoRetencao;
 		this.valorIss = valorIss;
+		this.valorIssRetido = valorIssRetido;
 		this.valorOutrasRetencoes = valorOutrasRetencoes;
 		this.valorBaseCalculo = valorBaseCalculo;
 		this.valorAliquota = valorAliquota;
@@ -168,7 +170,7 @@ public class DadosLivroPrestador {
 			 String codigoVerificacao, String naturezaOperacao, String regimeTributacao, String optantePeloSimplesNacional, String statusNota,
 			 String dataCancelamento, String motivoCancelamento, String dataCompetencia, String outrasInformacoes, String codigoAtividadeMunipal,
 			 String codigoCnae, String discriminacaoServico, String aux, Double valorServico, Double valorDeducao, Double valorPis, Double valorCofins,
-			 Double valorInss, Double valorIr, Double valorCsll, String tipoRetencao, Double valorIss, Double valorOutrasRetencoes,
+			 Double valorInss, Double valorIr, Double valorCsll, String tipoRetencao, Double valorIss,Double valorIssRetido, Double valorOutrasRetencoes,
 			 Double valorBaseCalculo, Double valorAliquota, Double valorTotalNfse, Double valorDescontoIncondicionado,
 			 Double valorDescontoCondicionado, String cnpjPrestador, String inscricaoMunicipalPrestador, String inscricaoEstadualPrestador,
 			 String razaoSocialPrestador, String nomeFantasiaPrestador, String enderecoPrestador, String enderecoNumeroPrestador,
@@ -206,6 +208,7 @@ public class DadosLivroPrestador {
 		this.valorCsll = valorCsll;
 		this.tipoRetencao = tipoRetencao;
 		this.valorIss = valorIss;
+		this.valorIssRetido = valorIssRetido;
 		this.valorOutrasRetencoes = valorOutrasRetencoes;
 		this.valorBaseCalculo = valorBaseCalculo;
 		this.valorAliquota = valorAliquota;
@@ -757,8 +760,12 @@ public class DadosLivroPrestador {
 	public void setDataInclusaoRegistro(String dataInclusaoRegistro) {
 		this.dataInclusaoRegistro = dataInclusaoRegistro;
 	}
-	
-	
-	
-	
+
+	public Double getValorIssRetido() {
+		return valorIssRetido;
+	}
+
+	public void setValorIssRetido(Double valorIssRetido) {
+		this.valorIssRetido = valorIssRetido;
+	}
 }

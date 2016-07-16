@@ -29,6 +29,7 @@ public class PrestadoresAtividadesDao {
 		}
 		catch(Exception e){
 			e.printStackTrace();
+			throw e;
 		}
 		finally{
 			session.close();

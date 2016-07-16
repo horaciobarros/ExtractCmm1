@@ -18,10 +18,6 @@ public class TrataTxts {
 	
 	public static void main(String args[]){
 		new TrataTxts().processa();
-		TrataTxts t = new TrataTxts();
-		String a = "@@|@@|";
-		System.out.println(a);
-		System.out.println(t.preparaParaSplit(a));
 	}
 	
 	public void processa(){
@@ -34,7 +30,27 @@ public class TrataTxts {
 				case "dados_livro_prestador.txt":
 					lerArquivo(arqOrigem, 63);
 					break;
-
+				case "dados_cadastro.txt":
+					lerArquivo(arqOrigem, 22);
+					break;
+				case "dados_cadastro_acesso.txt":
+					lerArquivo(arqOrigem, 2);
+					break;
+				case "dados_cadastro_atividade.txt":
+					lerArquivo(arqOrigem, 11);
+					break;
+				case "dados_contador.txt":
+					lerArquivo(arqOrigem, 18);
+					break;
+				case "dados_guia.txt":
+					lerArquivo(arqOrigem, 40);
+					break;
+				case "dados_livro_tomador.txt":
+					lerArquivo(arqOrigem, 64);
+					break;
+				case "plano_conta.txt":
+					lerArquivo(arqOrigem, 13);
+					break;
 				default:
 					break;
 			}
@@ -66,7 +82,7 @@ public class TrataTxts {
 						}
 						linha = preparaParaSplit(linha);
 						linhaDefinitiva = new StringBuilder(linhaDefinitiva.toString() + linha);
-						campos = linhaDefinitiva.toString().split("@@\\|");
+						campos = linhaDefinitiva.toString().split("@@|");
 					}
 
 					String linhaAux = linhaDefinitiva.toString();
@@ -96,8 +112,23 @@ public class TrataTxts {
 			linha = linha.replace("@@|@@|", "@@| @@|");
 		}
 		try {
-			String ultCarac = linha.substring(linha.length() - 1);
+			String ultCarac = linha.substring(linha.length() - 3);
 			if (ultCarac.equals("@@|")) {
+				linha = linha + " ";
+			}
+		} catch (Exception e) {
+
+		}
+		return linha;
+	}
+	
+	public String preparaParaSplit2(String linha) {
+		while (linha.contains("\\|\\|")) {
+			linha = linha.replace("\\|\\||", "\\| \\|");
+		}
+		try {
+			String ultCarac = linha.substring(linha.length() - 3);
+			if (ultCarac.equals("\\|")) {
 				linha = linha + " ";
 			}
 		} catch (Exception e) {

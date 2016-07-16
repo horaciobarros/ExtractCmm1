@@ -18,7 +18,7 @@ public class Controller {
 
 	public void importaNfe() {
 
-		int nivelProcessamento = 4;
+		int nivelProcessamento = 1;
 		boolean txtsTratados = true;
 
 		System.out.println("Lagoa da Prata - Limpando o banco...");
@@ -33,7 +33,7 @@ public class Controller {
 		} else if (nivelProcessamento == 1) {
 			entidades = extractorService.excluiParaProcessarNivel1();
 		} else if (nivelProcessamento == 5) {
-			entidades = extractorService.excluiGuiasNotasFiscais();
+			entidades = extractorService.excluiParaProcessarNivel5();
 		}
 
 		// limpando o banco
@@ -51,8 +51,9 @@ public class Controller {
 
 		if (nivelProcessamento == 1) {
 
-			System.out.println("Gravando contribuintes");
+			System.out.println("Lendo contribuintes");
 			dadosList = extractorService.lerArquivo("dados_cadastro");
+			System.out.println("Gravando contribuintes");
 			extractorService.processaDadosCadastro(dadosList);
 			System.out.println("--- Fim de ajustes ---");
 
@@ -82,6 +83,9 @@ public class Controller {
 			extractorService.processaDadosCadastroAtividade(dadosList);
 			System.out.println("--- Fim de atividades prestador ---");
 
+		}
+		
+		if (nivelProcessamento <= 5) {
 			// notas fiscais
 			System.out.println("Lendo notas fiscais - " + Util.getDateHourMinutes(new Date()));
 			dadosList = extractorService.lerArquivo("dados_livro_prestador");

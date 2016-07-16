@@ -28,6 +28,7 @@ public class PrestadoresOptanteSimplesDao {
 		}
 		catch(Exception e){
 			e.printStackTrace();
+			throw e;
 		}
 		finally{
 			session.close();

@@ -47,6 +47,7 @@ public class TomadoresDao {
 		}
 		catch(Exception e){
 			e.printStackTrace();
+			throw e;
 		}
 		finally{
 			session.close();

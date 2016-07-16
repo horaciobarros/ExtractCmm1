@@ -28,6 +28,7 @@ public class PagamentosDao {
 		}
 		catch(Exception e){
 			e.printStackTrace();
+			throw e;
 		}
 		finally{
 			session.close();

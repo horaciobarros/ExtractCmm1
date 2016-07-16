@@ -28,6 +28,7 @@ public class NotasFiscaisCanceladasDao {
 		}
 		catch(Exception e){
 			e.printStackTrace();
+			throw e;
 		}
 		finally{
 			session.close();

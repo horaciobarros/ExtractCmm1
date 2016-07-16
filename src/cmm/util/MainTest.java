@@ -30,7 +30,7 @@ public class MainTest {
 	}
 
 	private void processaDadosNotasFiscaisAux(List<String> dadosList) {
-		FileLog log = new FileLog("dados_livro_prestador_notas_fiscais");
+	/*	FileLog log = new FileLog("dados_livro_prestador_notas_fiscais");
 
 		int linhas = 0;
 
@@ -87,7 +87,7 @@ public class MainTest {
 
 		}
 		log.close();
-
+	 	*/
 	}
 
 }
