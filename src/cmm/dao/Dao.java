@@ -1,5 +1,8 @@
 package cmm.dao;
 
+import java.sql.SQLException;
+
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -38,8 +41,14 @@ public class Dao {
 		session.getTransaction().commit();
 		session.close();
 	}
-	
 
-	
-	
+	public String getInfoBanco(){
+		try {
+			return sessionFactory.openSession().connection().getMetaData().getURL();
+		} catch (HibernateException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		};
+		return "";
+	}
 }
