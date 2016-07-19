@@ -29,6 +29,16 @@ public class Dao {
 		session.close();
 	}
 	
+	public void limpaHash(String nomeEntidade) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		
+		Query query = session.createQuery("update " + nomeEntidade + " set hash = null");
+		query.executeUpdate();
+		session.getTransaction().commit();
+		session.close();
+	}
+	
 
 	
 	
