@@ -75,4 +75,21 @@ public class NotasFiscaisDao {
 		return lista;
 	}
 
+	public NotasFiscais findNotaExistente(NotasFiscais nf) {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session
+				.createQuery("from NotasFiscais nf where numeroNota = :num and inscricaoPrestador=:insc")
+				.setParameter("num", nf.getNumeroNota())
+				.setParameter("insc", nf.getInscricaoPrestador());
+		List<NotasFiscais> lista = query.list();
+		tx.commit();session.close();
+		if (!lista.isEmpty()){
+			return lista.get(0);
+		}
+		else{
+			return null;
+		}
+	}
+
 }

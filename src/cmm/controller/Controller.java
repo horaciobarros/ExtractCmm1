@@ -1,7 +1,10 @@
 package cmm.controller;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
+import javax.swing.JOptionPane;
 
 import cmm.dao.NotasFiscaisDao;
 import cmm.service.ExtractorService;
@@ -17,6 +20,12 @@ public class Controller {
 	private ExtractorService extractorService = new ExtractorService();
 
 	public void importaNfe() {
+		
+		String msg = "Confirma Extract de Lagoa da Prata?";
+		int op = JOptionPane.showConfirmDialog(null, msg,"", JOptionPane.YES_NO_OPTION);
+		if (op != JOptionPane.YES_OPTION){
+			System.exit(0);
+		}
 
 		int nivelProcessamento = 5;
 		boolean txtsTratados = true;
@@ -93,7 +102,21 @@ public class Controller {
 			extractorService.processaDadosNotasFiscais(dadosList);
 			System.out.println("--- Fim de notas fiscais ---" + Util.getDateHourMinutes(new Date()));
 		}
-
+		
+		desligarComputador();
+	}
+	
+	/**
+	 * Método para desligar o computador
+	 * ATENÇÃO: Para cancelar, entrar no cmd e digitar: shutdown -a
+	 */
+	public static void desligarComputador() {
+		try {
+			Runtime.getRuntime().exec("shutdown -s -t 480");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

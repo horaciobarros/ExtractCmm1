@@ -58,7 +58,7 @@ public class FileLog {
 	public void fillError(String linha, Exception e) {
 		String linhaAux = linha.replaceAll("#", "|");
 		try {
-			bw.write("erro --> " + " conteudo da linha:" + linhaAux + "\n" + e);
+			bw.write("erro --> " + " conteudo da linha:" + linhaAux + "\n" + e+"\n");
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

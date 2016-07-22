@@ -127,7 +127,7 @@ public class ExtractorService {
 				linha = preparaParaSplit(linha);
 				String[] arrayLinha = linha.split("@@#");
 				DadosCadastroAtividade dca = new DadosCadastroAtividade(arrayLinha[0], arrayLinha[1], arrayLinha[2],
-						arrayLinha[3], arrayLinha[4], Double.valueOf(arrayLinha[5]), arrayLinha[6], arrayLinha[7],
+						arrayLinha[3], arrayLinha[4], util.corrigeDouble(arrayLinha[5]), arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12]);
 
 				// atividade prestador{
@@ -138,7 +138,7 @@ public class ExtractorService {
 						PrestadoresAtividades pa = new PrestadoresAtividades();
 						pa.setAliquota(BigDecimal.valueOf(dca.getAliquota()));
 						// pa.setIcnaes(null);
-						pa.setIlistaservicos(dca.getGrupoAtividade());
+						pa.setIlistaservicos(util.completarZerosEsquerda(dca.getGrupoAtividade(),4));
 						pa.setInscricaoPrestador(dca.getCnpj());
 						pa.setPrestadores(p);
 						dca.setAtividadeFederal(dca.getAtividadeFederal().replace(".", ""));
@@ -340,12 +340,12 @@ public class ExtractorService {
 				linha = preparaParaSplit(linha);
 				String[] arrayLinha = linha.split("@@#");
 				DadosGuia dg = new DadosGuia(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3], arrayLinha[4],
-						arrayLinha[5], arrayLinha[6], Double.valueOf(arrayLinha[7]), Double.valueOf(arrayLinha[8]),
-						Double.valueOf(arrayLinha[9]), Double.valueOf(arrayLinha[10]), Double.valueOf(arrayLinha[11]),
+						arrayLinha[5], arrayLinha[6], util.corrigeDouble(arrayLinha[7]), util.corrigeDouble(arrayLinha[8]),
+						util.corrigeDouble(arrayLinha[9]), util.corrigeDouble(arrayLinha[10]), util.corrigeDouble(arrayLinha[11]),
 						arrayLinha[12], arrayLinha[13], arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17],
 						arrayLinha[18], arrayLinha[19], arrayLinha[20], arrayLinha[21], arrayLinha[22], arrayLinha[23],
 						arrayLinha[24], arrayLinha[25], arrayLinha[26], arrayLinha[27], arrayLinha[28],
-						Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]), arrayLinha[31], arrayLinha[32],
+						util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]), arrayLinha[31], arrayLinha[32],
 						arrayLinha[33], arrayLinha[34], arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38],
 						arrayLinha[39], arrayLinha[40], arrayLinha[41]);
 				String descricao = util.getNomeMes(dg.getMes()) + "/" + dg.getAno();
@@ -384,7 +384,7 @@ public class ExtractorService {
 						guias.setPrestadores(prestadores);
 					}
 					String situacao = "A";
-					if (dg.getValorPago() != null && dg.getValorPago() != Double.valueOf(0)) {
+					if (dg.getValorPago() != null && dg.getValorPago() != util.corrigeDouble(0)) {
 						situacao = "P";
 					}
 					if (dg.getDataCancelamento() != null && !dg.getDataCancelamento().trim().isEmpty()) {
@@ -405,8 +405,8 @@ public class ExtractorService {
 							Pagamentos p = new Pagamentos();
 							p.setDataPagamento(util.getStringToDateHoursMinutes(dg.getDataPagamento()));
 							p.setGuias(guias);
-							p.setNumeroGuia(guias.getId());
-							p.setNumeroPagamento(guias.getId());
+							p.setNumeroGuia(guias.getNumeroGuia());
+							p.setNumeroPagamento(guias.getNumeroGuia());
 							p.setTipoPagamento("N");
 							p.setValorCorrecao(BigDecimal.valueOf(dg.getCorrecaoMonetaria()));
 							p.setValorJuro(BigDecimal.valueOf(dg.getJuros()));
@@ -453,12 +453,12 @@ public class ExtractorService {
 				DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
 						arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13],
-						arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], Double.valueOf(arrayLinha[18]),
-						Double.valueOf(arrayLinha[19]), Double.valueOf(arrayLinha[20]), Double.valueOf(arrayLinha[21]),
-						Double.valueOf(arrayLinha[22]), Double.valueOf(arrayLinha[23]), Double.valueOf(arrayLinha[24]),
-						arrayLinha[25], Double.valueOf(arrayLinha[26]), Double.valueOf(arrayLinha[27]),
-						Double.valueOf(arrayLinha[28]), Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]),
-						Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]),Double.valueOf(arrayLinha[33]), arrayLinha[34],
+						arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], util.corrigeDouble(arrayLinha[18]),
+						util.corrigeDouble(arrayLinha[19]), util.corrigeDouble(arrayLinha[20]), util.corrigeDouble(arrayLinha[21]),
+						util.corrigeDouble(arrayLinha[22]), util.corrigeDouble(arrayLinha[23]), util.corrigeDouble(arrayLinha[24]),
+						arrayLinha[25], util.corrigeDouble(arrayLinha[26]), util.corrigeDouble(arrayLinha[27]),
+						util.corrigeDouble(arrayLinha[28]), util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]),
+						util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),util.corrigeDouble(arrayLinha[33]), arrayLinha[34],
 						arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39],
 						arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44],
 						arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48], arrayLinha[49],
@@ -590,12 +590,12 @@ public class ExtractorService {
 				DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
 						arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13],
-						arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], Double.valueOf(arrayLinha[18]),
-						Double.valueOf(arrayLinha[19]), Double.valueOf(arrayLinha[20]), Double.valueOf(arrayLinha[21]),
-						Double.valueOf(arrayLinha[22]), Double.valueOf(arrayLinha[23]), Double.valueOf(arrayLinha[24]),
-						arrayLinha[25], Double.valueOf(arrayLinha[26]), Double.valueOf(arrayLinha[27]),
-						Double.valueOf(arrayLinha[28]), Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]),
-						Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]),Double.valueOf(arrayLinha[33]), arrayLinha[34],
+						arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], util.corrigeDouble(arrayLinha[18]),
+						util.corrigeDouble(arrayLinha[19]), util.corrigeDouble(arrayLinha[20]), util.corrigeDouble(arrayLinha[21]),
+						util.corrigeDouble(arrayLinha[22]), util.corrigeDouble(arrayLinha[23]), util.corrigeDouble(arrayLinha[24]),
+						arrayLinha[25], util.corrigeDouble(arrayLinha[26]), util.corrigeDouble(arrayLinha[27]),
+						util.corrigeDouble(arrayLinha[28]), util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]),
+						util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),util.corrigeDouble(arrayLinha[33]), arrayLinha[34],
 						arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39],
 						arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44],
 						arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48], arrayLinha[49],
@@ -612,13 +612,13 @@ public class ExtractorService {
 							arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
 							arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12],
 							arrayLinha[13], arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], aux,
-							Double.valueOf(arrayLinha[18]), Double.valueOf(arrayLinha[19]),
-							Double.valueOf(arrayLinha[20]), Double.valueOf(arrayLinha[21]),
-							Double.valueOf(arrayLinha[22]), Double.valueOf(arrayLinha[23]),
-							Double.valueOf(arrayLinha[24]), arrayLinha[25], Double.valueOf(arrayLinha[26]),
-							Double.valueOf(arrayLinha[27]), Double.valueOf(arrayLinha[28]),
-							Double.valueOf(arrayLinha[29]), Double.valueOf(arrayLinha[30]),
-							Double.valueOf(arrayLinha[31]), Double.valueOf(arrayLinha[32]),Double.valueOf(arrayLinha[33]), arrayLinha[34],
+							util.corrigeDouble(arrayLinha[18]), util.corrigeDouble(arrayLinha[19]),
+							util.corrigeDouble(arrayLinha[20]), util.corrigeDouble(arrayLinha[21]),
+							util.corrigeDouble(arrayLinha[22]), util.corrigeDouble(arrayLinha[23]),
+							util.corrigeDouble(arrayLinha[24]), arrayLinha[25], util.corrigeDouble(arrayLinha[26]),
+							util.corrigeDouble(arrayLinha[27]), util.corrigeDouble(arrayLinha[28]),
+							util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]),
+							util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),util.corrigeDouble(arrayLinha[33]), arrayLinha[34],
 							arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39],
 							arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44],
 							arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48], arrayLinha[49],
@@ -656,17 +656,29 @@ public class ExtractorService {
 		NotasFiscais nf = new NotasFiscais();
 		nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
 		nf.setInscricaoPrestador(dlp.getCnpjPrestador());
-		nf.setInscricaoTomador(dlp.getCnpjTomador());
+		
+		if (util.getTipoPessoa(dlp.getCnpjTomador()).equals("F")){
+			if (Util.validarCpf(dlp.getCnpjTomador())){
+				nf.setInscricaoTomador(dlp.getCnpjTomador());
+				nf.setNomeTomador(dlp.getRazaoSocialTomador());
+			}
+		} else if (util.getTipoPessoa(dlp.getCnpjTomador()).equals("J")){
+			if (Util.validarCnpj(dlp.getCnpjTomador())){
+				nf.setInscricaoTomador(dlp.getCnpjTomador());
+				nf.setNomeTomador(dlp.getRazaoSocialTomador());
+			}
+		}
+		
+		
 		nf.setNaturezaOperacao(dlp.getNaturezaOperacao());
 		nf.setNomePrestador(dlp.getRazaoSocialPrestador());
-		nf.setNomeTomador(dlp.getRazaoSocialTomador());
 		nf.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 		nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
 		nf.setPrestadores(p);
 		if (util.getTipoPessoa(p.getInscricaoPrestador()).equals("J")) {
 			nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
+			nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
 		}
-		nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
 		nf.setValorInss(BigDecimal.valueOf(dlp.getValorInss()));
 		nf.setValorIr(BigDecimal.valueOf(dlp.getValorIr()));
 		nf.setValorOutrasRetencoes(BigDecimal.valueOf(dlp.getValorOutrasRetencoes()));
@@ -706,6 +718,15 @@ public class ExtractorService {
 		catch(Exception e){
 			e.printStackTrace();
 			log.fillError(linha, e);
+			
+			try{
+				NotasFiscais outraNf = notasFiscaisDao.findNotaExistente(nf);
+				if (outraNf!=null){
+					nf.setId(outraNf.getId());
+					System.out.println("Nota duplicada-> numero:"+nf.getNumeroNota()+" prestador:"+nf.getInscricaoPrestador());
+					System.out.println("Nota duplicada-> nf nova valor:"+nf.getValorTotalServico().doubleValue()+" nf banco valor:"+outraNf.getValorTotalServico().doubleValue());
+				}
+			} catch(Exception e1){}
 		}
 
 		// tomadores
@@ -735,14 +756,18 @@ public class ExtractorService {
 						t.setMunicipioIbge(Long.valueOf(
 								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
 					} catch (Exception e) {
-						log.fillError(linha, e);
-						e.printStackTrace();
+						//log.fillError(linha, e);
+						//e.printStackTrace();
 					}
 
 					trataNumerosTelefones(t);
 					anulaCamposVazios(t);
-
-					t = tomadoresDao.save(t);
+					
+					// Só salvar tomador se a inscrição não for = 00000000000;
+					if (!t.getInscricaoTomador().replace("0","").trim().equals("")){
+						t = tomadoresDao.save(t);
+					}
+					
 				} catch (Exception e) {
 					log.fillError(linha, "Erro Tomadores " + e.getMessage());
 					e.printStackTrace();

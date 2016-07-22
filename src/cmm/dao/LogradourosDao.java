@@ -55,7 +55,7 @@ public class LogradourosDao {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		Query query = session
-				.createQuery("from Logradouros c where hash is null").setFirstResult(0).setMaxResults(500);
+				.createQuery("from Logradouros c where hash is null").setFirstResult(0).setMaxResults(1);
 		List<Logradouros> lista = query.list();
 		tx.commit();session.close();
 

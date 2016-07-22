@@ -55,7 +55,7 @@ public class BairrosDao {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		Query query = session
-				.createQuery("from Bairros c where hash is null").setFirstResult(0).setMaxResults(2000);
+				.createQuery("from Bairros c where hash is null").setFirstResult(0).setMaxResults(1);
 		List<Bairros> lista = query.list();
 		tx.commit();session.close();
 

@@ -159,7 +159,7 @@ public class NotasThreadService implements Runnable {
 			try {
 				NotasFiscaisPrestadores nfp = new NotasFiscaisPrestadores();
 				nfp.setBairro(dlp.getEnderecoBairroPrestador());
-				nfp.setCelular(util.getLimpaTelefone(dlp.getTelefonePrestador()));
+				nfp.setCelular(util.trataTelefone(util.getLimpaTelefone(dlp.getTelefonePrestador())));
 				nfp.setCep(dlp.getCepPrestador());
 				nfp.setComplemento(dlp.getEnderecoComplementoPrestador());
 				nfp.setEmail(p.getEmail());
@@ -186,7 +186,7 @@ public class NotasThreadService implements Runnable {
 				gnf.setGuias(guia);
 				gnf.setInscricaoPrestador(p.getInscricaoPrestador());
 				// gnf.setNumeroGuia(g.getNumeroGuia());
-				gnf.setNumeroGuia(guia.getId()); // acertar depois
+				gnf.setNumeroGuia(guia.getNumeroGuia()); // acertar depois
 				gnf.setNumeroNota(nf.getNumeroNota());
 				guiasNotasFiscaisDao.save(gnf);
 			} catch (Exception e) {
