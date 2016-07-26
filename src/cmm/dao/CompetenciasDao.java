@@ -55,7 +55,7 @@ public class CompetenciasDao {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		Query query = session
-				.createQuery("from Competencias c where hash is null").setFirstResult(0).setMaxResults(1000);;
+				.createQuery("from Competencias c where hash is null order by dataInicio").setFirstResult(0).setMaxResults(1);;
 		List<Competencias> lista = query.list();
 		tx.commit();session.close();
 

@@ -702,7 +702,8 @@ public class ExtractorService {
 		nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
 		nf.setValorTotalDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
 		nf.setServicoPrestadoForaPais("N");
-		nf.setDataHoraRps(nf.getDataHoraEmissao());
+		//nf.setDataHoraRps(nf.getDataHoraEmissao());
+
 		List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(),
 				nf.getValorIr());
 		BigDecimal descontos = util.getSumOfBigDecimal(lista);
@@ -843,7 +844,6 @@ public class ExtractorService {
 			br = new BufferedReader(new InputStreamReader(
 					new FileInputStream("c:/TEMP/lagoa/tratados/" + arquivoIn + ".txt"), "UTF-8"));
 
-			br.readLine(); // cabe�alho
 			while (br.ready()) {
 				String linha = br.readLine();
 				dadosList.add(linha);
