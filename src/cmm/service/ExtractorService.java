@@ -138,7 +138,7 @@ public class ExtractorService {
 						PrestadoresAtividades pa = new PrestadoresAtividades();
 						pa.setAliquota(BigDecimal.valueOf(dca.getAliquota()));
 						// pa.setIcnaes(null);
-						pa.setIlistaservicos(util.completarZerosEsquerda(dca.getGrupoAtividade(),4));
+						pa.setIlistaservicos(util.completarZerosEsquerda(dca.getGrupoAtividade(), 4));
 						pa.setInscricaoPrestador(dca.getCnpj());
 						pa.setPrestadores(p);
 						dca.setAtividadeFederal(dca.getAtividadeFederal().replace(".", ""));
@@ -340,14 +340,15 @@ public class ExtractorService {
 				linha = preparaParaSplit(linha);
 				String[] arrayLinha = linha.split("@@#");
 				DadosGuia dg = new DadosGuia(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3], arrayLinha[4],
-						arrayLinha[5], arrayLinha[6], util.corrigeDouble(arrayLinha[7]), util.corrigeDouble(arrayLinha[8]),
-						util.corrigeDouble(arrayLinha[9]), util.corrigeDouble(arrayLinha[10]), util.corrigeDouble(arrayLinha[11]),
-						arrayLinha[12], arrayLinha[13], arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17],
-						arrayLinha[18], arrayLinha[19], arrayLinha[20], arrayLinha[21], arrayLinha[22], arrayLinha[23],
-						arrayLinha[24], arrayLinha[25], arrayLinha[26], arrayLinha[27], arrayLinha[28],
-						util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]), arrayLinha[31], arrayLinha[32],
-						arrayLinha[33], arrayLinha[34], arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38],
-						arrayLinha[39], arrayLinha[40], arrayLinha[41]);
+						arrayLinha[5], arrayLinha[6], util.corrigeDouble(arrayLinha[7]),
+						util.corrigeDouble(arrayLinha[8]), util.corrigeDouble(arrayLinha[9]),
+						util.corrigeDouble(arrayLinha[10]), util.corrigeDouble(arrayLinha[11]), arrayLinha[12],
+						arrayLinha[13], arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], arrayLinha[18],
+						arrayLinha[19], arrayLinha[20], arrayLinha[21], arrayLinha[22], arrayLinha[23], arrayLinha[24],
+						arrayLinha[25], arrayLinha[26], arrayLinha[27], arrayLinha[28],
+						util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]), arrayLinha[31],
+						arrayLinha[32], arrayLinha[33], arrayLinha[34], arrayLinha[35], arrayLinha[36], arrayLinha[37],
+						arrayLinha[38], arrayLinha[39], arrayLinha[40], arrayLinha[41]);
 				String descricao = util.getNomeMes(dg.getMes()) + "/" + dg.getAno();
 				Competencias cp = competenciasDao.findByDescricao(descricao);
 				try {
@@ -366,57 +367,59 @@ public class ExtractorService {
 				}
 
 				try {
-					Guias guias = new Guias();
-					guias.setCompetencias(cp);
-					guias.setDataVencimento(util.getStringToDateHoursMinutes(dg.getDataVencimento()));
-					guias.setInscricaoPrestador(dg.getCnpj());
-					guias.setIntegrarGuia("N"); // TODO sanar dï¿½vida
+					if (dg.getTipoGuia().trim().equals("GUIA_PRESTADOR")) {
+						Guias guias = new Guias();
+						guias.setCompetencias(cp);
+						guias.setDataVencimento(util.getStringToDateHoursMinutes(dg.getDataVencimento()));
+						guias.setInscricaoPrestador(dg.getCnpj());
+						guias.setIntegrarGuia("N"); // TODO sanar dï¿½vida
 
-					String numeroGuia = dg.getNossoNumero().substring(3);
-					int proximoNumeroGuia = 60000000 + Integer.parseInt(numeroGuia);
-					guias.setNumeroGuia(Long.valueOf(proximoNumeroGuia));
-					guias.setNumeroGuiaOrigem(dg.getNossoNumero());
+						String numeroGuia = dg.getNossoNumero().substring(3);
+						int proximoNumeroGuia = 60000000 + Integer.parseInt(numeroGuia);
+						guias.setNumeroGuia(Long.valueOf(proximoNumeroGuia));
+						guias.setNumeroGuiaOrigem(dg.getNossoNumero());
 
-					Prestadores prestadores = prestadoresDao.findByInscricao(dg.getCnpj().trim());
-					if (prestadores == null) {
-						log.fillError(linha, "Prestador nï¿½o encontrado:" + dg.getInscMunicipal());
-					} else {
-						guias.setPrestadores(prestadores);
-					}
-					String situacao = "A";
-					if (dg.getValorPago() != null && dg.getValorPago() != util.corrigeDouble(0)) {
-						situacao = "P";
-					}
-					if (dg.getDataCancelamento() != null && !dg.getDataCancelamento().trim().isEmpty()) {
-						situacao = "C";
-					}
-					guias.setSituacao(situacao);
+						Prestadores prestadores = prestadoresDao.findByInscricao(dg.getCnpj().trim());
+						if (prestadores == null) {
+							log.fillError(linha, "Prestador nï¿½o encontrado:" + dg.getInscMunicipal());
+						} else {
+							guias.setPrestadores(prestadores);
+						}
+						String situacao = "A";
+						if (dg.getValorPago() != null && dg.getValorPago() != util.corrigeDouble(0)) {
+							situacao = "P";
+						}
+						if (dg.getDataCancelamento() != null && !dg.getDataCancelamento().trim().isEmpty()) {
+							situacao = "C";
+						}
+						guias.setSituacao(situacao);
 
-					guias.setTipo(dg.getTipoGuia().substring(5, 6));
+						guias.setTipo(dg.getTipoGuia().substring(5, 6));
 
-					guias.setValorDesconto(BigDecimal.valueOf(0.00));
-					guias.setValorGuia(BigDecimal.valueOf(dg.getValorTotal()));
-					guias.setValorImposto(BigDecimal.valueOf(dg.getImposto()));
-					guiasDao.save(guias);
+						guias.setValorDesconto(BigDecimal.valueOf(0.00));
+						guias.setValorGuia(BigDecimal.valueOf(dg.getValorTotal()));
+						guias.setValorImposto(BigDecimal.valueOf(dg.getImposto()));
+						guiasDao.save(guias);
 
-					// pagamentos
-					if (guias.getSituacao().equals("P")) {
-						try {
-							Pagamentos p = new Pagamentos();
-							p.setDataPagamento(util.getStringToDateHoursMinutes(dg.getDataPagamento()));
-							p.setGuias(guias);
-							p.setNumeroGuia(guias.getNumeroGuia());
-							p.setNumeroPagamento(guias.getNumeroGuia());
-							p.setTipoPagamento("N");
-							p.setValorCorrecao(BigDecimal.valueOf(dg.getCorrecaoMonetaria()));
-							p.setValorJuro(BigDecimal.valueOf(dg.getJuros()));
-							p.setValorMulta(BigDecimal.valueOf(dg.getMulta()));
-							p.setValorPago(BigDecimal.valueOf(dg.getValorPago()));
-							pagamentosDao.save(p);
-						} catch (Exception e) {
-							System.out.println(dg.getNossoNumero().trim());
-							e.printStackTrace();
-							log.fillError(linha, e);
+						// pagamentos
+						if (guias.getSituacao().equals("P") && dg.getValorPago() > 0) {
+							try {
+								Pagamentos p = new Pagamentos();
+								p.setDataPagamento(util.getStringToDateHoursMinutes(dg.getDataPagamento()));
+								p.setGuias(guias);
+								p.setNumeroGuia(guias.getNumeroGuia());
+								p.setNumeroPagamento(guias.getNumeroGuia());
+								p.setTipoPagamento("N");
+								p.setValorCorrecao(BigDecimal.valueOf(dg.getCorrecaoMonetaria()));
+								p.setValorJuro(BigDecimal.valueOf(dg.getJuros()));
+								p.setValorMulta(BigDecimal.valueOf(dg.getMulta()));
+								p.setValorPago(BigDecimal.valueOf(dg.getValorPago()));
+								pagamentosDao.save(p);
+							} catch (Exception e) {
+								System.out.println(dg.getNossoNumero().trim());
+								e.printStackTrace();
+								log.fillError(linha, e);
+							}
 						}
 					}
 
@@ -453,18 +456,20 @@ public class ExtractorService {
 				DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
 						arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13],
-						arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], util.corrigeDouble(arrayLinha[18]),
-						util.corrigeDouble(arrayLinha[19]), util.corrigeDouble(arrayLinha[20]), util.corrigeDouble(arrayLinha[21]),
-						util.corrigeDouble(arrayLinha[22]), util.corrigeDouble(arrayLinha[23]), util.corrigeDouble(arrayLinha[24]),
-						arrayLinha[25], util.corrigeDouble(arrayLinha[26]), util.corrigeDouble(arrayLinha[27]),
-						util.corrigeDouble(arrayLinha[28]), util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]),
-						util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),util.corrigeDouble(arrayLinha[33]), arrayLinha[34],
-						arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39],
-						arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44],
-						arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48], arrayLinha[49],
-						arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53], arrayLinha[54],
-						arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59],
-						arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64]);
+						arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17],
+						util.corrigeDouble(arrayLinha[18]), util.corrigeDouble(arrayLinha[19]),
+						util.corrigeDouble(arrayLinha[20]), util.corrigeDouble(arrayLinha[21]),
+						util.corrigeDouble(arrayLinha[22]), util.corrigeDouble(arrayLinha[23]),
+						util.corrigeDouble(arrayLinha[24]), arrayLinha[25], util.corrigeDouble(arrayLinha[26]),
+						util.corrigeDouble(arrayLinha[27]), util.corrigeDouble(arrayLinha[28]),
+						util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]),
+						util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),
+						util.corrigeDouble(arrayLinha[33]), arrayLinha[34], arrayLinha[35], arrayLinha[36],
+						arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40], arrayLinha[41], arrayLinha[42],
+						arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48],
+						arrayLinha[49], arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53], arrayLinha[54],
+						arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59], arrayLinha[60],
+						arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64]);
 
 				String inscricaoPrestador = dlp.getCnpjPrestador().trim();
 				Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
@@ -590,18 +595,20 @@ public class ExtractorService {
 				DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
 						arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13],
-						arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], util.corrigeDouble(arrayLinha[18]),
-						util.corrigeDouble(arrayLinha[19]), util.corrigeDouble(arrayLinha[20]), util.corrigeDouble(arrayLinha[21]),
-						util.corrigeDouble(arrayLinha[22]), util.corrigeDouble(arrayLinha[23]), util.corrigeDouble(arrayLinha[24]),
-						arrayLinha[25], util.corrigeDouble(arrayLinha[26]), util.corrigeDouble(arrayLinha[27]),
-						util.corrigeDouble(arrayLinha[28]), util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]),
-						util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),util.corrigeDouble(arrayLinha[33]), arrayLinha[34],
-						arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39],
-						arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44],
-						arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48], arrayLinha[49],
-						arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53], arrayLinha[54],
-						arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59],
-						arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64]);
+						arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17],
+						util.corrigeDouble(arrayLinha[18]), util.corrigeDouble(arrayLinha[19]),
+						util.corrigeDouble(arrayLinha[20]), util.corrigeDouble(arrayLinha[21]),
+						util.corrigeDouble(arrayLinha[22]), util.corrigeDouble(arrayLinha[23]),
+						util.corrigeDouble(arrayLinha[24]), arrayLinha[25], util.corrigeDouble(arrayLinha[26]),
+						util.corrigeDouble(arrayLinha[27]), util.corrigeDouble(arrayLinha[28]),
+						util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]),
+						util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),
+						util.corrigeDouble(arrayLinha[33]), arrayLinha[34], arrayLinha[35], arrayLinha[36],
+						arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40], arrayLinha[41], arrayLinha[42],
+						arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48],
+						arrayLinha[49], arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53], arrayLinha[54],
+						arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59], arrayLinha[60],
+						arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64]);
 
 				processaDlp(dlp, log, linha);
 
@@ -618,13 +625,14 @@ public class ExtractorService {
 							util.corrigeDouble(arrayLinha[24]), arrayLinha[25], util.corrigeDouble(arrayLinha[26]),
 							util.corrigeDouble(arrayLinha[27]), util.corrigeDouble(arrayLinha[28]),
 							util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]),
-							util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),util.corrigeDouble(arrayLinha[33]), arrayLinha[34],
-							arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39],
-							arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44],
-							arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48], arrayLinha[49],
-							arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53], arrayLinha[54],
-							arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59],
-							arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64]);
+							util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),
+							util.corrigeDouble(arrayLinha[33]), arrayLinha[34], arrayLinha[35], arrayLinha[36],
+							arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40], arrayLinha[41],
+							arrayLinha[42], arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46],
+							arrayLinha[47], arrayLinha[48], arrayLinha[49], arrayLinha[50], arrayLinha[51],
+							arrayLinha[52], arrayLinha[53], arrayLinha[54], arrayLinha[55], arrayLinha[56],
+							arrayLinha[57], arrayLinha[58], arrayLinha[59], arrayLinha[60], arrayLinha[61],
+							arrayLinha[62], arrayLinha[63], arrayLinha[64]);
 
 					processaDlp(dlp, log, linha);
 
@@ -654,22 +662,24 @@ public class ExtractorService {
 		}
 
 		NotasFiscais nf = new NotasFiscais();
-		nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
+		// nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
+		nf.setDataHoraEmissao(util.getStringToDate(dlp.getDataCompetencia())); // definido
+																							// pela
+																							// cmm
 		nf.setInscricaoPrestador(dlp.getCnpjPrestador());
-		
-		if (util.getTipoPessoa(dlp.getCnpjTomador()).equals("F")){
-			if (Util.validarCpf(dlp.getCnpjTomador())){
+
+		if (util.getTipoPessoa(dlp.getCnpjTomador()).equals("F")) {
+			if (Util.validarCpf(dlp.getCnpjTomador())) {
 				nf.setInscricaoTomador(dlp.getCnpjTomador());
 				nf.setNomeTomador(dlp.getRazaoSocialTomador());
 			}
-		} else if (util.getTipoPessoa(dlp.getCnpjTomador()).equals("J")){
-			if (Util.validarCnpj(dlp.getCnpjTomador())){
+		} else if (util.getTipoPessoa(dlp.getCnpjTomador()).equals("J")) {
+			if (Util.validarCnpj(dlp.getCnpjTomador())) {
 				nf.setInscricaoTomador(dlp.getCnpjTomador());
 				nf.setNomeTomador(dlp.getRazaoSocialTomador());
 			}
 		}
-		
-		
+
 		nf.setNaturezaOperacao(dlp.getNaturezaOperacao());
 		nf.setNomePrestador(dlp.getRazaoSocialPrestador());
 		nf.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
@@ -702,7 +712,7 @@ public class ExtractorService {
 		nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
 		nf.setValorTotalDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
 		nf.setServicoPrestadoForaPais("N");
-		//nf.setDataHoraRps(nf.getDataHoraEmissao());
+		// nf.setDataHoraRps(nf.getDataHoraEmissao());
 
 		List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(),
 				nf.getValorIr());
@@ -713,21 +723,23 @@ public class ExtractorService {
 			nf.setValorLiquido(nf.getValorLiquido().multiply(BigDecimal.valueOf(-1)));
 		}
 
-		try{
+		try {
 			nf = notasFiscaisDao.save(nf);
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			log.fillError(linha, e);
-			
-			try{
+
+			try {
 				NotasFiscais outraNf = notasFiscaisDao.findNotaExistente(nf);
-				if (outraNf!=null){
+				if (outraNf != null) {
 					nf.setId(outraNf.getId());
-					System.out.println("Nota duplicada-> numero:"+nf.getNumeroNota()+" prestador:"+nf.getInscricaoPrestador());
-					System.out.println("Nota duplicada-> nf nova valor:"+nf.getValorTotalServico().doubleValue()+" nf banco valor:"+outraNf.getValorTotalServico().doubleValue());
+					System.out.println("Nota duplicada-> numero:" + nf.getNumeroNota() + " prestador:"
+							+ nf.getInscricaoPrestador());
+					System.out.println("Nota duplicada-> nf nova valor:" + nf.getValorTotalServico().doubleValue()
+							+ " nf banco valor:" + outraNf.getValorTotalServico().doubleValue());
 				}
-			} catch(Exception e1){}
+			} catch (Exception e1) {
+			}
 		}
 
 		// tomadores
@@ -757,18 +769,18 @@ public class ExtractorService {
 						t.setMunicipioIbge(Long.valueOf(
 								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
 					} catch (Exception e) {
-						//log.fillError(linha, e);
-						//e.printStackTrace();
+						// log.fillError(linha, e);
+						// e.printStackTrace();
 					}
 
 					trataNumerosTelefones(t);
 					anulaCamposVazios(t);
-					
-					// Só salvar tomador se a inscrição não for = 00000000000;
-					if (!t.getInscricaoTomador().replace("0","").trim().equals("")){
+
+					// Sï¿½ salvar tomador se a inscriï¿½ï¿½o nï¿½o for = 00000000000;
+					if (!t.getInscricaoTomador().replace("0", "").trim().equals("")) {
 						t = tomadoresDao.save(t);
 					}
-					
+
 				} catch (Exception e) {
 					log.fillError(linha, "Erro Tomadores " + e.getMessage());
 					e.printStackTrace();

@@ -98,14 +98,12 @@ public class NotasThreadService implements Runnable {
 					nfs.setDescricao("Serviços Diversos");
 				}
 				nfs.setAliquota(BigDecimal.valueOf(dlp.getValorAliquota()));
-				nfs.setValorServico(BigDecimal.valueOf(dlp.getValorServico()));
 				nfs.setQuantidade(BigDecimal.valueOf(1));
 				nfs.setValorServico(BigDecimal.valueOf(dlp.getValorServico()));
 				nfs.setValorDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
 				nfs.setValorDescCondicionado(BigDecimal.valueOf(dlp.getValorDescontoCondicionado()));
 				nfs.setValorDescIncondicionado(BigDecimal.valueOf(dlp.getValorDescontoIncondicionado()));
 				nfs.setValorBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
-				nfs.setAliquota(BigDecimal.valueOf(dlp.getValorAliquota()));
 				nfs.setValorIss(BigDecimal.valueOf(dlp.getValorIss()));
 				nfs.setNotasFiscais(nf);
 				nfs.setValorUnitario(BigDecimal.valueOf(dlp.getValorServico()));

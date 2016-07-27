@@ -107,8 +107,8 @@ public class Controller {
 	}
 	
 	/**
-	 * Método para desligar o computador
-	 * ATENÇÃO: Para cancelar, entrar no cmd e digitar: shutdown -a
+	 * Mï¿½todo para desligar o computador
+	 * ATENï¿½ï¿½O: Para cancelar, entrar no cmd e digitar: shutdown -a
 	 */
 	public static void desligarComputador() {
 		try {

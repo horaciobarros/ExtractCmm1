@@ -11,8 +11,8 @@ import java.util.List;
 
 public class TrataTxts {
 
-	String pastaOrigem = "C:\\Temp\\dados_livro_prestador\\";
-	String pastaDestino = "C:\\Temp\\dados_livro_prestador\\tratados\\";
+	String pastaOrigem = "C:\\Temp\\lagoa\\";
+	String pastaDestino = "C:\\Temp\\lagoa\\tratados\\";
 	
 	
 	
