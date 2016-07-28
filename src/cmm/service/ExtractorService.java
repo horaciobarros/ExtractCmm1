@@ -2,13 +2,13 @@ package cmm.service;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import antlr.StringUtils;
 import cmm.dao.CompetenciasDao;
 import cmm.dao.Dao;
 import cmm.dao.GuiasDao;
@@ -21,12 +21,9 @@ import cmm.dao.PrestadoresDao;
 import cmm.dao.PrestadoresOptanteSimplesDao;
 import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosCadastro;
-import cmm.entidadesOrigem.DadosCadastroAcesso;
 import cmm.entidadesOrigem.DadosCadastroAtividade;
-import cmm.entidadesOrigem.DadosContador;
 import cmm.entidadesOrigem.DadosGuia;
 import cmm.entidadesOrigem.DadosLivroPrestador;
-import cmm.entidadesOrigem.PlanoConta;
 import cmm.model.Competencias;
 import cmm.model.Guias;
 import cmm.model.NotasFiscais;
@@ -38,10 +35,6 @@ import cmm.model.PrestadoresOptanteSimples;
 import cmm.model.Tomadores;
 import cmm.util.FileLog;
 import cmm.util.Util;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 
 /**
  * 
@@ -63,7 +56,7 @@ public class ExtractorService {
 	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
 	private TomadoresDao tomadoresDao = new TomadoresDao();
 
-	public void processaPlanoConta(List<String> dadosList) {
+	public void processaPlanoConta(List<String> dadosList) {/*
 		FileLog log = new FileLog("plano_conta");
 
 		for (String linha : dadosList) {
@@ -79,11 +72,11 @@ public class ExtractorService {
 			}
 
 		}
-		log.close();
+		log.close();*/
 
 	}
 
-	public void processaDadosContador(List<String> dadosList) {
+	public void processaDadosContador(List<String> dadosList) {/*
 		FileLog log = new FileLog("dados_contador");
 		for (String linha : dadosList) {
 			try {
@@ -100,10 +93,10 @@ public class ExtractorService {
 
 		}
 		log.close();
-
+	*/
 	}
 
-	public void processaDadosCadastroAcesso(List<String> dadosList) {
+	public void processaDadosCadastroAcesso(List<String> dadosList) {/*
 		FileLog log = new FileLog("dados_cadastro_acesso");
 		for (String linha : dadosList) {
 			try {
@@ -116,7 +109,7 @@ public class ExtractorService {
 			}
 
 		}
-		log.close();
+		log.close();/*/
 
 	}
 
@@ -221,7 +214,7 @@ public class ExtractorService {
 						pessoa.setMunicipioIbge(
 								Long.valueOf(municipiosIbgeDao.getCodigoIbge(pessoa.getMunicipio(), pessoa.getUf())));
 
-						if (pessoa.getTipoPessoa().equals("F")) {
+						if ("F".equals(pessoa.getTipoPessoa())) {
 							pessoa.setSexo("M");
 						}
 						pessoa = anulaCamposVazios(pessoa);
@@ -286,7 +279,7 @@ public class ExtractorService {
 					}
 
 					// prestadores optantes simples
-					if (dc.getOptanteSimplesNacional().substring(0, 1).equalsIgnoreCase("S")) {
+					if ("S".equalsIgnoreCase(dc.getOptanteSimplesNacional().substring(0, 1))) {
 						try {
 							PrestadoresOptanteSimples pos = new PrestadoresOptanteSimples();
 							String inicioAtividade = dc.getDtInicioAtividade();
@@ -367,7 +360,7 @@ public class ExtractorService {
 				}
 
 				try {
-					if (dg.getTipoGuia().trim().equals("GUIA_PRESTADOR")) {
+					if ("GUIA_PRESTADOR".equals(dg.getTipoGuia().trim())) {
 						Guias guias = new Guias();
 						guias.setCompetencias(cp);
 						guias.setDataVencimento(util.getStringToDateHoursMinutes(dg.getDataVencimento()));
@@ -402,7 +395,7 @@ public class ExtractorService {
 						guiasDao.save(guias);
 
 						// pagamentos
-						if (guias.getSituacao().equals("P") && dg.getValorPago() > 0) {
+						if ("P".equals(guias.getSituacao()) && dg.getValorPago() > 0) {
 							try {
 								Pagamentos p = new Pagamentos();
 								p.setDataPagamento(util.getStringToDateHoursMinutes(dg.getDataPagamento()));
@@ -552,7 +545,7 @@ public class ExtractorService {
 		}
 		try {
 			String ultCarac = linha.substring(linha.length() - 1);
-			if (ultCarac.equals("#")) {
+			if ("#".equals(ultCarac)) {
 				linha = linha + " ";
 			}
 		} catch (Exception e) {
@@ -653,7 +646,7 @@ public class ExtractorService {
 		String inscricaoPrestador = dlp.getCnpjPrestador().trim();
 		Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
 		try {
-			if (p == null || p.getId() == 0 || !inscricaoPrestador.trim().equals(p.getInscricaoPrestador())) {
+			if (p == null || p.getId() == 0 || !p.getInscricaoPrestador().equals(inscricaoPrestador.trim())) {
 				System.out.println("Prestador não encontrado:" + inscricaoPrestador);
 				throw new Exception();
 			}
@@ -668,12 +661,12 @@ public class ExtractorService {
 																							// cmm
 		nf.setInscricaoPrestador(dlp.getCnpjPrestador());
 
-		if (util.getTipoPessoa(dlp.getCnpjTomador()).equals("F")) {
+		if ("F".equals(util.getTipoPessoa(dlp.getCnpjTomador()))) {
 			if (Util.validarCpf(dlp.getCnpjTomador())) {
 				nf.setInscricaoTomador(dlp.getCnpjTomador());
 				nf.setNomeTomador(dlp.getRazaoSocialTomador());
 			}
-		} else if (util.getTipoPessoa(dlp.getCnpjTomador()).equals("J")) {
+		} else if ("J".equals(util.getTipoPessoa(dlp.getCnpjTomador()))) {
 			if (Util.validarCnpj(dlp.getCnpjTomador())) {
 				nf.setInscricaoTomador(dlp.getCnpjTomador());
 				nf.setNomeTomador(dlp.getRazaoSocialTomador());
@@ -685,7 +678,7 @@ public class ExtractorService {
 		nf.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 		nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
 		nf.setPrestadores(p);
-		if (util.getTipoPessoa(p.getInscricaoPrestador()).equals("J")) {
+		if ("J".equals(util.getTipoPessoa(p.getInscricaoPrestador()))) {
 			nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
 			nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
 		}
@@ -777,7 +770,7 @@ public class ExtractorService {
 					anulaCamposVazios(t);
 
 					// S� salvar tomador se a inscri��o n�o for = 00000000000;
-					if (!t.getInscricaoTomador().replace("0", "").trim().equals("")) {
+					if (!"".equals(t.getInscricaoTomador().replace("0", "").trim())) {
 						t = tomadoresDao.save(t);
 					}
 
@@ -802,7 +795,7 @@ public class ExtractorService {
 		s.start();
 
 		// -- canceladas
-		if (dlp.getStatusNota().substring(0, 1).equals("C")) {
+		if ("C".equals(dlp.getStatusNota().substring(0, 1))) {
 			NotasThreadService nfCanceladas = new NotasThreadService(p, nf, dlp, log, linha, "C");
 			Thread c = new Thread(nfCanceladas);
 			c.start();
@@ -975,22 +968,22 @@ public class ExtractorService {
 
 		if (pessoa.getCelular() != null) {
 			if (pessoa.getCelular().trim().length() < 10) {
-				if (pessoa.getMunicipio().trim().equals("LAGOA DA PRATA")) {
+				if ("LAGOA DA PRATA".equals(pessoa.getMunicipio().trim())) {
 					pessoa.setCelular(incluiPrefixoLagoa(pessoa.getTelefone()));
 				}
 			} else {
-				if (pessoa.getCelular().substring(0, 1).equals("0")) {
+				if ("0".equals(pessoa.getCelular().substring(0, 1))) {
 					pessoa.setCelular(pessoa.getCelular().substring(1));
 				}
 			}
 		}
 		if (pessoa.getTelefone() != null) {
 			if (pessoa.getTelefone().trim().length() < 10) {
-				if (pessoa.getMunicipio().trim().equals("LAGOA DA PRATA")) {
+				if ("LAGOA DA PRATA".equals(pessoa.getMunicipio().trim())) {
 					pessoa.setTelefone(incluiPrefixoLagoa(pessoa.getTelefone()));
 				}
 			} else {
-				if (pessoa.getTelefone().substring(0, 1).equals("0")) {
+				if ("0".equals(pessoa.getTelefone().substring(0, 1))) {
 					pessoa.setTelefone(pessoa.getCelular().substring(1));
 				}
 			}
@@ -1001,7 +994,10 @@ public class ExtractorService {
 
 	private String incluiPrefixoLagoa(String telefone) {
 		if (telefone != null && !telefone.trim().isEmpty()) {
-			telefone = "37" + telefone;
+			StringBuilder tel = new StringBuilder();
+			tel.append("37");
+			tel.append(telefone);
+			telefone = tel.toString();
 			if (telefone.trim().length() <= 3) {
 				telefone = null;
 			}
@@ -1048,48 +1044,6 @@ public class ExtractorService {
 		}
 
 		return t;
-	}
-
-	public List<String> lerArquivo(String arquivoIn, int qtdeCampos) {
-		File file, fileWr;
-		file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
-		fileWr = new File("c:/TEMP/lagoa/txts_corrigidos/" + arquivoIn + "_new.txt");
-		try {
-			BufferedReader br;
-			OutputStreamWriter bo = new OutputStreamWriter(new FileOutputStream("c:\\temp\\acentos.txt"), "UTF-8");
-			List<String> dadosList = new ArrayList<String>();
-			try {
-				br = new BufferedReader(
-						new InputStreamReader(new FileInputStream("c:/TEMP/lagoa/" + arquivoIn + ".txt"), "UTF-8"));
-				br.readLine(); // cabe�alho
-				while (br.ready()) {
-					StringBuilder linhaDefinitiva = new StringBuilder();
-					String[] arrayAux = { "", "" };
-
-					while (arrayAux != null && arrayAux.length < qtdeCampos) {
-						String linha = br.readLine();
-						linha = preparaParaSplit(linha);
-						linhaDefinitiva.append(linha);
-						arrayAux = linhaDefinitiva.toString().split("#");
-					}
-
-					String linhaAux = linhaDefinitiva.toString();
-					linhaAux = linhaAux.replaceAll("\"", "");
-					dadosList.add(linhaAux);
-					bo.write(linhaAux + "\n");
-
-				}
-				br.close();
-				bo.close();
-				return dadosList;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-
 	}
 
 }

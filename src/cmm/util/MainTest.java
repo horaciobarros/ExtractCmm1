@@ -1,16 +1,11 @@
 package cmm.util;
 
-import java.text.SimpleDateFormat;
+import java.util.List;
 
 import cmm.dao.MunicipiosIbgeDao;
 import cmm.dao.PessoaDao;
 import cmm.dao.TomadoresDao;
-import cmm.entidadesOrigem.DadosLivroPrestador;
 import cmm.service.ExtractorService;
-import cmm.model.Pessoa;
-import cmm.model.Tomadores;
-
-import java.util.*;
 
 public class MainTest {
 

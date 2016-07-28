@@ -7,7 +7,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
-import cmm.model.Prestadores;
 import cmm.model.PrestadoresAtividades;
 import cmm.util.HibernateUtil;
 
