@@ -726,10 +726,11 @@ public class ExtractorService {
 				NotasFiscais outraNf = notasFiscaisDao.findNotaExistente(nf);
 				if (outraNf != null) {
 					nf.setId(outraNf.getId());
-					System.out.println("Nota duplicada-> numero:" + nf.getNumeroNota() + " prestador:"
-							+ nf.getInscricaoPrestador());
-					System.out.println("Nota duplicada-> nf nova valor:" + nf.getValorTotalServico().doubleValue()
-							+ " nf banco valor:" + outraNf.getValorTotalServico().doubleValue());
+					String msg = "Nota duplicada-> numero:" + nf.getNumeroNota() + " prestador:"
+							+ nf.getInscricaoPrestador()+"\n";
+					msg += "Nota duplicada-> nf nova valor:" + nf.getValorTotalServico().doubleValue()
+							+ " nf banco valor:" + outraNf.getValorTotalServico().doubleValue();
+					log.fillError(linha, msg);
 				}
 			} catch (Exception e1) {
 			}

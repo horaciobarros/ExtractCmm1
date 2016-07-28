@@ -303,6 +303,7 @@ public class Util {
 	}
 
 	public static boolean validarEmail(String email) {
+		if (email == null){return false;}
 		Matcher matcher = pattern.matcher(email);
 		return matcher.matches();
 	}
