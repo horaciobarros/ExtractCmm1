@@ -112,7 +112,6 @@ public class NotasThreadService implements Runnable {
 				}
 				notasFiscaisServicosDao.save(nfs);
 			} catch (Exception e) {
-				log.fillError(linha, e);
 				e.printStackTrace();
 			}
 		}
@@ -134,7 +133,6 @@ public class NotasThreadService implements Runnable {
 				notasFiscaisCanceladasDao.save(nfc);
 
 			} catch (Exception e) {
-				log.fillError(linha, e);
 				e.printStackTrace();
 			}
 		}
@@ -148,7 +146,6 @@ public class NotasThreadService implements Runnable {
 				nfe.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 				notasFiscaisEmailsDao.save(nfe);
 			} catch (Exception e) {
-				log.fillError(linha, e);
 				e.printStackTrace();
 			}
 		}
@@ -173,7 +170,6 @@ public class NotasThreadService implements Runnable {
 				notasFiscaisPrestadoresDao.save(nfp);
 
 			} catch (Exception e) {
-				log.fillError(linha, e);
 				e.printStackTrace();
 			}
 		}
@@ -188,7 +184,6 @@ public class NotasThreadService implements Runnable {
 				gnf.setNumeroNota(nf.getNumeroNota());
 				guiasNotasFiscaisDao.save(gnf);
 			} catch (Exception e) {
-				log.fillError(linha, e);
 				e.printStackTrace();
 			}
 		}
@@ -222,7 +217,6 @@ public class NotasThreadService implements Runnable {
 				nft.setTipoPessoa(tomadores.getTipoPessoa());
 				notasFiscaisTomadoresDao.save(nft);
 			} catch (Exception e) {
-				log.fillError(linha, "Erro NotasFiscaisTomadores " + e.getMessage());
 				e.printStackTrace();
 			}
 

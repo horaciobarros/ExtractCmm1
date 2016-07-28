@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import cmm.dao.NotasFiscaisDao;
 import cmm.service.ExtractorService;
 import cmm.util.Util;
 
@@ -55,7 +54,7 @@ public class Controller {
 		}
 
 		System.out.println(
-				"Lagoa da Prata - Leitura de arquivos txt - InÃ­cio - Processando no nÃ­vel: " + nivelProcessamento);
+				"Lagoa da Prata - Leitura de arquivos txt - Início Processando no nível: " + nivelProcessamento);
 		List<String> dadosList;
 
 		if (nivelProcessamento == 1) {
@@ -103,7 +102,7 @@ public class Controller {
 			System.out.println("--- Fim de notas fiscais ---" + Util.getDateHourMinutes(new Date()));
 		}
 		
-		desligarComputador();
+		//desligarComputador();
 	}
 	
 	/**

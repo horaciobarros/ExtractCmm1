@@ -62,6 +62,7 @@ public class ExtractorService {
 	private int linhasMil = 0;
 	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
 	private TomadoresDao tomadoresDao = new TomadoresDao();
+	private NotasFiscais nf;
 
 	public void processaPlanoConta(List<String> dadosList) {
 		FileLog log = new FileLog("plano_conta");
@@ -447,7 +448,9 @@ public class ExtractorService {
 		for (String linha : dadosList) {
 			linhas++;
 			linhasMil++;
-			mostraProgresso(linhas, dadosList.size());
+			if (linhasMil == 1000) {
+				mostraProgresso(linhas, dadosList.size());
+			}
 
 			try {
 
@@ -475,7 +478,8 @@ public class ExtractorService {
 				Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
 				try {
 					if (p == null || p.getId() == 0 || p.getId() == null) {
-						// na hora de processar dados_cadastro estas informa��es
+						// na hora de processar dados_cadastro estas
+						// informa��es
 						// tem que ser verificadas
 						p = new Prestadores();
 						p.setAutorizado("N");
@@ -585,7 +589,9 @@ public class ExtractorService {
 		for (String linha : dadosList) {
 			linhas++;
 			linhasMil++;
-			mostraProgresso(linhas, dadosList.size());
+			if (linhasMil == 1000) {
+				mostraProgresso(linhas, dadosList.size());
+			}
 
 			linha = preparaParaSplit(linha);
 			String[] arrayLinha = linha.split("@@#");
@@ -661,11 +667,11 @@ public class ExtractorService {
 			e.printStackTrace();
 		}
 
-		NotasFiscais nf = new NotasFiscais();
+		nf = new NotasFiscais();
 		// nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
 		nf.setDataHoraEmissao(util.getStringToDate(dlp.getDataCompetencia())); // definido
-																							// pela
-																							// cmm
+																				// pela
+																				// cmm
 		nf.setInscricaoPrestador(dlp.getCnpjPrestador());
 
 		if (util.getTipoPessoa(dlp.getCnpjTomador()).equals("F")) {
@@ -776,13 +782,13 @@ public class ExtractorService {
 					trataNumerosTelefones(t);
 					anulaCamposVazios(t);
 
-					// S� salvar tomador se a inscri��o n�o for = 00000000000;
+					// S� salvar tomador se a inscri��o n�o for =
+					// 00000000000;
 					if (!t.getInscricaoTomador().replace("0", "").trim().equals("")) {
 						t = tomadoresDao.save(t);
 					}
 
 				} catch (Exception e) {
-					log.fillError(linha, "Erro Tomadores " + e.getMessage());
 					e.printStackTrace();
 					t = null;
 				}
@@ -790,12 +796,6 @@ public class ExtractorService {
 			}
 		}
 
-		processaDemaisTiposNotas(p, nf, dlp, log, linha, t);
-
-	}
-
-	private void processaDemaisTiposNotas(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
-			String linha, Tomadores t) {
 		// -- serviços
 		NotasThreadService nfServico = new NotasThreadService(p, nf, dlp, log, linha, "S");
 		Thread s = new Thread(nfServico);
