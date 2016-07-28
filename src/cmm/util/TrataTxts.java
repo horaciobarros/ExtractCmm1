@@ -77,12 +77,12 @@ public class TrataTxts {
 							System.out.println();
 						}
 						String linha = br.readLine();
-						if (linha == null || linha.trim().isEmpty()){
-							continue;
+						if (linha != null && !linha.trim().isEmpty()){
+							linha = preparaParaSplit(linha);
+							linhaDefinitiva = new StringBuilder(linhaDefinitiva.toString() + linha);
+							campos = linhaDefinitiva.toString().split("@@|");
 						}
-						linha = preparaParaSplit(linha);
-						linhaDefinitiva = new StringBuilder(linhaDefinitiva.toString() + linha);
-						campos = linhaDefinitiva.toString().split("@@|");
+						
 					}
 
 					String linhaAux = linhaDefinitiva.toString();
@@ -113,7 +113,7 @@ public class TrataTxts {
 		}
 		try {
 			String ultCarac = linha.substring(linha.length() - 3);
-			if (ultCarac.equals("@@|")) {
+			if ("@@|".equals(ultCarac)) {
 				linha = linha + " ";
 			}
 		} catch (Exception e) {
@@ -128,7 +128,7 @@ public class TrataTxts {
 		}
 		try {
 			String ultCarac = linha.substring(linha.length() - 3);
-			if (ultCarac.equals("\\|")) {
+			if ("\\|".equals(ultCarac)) {
 				linha = linha + " ";
 			}
 		} catch (Exception e) {

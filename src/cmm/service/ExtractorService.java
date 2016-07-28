@@ -42,19 +42,19 @@ import cmm.util.Util;
  *
  */
 public class ExtractorService {
-	private Util util = new Util();
-	private CompetenciasDao competenciasDao = new CompetenciasDao();
-	private PrestadoresDao prestadoresDao = new PrestadoresDao();
-	private Dao dao = new Dao();
-	private GuiasDao guiasDao = new GuiasDao();
-	private NotasFiscaisDao notasFiscaisDao = new NotasFiscaisDao();
-	private PagamentosDao pagamentosDao = new PagamentosDao();
-	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
-	private PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
-	private PessoaDao pessoaDao = new PessoaDao();
+	private final Util util = new Util();
+	private final CompetenciasDao competenciasDao = new CompetenciasDao();
+	private final PrestadoresDao prestadoresDao = new PrestadoresDao();
+	private final Dao dao = new Dao();
+	private final GuiasDao guiasDao = new GuiasDao();
+	private final NotasFiscaisDao notasFiscaisDao = new NotasFiscaisDao();
+	private final PagamentosDao pagamentosDao = new PagamentosDao();
+	private final PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
+	private final PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
+	private final PessoaDao pessoaDao = new PessoaDao();
 	private int linhasMil = 0;
-	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
-	private TomadoresDao tomadoresDao = new TomadoresDao();
+	private final MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
+	private final TomadoresDao tomadoresDao = new TomadoresDao();
 
 	public void processaPlanoConta(List<String> dadosList) {/*
 		FileLog log = new FileLog("plano_conta");
@@ -114,7 +114,7 @@ public class ExtractorService {
 	}
 
 	public void processaDadosCadastroAtividade(List<String> dadosList) {
-		FileLog log = new FileLog("dados_cadastro_atividade");
+		final FileLog log = new FileLog("dados_cadastro_atividade");
 		for (String linha : dadosList) {
 			try {
 				linha = preparaParaSplit(linha);
