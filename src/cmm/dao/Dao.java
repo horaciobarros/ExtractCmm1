@@ -51,4 +51,19 @@ public class Dao {
 		};
 		return "";
 	}
+	
+	public Object save(Session session, Object obj) {
+		try{
+			session.beginTransaction();
+			session.save(obj);
+			session.getTransaction().commit();
+		}
+		catch(Exception e){
+			session.getTransaction().rollback();
+			e.printStackTrace();
+			throw e;
+		}
+		
+		return obj;
+	}
 }

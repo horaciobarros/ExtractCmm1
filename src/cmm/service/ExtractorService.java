@@ -472,7 +472,8 @@ public class ExtractorService {
 				Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
 				try {
 					if (p == null || p.getId() == 0 || p.getId() == null) {
-						// na hora de processar dados_cadastro estas informa��es
+						// na hora de processar dados_cadastro estas
+						// informa��es
 						// tem que ser verificadas
 						p = new Prestadores();
 						p.setAutorizado("N");
