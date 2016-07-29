@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import cmm.dao.CompetenciasDao;
@@ -35,7 +36,7 @@ import cmm.model.PrestadoresOptanteSimples;
 import cmm.model.Tomadores;
 import cmm.util.FileLog;
 import cmm.util.Util;
-
+	
 /**
  * 
  * @author jway
@@ -61,8 +62,8 @@ public class ExtractorService {
 
 		for (String linha : dadosList) {
 			try {
-				linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("@@#");
+				//linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@\\|");
 				PlanoConta pc = new PlanoConta(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3],
 						arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8], arrayLinha[9],
 						arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14]);
@@ -80,8 +81,8 @@ public class ExtractorService {
 		FileLog log = new FileLog("dados_contador");
 		for (String linha : dadosList) {
 			try {
-				linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("@@#");
+				//linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@\\|");
 				DadosContador dc = new DadosContador(Long.valueOf(arrayLinha[0]), arrayLinha[1], arrayLinha[2],
 						arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8],
 						arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14],
@@ -100,8 +101,8 @@ public class ExtractorService {
 		FileLog log = new FileLog("dados_cadastro_acesso");
 		for (String linha : dadosList) {
 			try {
-				linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("@@#");
+				//linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@\\|");
 				DadosCadastroAcesso dca = new DadosCadastroAcesso(arrayLinha[0], arrayLinha[1]);
 			} catch (Exception e) {
 				log.fillError(linha, e);
@@ -117,8 +118,8 @@ public class ExtractorService {
 		final FileLog log = new FileLog("dados_cadastro_atividade");
 		for (String linha : dadosList) {
 			try {
-				linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("@@#");
+				//linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@\\|");
 				DadosCadastroAtividade dca = new DadosCadastroAtividade(arrayLinha[0], arrayLinha[1], arrayLinha[2],
 						arrayLinha[3], arrayLinha[4], util.corrigeDouble(arrayLinha[5]), arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12]);
@@ -162,8 +163,8 @@ public class ExtractorService {
 				mostraProgresso(linhas, dadosList.size());
 			}
 			try {
-				linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("@@#");
+				//linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@\\|");
 				DadosCadastro dc = new DadosCadastro(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3],
 						arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8], arrayLinha[9],
 						arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14], arrayLinha[15],
@@ -330,8 +331,8 @@ public class ExtractorService {
 			mostraProgresso(linhas, dadosList.size());
 
 			try {
-				linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("@@#");
+				//linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@\\|");
 				DadosGuia dg = new DadosGuia(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3], arrayLinha[4],
 						arrayLinha[5], arrayLinha[6], util.corrigeDouble(arrayLinha[7]),
 						util.corrigeDouble(arrayLinha[8]), util.corrigeDouble(arrayLinha[9]),
@@ -444,8 +445,8 @@ public class ExtractorService {
 
 			try {
 
-				linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("@@#");
+				//linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@\\|");
 				DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
 						arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
 						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13],
@@ -528,7 +529,7 @@ public class ExtractorService {
 			perc = perc * 100;
 			perc = Math.round(perc);
 			System.out.println("Percentual registros processados: " + perc + "% - total de linhas:" + dadosSize
-					+ " total lido:" + linhas);
+					+ " total lido:" + linhas+" "+ Util.getDateHourMinutes(new Date()));
 			linhasMil = 0;
 		}
 
@@ -580,8 +581,8 @@ public class ExtractorService {
 			linhasMil++;
 			mostraProgresso(linhas, dadosList.size());
 
-			linha = preparaParaSplit(linha);
-			String[] arrayLinha = linha.split("@@#");
+			//linha = preparaParaSplit(linha);
+			String[] arrayLinha = linha.split("@@\\|");
 
 			try {
 
