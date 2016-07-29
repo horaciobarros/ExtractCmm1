@@ -80,7 +80,7 @@ public class NotasThreadService implements Runnable {
 
 	@Override
 	public void run() {
-		if (tipoNotaFilha.equals("S") && !nf.getSituacaoOriginal().equals("C")) { // serviços
+		if (("S").equals(tipoNotaFilha) && !"C".equals(nf.getSituacaoOriginal())) { // serviços
 			try {
 
 				NotasFiscaisServicos nfs = new NotasFiscaisServicos();
@@ -116,7 +116,7 @@ public class NotasThreadService implements Runnable {
 			}
 		}
 
-		if (tipoNotaFilha.equals("C")) { // canceladas
+		if ("C".equals(tipoNotaFilha)) { // canceladas
 			try {
 				NotasFiscaisCanceladas nfc = new NotasFiscaisCanceladas();
 				nfc.setDatahoracancelamento(util.getStringToDateHoursMinutes(dlp.getDataCancelamento()));
@@ -137,7 +137,7 @@ public class NotasThreadService implements Runnable {
 			}
 		}
 
-		if (tipoNotaFilha.equals("E")) { // email
+		if ("E".equals(tipoNotaFilha)) { // email
 			try {
 				NotasFiscaisEmails nfe = new NotasFiscaisEmails();
 				nfe.setEmail(p.getEmail());
@@ -150,7 +150,7 @@ public class NotasThreadService implements Runnable {
 			}
 		}
 
-		if (tipoNotaFilha.equals("P")) { // prestadores
+		if ("P".equals(tipoNotaFilha)) { // prestadores
 			try {
 				NotasFiscaisPrestadores nfp = new NotasFiscaisPrestadores();
 				nfp.setBairro(dlp.getEnderecoBairroPrestador());
@@ -174,7 +174,7 @@ public class NotasThreadService implements Runnable {
 			}
 		}
 
-		if (tipoNotaFilha.equals("G")) { // guias
+		if ("G".equals(tipoNotaFilha)) { // guias
 			try {
 				GuiasNotasFiscais gnf = new GuiasNotasFiscais();
 				gnf.setGuias(guia);
@@ -188,7 +188,7 @@ public class NotasThreadService implements Runnable {
 			}
 		}
 
-		if (tipoNotaFilha.equals("T") && tomadores != null && tomadores.getId() != null) {
+		if ("T".equals(tipoNotaFilha) && tomadores != null && tomadores.getId() != null) {
 			try {
 				NotasFiscaisTomadores nft = new NotasFiscaisTomadores();
 				nft.setBairro(tomadores.getBairro());

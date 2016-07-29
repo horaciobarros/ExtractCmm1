@@ -14,15 +14,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cmm.entidadesOrigem.DadosLivroPrestador;
-import cmm.model.Tomadores;
 
 public class Util {
+
+	public static final String CODIGO_IBGE = "3137205";
 
 	private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
 	private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN, Pattern.CASE_INSENSITIVE);
-
-	public String CODIGO_IBGE = "3137205";
 
 	public static Long castToLong(Object value, Long defaultValue) {
 		if (value != null) {
@@ -32,7 +31,7 @@ public class Util {
 				return new Long(((Number) value).longValue());
 			} else if (value instanceof String) {
 				try {
-					return value.equals("") ? defaultValue : new Long((String) value);
+					return "".equals(value) ? defaultValue : new Long((String) value);
 				} catch (NumberFormatException exn) {
 					return defaultValue;
 				}
@@ -77,7 +76,10 @@ public class Util {
 				return ((BigDecimal) value).intValue();
 			} else if (value instanceof String) {
 				try {
-					return value.equals("") ? defaultValue : new Integer((String) value);
+					if ("".equals(value))
+						return defaultValue;
+					else
+						return new Integer((String) value);
 				} catch (NumberFormatException exn) {
 					return defaultValue;
 				}
@@ -164,7 +166,7 @@ public class Util {
 
 	public String getSituacaoTributaria(DadosLivroPrestador dlp) {
 		try {
-			if (dlp.getTipoRetencao().substring(0, 1).equals("R")) {
+			if ("R".equals(dlp.getTipoRetencao().substring(0, 1))) {
 				return "R";
 			} else {
 				return "N";
@@ -193,7 +195,7 @@ public class Util {
 	public Date getDecimoDiaMesPosterior(Date dataFim) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(dataFim);
-		calendar.set(Calendar.MONTH, calendar.get(calendar.MONTH) + 1);
+		calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + 1);
 		calendar.set(Calendar.DAY_OF_MONTH, 10);
 
 		return calendar.getTime();
@@ -301,6 +303,7 @@ public class Util {
 	}
 
 	public static boolean validarEmail(String email) {
+		if (email == null){return false;}
 		Matcher matcher = pattern.matcher(email);
 		return matcher.matches();
 	}
@@ -309,8 +312,8 @@ public class Util {
 		if ((cpf == null) || (cpf.length() != 11))
 			return false;
 		// considera-se erro cpf's formados por uma sequencia de numeros iguais
-		if (cpf.equals("00000000000") || cpf.equals("11111111111") || cpf.equals("22222222222") || cpf.equals("33333333333") || cpf.equals("44444444444")
-				|| cpf.equals("55555555555") || cpf.equals("66666666666") || cpf.equals("77777777777") || cpf.equals("88888888888") || cpf.equals("99999999999")
+		if ("00000000000".equals(cpf) || "11111111111".equals(cpf) || "22222222222".equals(cpf) || "33333333333".equals(cpf) || "44444444444".equals(cpf)
+				|| "55555555555".equals(cpf) || "66666666666".equals(cpf) || "77777777777".equals(cpf) || "88888888888".equals(cpf) || "99999999999".equals(cpf)
 				|| (cpf.length() != 11))
 			return (false);
 
@@ -333,11 +336,12 @@ public class Util {
 			}
 
 			r = 11 - (sm % 11);
-			if ((r == 10) || (r == 11))
+			if ((r == 10) || (r == 11)) {
 				dig10 = '0';
-			else
+			} else {
 				dig10 = (char) (r + 48); // converte no respectivo caractere
 											// numerico
+			}
 
 			// Calculo do 2o. Digito Verificador
 			sm = 0;
@@ -349,17 +353,19 @@ public class Util {
 			}
 
 			r = 11 - (sm % 11);
-			if ((r == 10) || (r == 11))
+			if ((r == 10) || (r == 11)) {
 				dig11 = '0';
-			else
+			} else {
 				dig11 = (char) (r + 48);
+			}
 
 			// Verifica se os digitos calculados conferem com os digitos
 			// informados.
-			if ((dig10 == cpf.charAt(9)) && (dig11 == cpf.charAt(10)))
+			if ((dig10 == cpf.charAt(9)) && (dig11 == cpf.charAt(10))) {
 				return (true);
-			else
+			} else {
 				return (false);
+			}
 		} catch (InputMismatchException erro) {
 			return (false);
 		}
@@ -369,11 +375,8 @@ public class Util {
 	public static boolean validarCnpj(String cnpj) {
 		if ((cnpj == null) || (cnpj.length() != 14))
 			return false;
-		int soma = 0, aux, dig;
+		int soma = 0, dig;
 		String cnpj_calc = cnpj.substring(0, 12);
-
-		if (cnpj.length() != 14)
-			return false;
 
 		char[] chr_cnpj = cnpj.toCharArray();
 
@@ -421,7 +424,7 @@ public class Util {
 	}
 
 	public static void main(String args[]) {
-		System.out.println(new Util().corrigeDouble(0 + 12 + ""));
+		System.out.println(new Util().validarCpf("05600766653"));
 	}
 
 	public double corrigeDouble(Object obj) {

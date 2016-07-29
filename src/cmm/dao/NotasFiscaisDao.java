@@ -84,12 +84,7 @@ public class NotasFiscaisDao {
 				.setParameter("insc", nf.getInscricaoPrestador());
 		List<NotasFiscais> lista = query.list();
 		tx.commit();session.close();
-		if (!lista.isEmpty()){
-			return lista.get(0);
-		}
-		else{
-			return null;
-		}
+		return ( !lista.isEmpty() ) ? lista.get(0) : null;
 	}
 
 }

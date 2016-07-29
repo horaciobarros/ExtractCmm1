@@ -88,7 +88,7 @@ public class TomadoresDao {
 	public List<Tomadores> findNaoEnviados() {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = session.createQuery("from Tomadores c where hash is null and inscricao_tomador!="+00000000000).setFirstResult(0).setMaxResults(320);
+		Query query = session.createQuery("from Tomadores c where hash is null and inscricao_tomador!="+00000000000).setFirstResult(0).setMaxResults(10000);
 		List<Tomadores> lista = query.list();
 		tx.commit();
 		session.close();

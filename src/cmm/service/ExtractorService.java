@@ -2,13 +2,13 @@ package cmm.service;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import antlr.StringUtils;
 import cmm.dao.CompetenciasDao;
 import cmm.dao.Dao;
 import cmm.dao.GuiasDao;
@@ -21,12 +21,9 @@ import cmm.dao.PrestadoresDao;
 import cmm.dao.PrestadoresOptanteSimplesDao;
 import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosCadastro;
-import cmm.entidadesOrigem.DadosCadastroAcesso;
 import cmm.entidadesOrigem.DadosCadastroAtividade;
-import cmm.entidadesOrigem.DadosContador;
 import cmm.entidadesOrigem.DadosGuia;
 import cmm.entidadesOrigem.DadosLivroPrestador;
-import cmm.entidadesOrigem.PlanoConta;
 import cmm.model.Competencias;
 import cmm.model.Guias;
 import cmm.model.NotasFiscais;
@@ -38,10 +35,6 @@ import cmm.model.PrestadoresOptanteSimples;
 import cmm.model.Tomadores;
 import cmm.util.FileLog;
 import cmm.util.Util;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 
 /**
  * 
@@ -49,22 +42,22 @@ import java.io.OutputStreamWriter;
  *
  */
 public class ExtractorService {
-	private Util util = new Util();
-	private CompetenciasDao competenciasDao = new CompetenciasDao();
-	private PrestadoresDao prestadoresDao = new PrestadoresDao();
-	private Dao dao = new Dao();
-	private GuiasDao guiasDao = new GuiasDao();
-	private NotasFiscaisDao notasFiscaisDao = new NotasFiscaisDao();
-	private PagamentosDao pagamentosDao = new PagamentosDao();
-	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
-	private PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
-	private PessoaDao pessoaDao = new PessoaDao();
+	private final Util util = new Util();
+	private final CompetenciasDao competenciasDao = new CompetenciasDao();
+	private final PrestadoresDao prestadoresDao = new PrestadoresDao();
+	private final Dao dao = new Dao();
+	private final GuiasDao guiasDao = new GuiasDao();
+	private final NotasFiscaisDao notasFiscaisDao = new NotasFiscaisDao();
+	private final PagamentosDao pagamentosDao = new PagamentosDao();
+	private final PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
+	private final PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
+	private final PessoaDao pessoaDao = new PessoaDao();
 	private int linhasMil = 0;
 	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
 	private TomadoresDao tomadoresDao = new TomadoresDao();
 	private NotasFiscais nf;
 
-	public void processaPlanoConta(List<String> dadosList) {
+	public void processaPlanoConta(List<String> dadosList) {/*
 		FileLog log = new FileLog("plano_conta");
 
 		for (String linha : dadosList) {
@@ -80,11 +73,11 @@ public class ExtractorService {
 			}
 
 		}
-		log.close();
+		log.close();*/
 
 	}
 
-	public void processaDadosContador(List<String> dadosList) {
+	public void processaDadosContador(List<String> dadosList) {/*
 		FileLog log = new FileLog("dados_contador");
 		for (String linha : dadosList) {
 			try {
@@ -101,10 +94,10 @@ public class ExtractorService {
 
 		}
 		log.close();
-
+	*/
 	}
 
-	public void processaDadosCadastroAcesso(List<String> dadosList) {
+	public void processaDadosCadastroAcesso(List<String> dadosList) {/*
 		FileLog log = new FileLog("dados_cadastro_acesso");
 		for (String linha : dadosList) {
 			try {
@@ -117,12 +110,12 @@ public class ExtractorService {
 			}
 
 		}
-		log.close();
+		log.close();/*/
 
 	}
 
 	public void processaDadosCadastroAtividade(List<String> dadosList) {
-		FileLog log = new FileLog("dados_cadastro_atividade");
+		final FileLog log = new FileLog("dados_cadastro_atividade");
 		for (String linha : dadosList) {
 			try {
 				linha = preparaParaSplit(linha);
@@ -222,7 +215,7 @@ public class ExtractorService {
 						pessoa.setMunicipioIbge(
 								Long.valueOf(municipiosIbgeDao.getCodigoIbge(pessoa.getMunicipio(), pessoa.getUf())));
 
-						if (pessoa.getTipoPessoa().equals("F")) {
+						if ("F".equals(pessoa.getTipoPessoa())) {
 							pessoa.setSexo("M");
 						}
 						pessoa = anulaCamposVazios(pessoa);
@@ -287,7 +280,7 @@ public class ExtractorService {
 					}
 
 					// prestadores optantes simples
-					if (dc.getOptanteSimplesNacional().substring(0, 1).equalsIgnoreCase("S")) {
+					if ("S".equalsIgnoreCase(dc.getOptanteSimplesNacional().substring(0, 1))) {
 						try {
 							PrestadoresOptanteSimples pos = new PrestadoresOptanteSimples();
 							String inicioAtividade = dc.getDtInicioAtividade();
@@ -368,7 +361,7 @@ public class ExtractorService {
 				}
 
 				try {
-					if (dg.getTipoGuia().trim().equals("GUIA_PRESTADOR")) {
+					if ("GUIA_PRESTADOR".equals(dg.getTipoGuia().trim())) {
 						Guias guias = new Guias();
 						guias.setCompetencias(cp);
 						guias.setDataVencimento(util.getStringToDateHoursMinutes(dg.getDataVencimento()));
@@ -403,7 +396,7 @@ public class ExtractorService {
 						guiasDao.save(guias);
 
 						// pagamentos
-						if (guias.getSituacao().equals("P") && dg.getValorPago() > 0) {
+						if ("P".equals(guias.getSituacao()) && dg.getValorPago() > 0) {
 							try {
 								Pagamentos p = new Pagamentos();
 								p.setDataPagamento(util.getStringToDateHoursMinutes(dg.getDataPagamento()));
@@ -556,7 +549,7 @@ public class ExtractorService {
 		}
 		try {
 			String ultCarac = linha.substring(linha.length() - 1);
-			if (ultCarac.equals("#")) {
+			if ("#".equals(ultCarac)) {
 				linha = linha + " ";
 			}
 		} catch (Exception e) {
@@ -593,8 +586,8 @@ public class ExtractorService {
 				mostraProgresso(linhas, dadosList.size());
 			}
 
-			linha = preparaParaSplit(linha);
-			String[] arrayLinha = linha.split("@@#");
+			//linha = preparaParaSplit(linha);
+			String[] arrayLinha = linha.split("@@\\|");
 
 			try {
 
@@ -618,35 +611,8 @@ public class ExtractorService {
 
 				processaDlp(dlp, log, linha);
 
-			} catch (NumberFormatException e) {
-				try {
-					String aux = null;
-					DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
-							arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
-							arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12],
-							arrayLinha[13], arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], aux,
-							util.corrigeDouble(arrayLinha[18]), util.corrigeDouble(arrayLinha[19]),
-							util.corrigeDouble(arrayLinha[20]), util.corrigeDouble(arrayLinha[21]),
-							util.corrigeDouble(arrayLinha[22]), util.corrigeDouble(arrayLinha[23]),
-							util.corrigeDouble(arrayLinha[24]), arrayLinha[25], util.corrigeDouble(arrayLinha[26]),
-							util.corrigeDouble(arrayLinha[27]), util.corrigeDouble(arrayLinha[28]),
-							util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]),
-							util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),
-							util.corrigeDouble(arrayLinha[33]), arrayLinha[34], arrayLinha[35], arrayLinha[36],
-							arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40], arrayLinha[41],
-							arrayLinha[42], arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46],
-							arrayLinha[47], arrayLinha[48], arrayLinha[49], arrayLinha[50], arrayLinha[51],
-							arrayLinha[52], arrayLinha[53], arrayLinha[54], arrayLinha[55], arrayLinha[56],
-							arrayLinha[57], arrayLinha[58], arrayLinha[59], arrayLinha[60], arrayLinha[61],
-							arrayLinha[62], arrayLinha[63], arrayLinha[64]);
-
-					processaDlp(dlp, log, linha);
-
-				} catch (Exception e2) {
-					log.fillError(linha, "Erro NotasFiscais " + e2.getMessage());
-					e2.printStackTrace();
-				}
-
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 		}
@@ -656,10 +622,10 @@ public class ExtractorService {
 
 	// para notas fiscais
 	private void processaDlp(DadosLivroPrestador dlp, FileLog log, String linha) {
-		String inscricaoPrestador = dlp.getCnpjPrestador().trim();
+		String inscricaoPrestador = dlp.getCnpjPrestador().trim();;
 		Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
 		try {
-			if (p == null || p.getId() == 0 || !inscricaoPrestador.trim().equals(p.getInscricaoPrestador())) {
+			if (p == null || p.getId() == 0 || !p.getInscricaoPrestador().equals(inscricaoPrestador.trim())) {
 				System.out.println("Prestador não encontrado:" + inscricaoPrestador);
 				throw new Exception();
 			}
@@ -674,12 +640,12 @@ public class ExtractorService {
 																				// cmm
 		nf.setInscricaoPrestador(dlp.getCnpjPrestador());
 
-		if (util.getTipoPessoa(dlp.getCnpjTomador()).equals("F")) {
+		if ("F".equals(util.getTipoPessoa(dlp.getCnpjTomador()))) {
 			if (Util.validarCpf(dlp.getCnpjTomador())) {
 				nf.setInscricaoTomador(dlp.getCnpjTomador());
 				nf.setNomeTomador(dlp.getRazaoSocialTomador());
 			}
-		} else if (util.getTipoPessoa(dlp.getCnpjTomador()).equals("J")) {
+		} else if ("J".equals(util.getTipoPessoa(dlp.getCnpjTomador()))) {
 			if (Util.validarCnpj(dlp.getCnpjTomador())) {
 				nf.setInscricaoTomador(dlp.getCnpjTomador());
 				nf.setNomeTomador(dlp.getRazaoSocialTomador());
@@ -691,7 +657,7 @@ public class ExtractorService {
 		nf.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 		nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
 		nf.setPrestadores(p);
-		if (util.getTipoPessoa(p.getInscricaoPrestador()).equals("J")) {
+		if ("J".equals(util.getTipoPessoa(p.getInscricaoPrestador()))) {
 			nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
 			nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
 		}
@@ -739,10 +705,11 @@ public class ExtractorService {
 				NotasFiscais outraNf = notasFiscaisDao.findNotaExistente(nf);
 				if (outraNf != null) {
 					nf.setId(outraNf.getId());
-					System.out.println("Nota duplicada-> numero:" + nf.getNumeroNota() + " prestador:"
-							+ nf.getInscricaoPrestador());
-					System.out.println("Nota duplicada-> nf nova valor:" + nf.getValorTotalServico().doubleValue()
-							+ " nf banco valor:" + outraNf.getValorTotalServico().doubleValue());
+					String msg = "Nota duplicada-> numero:" + nf.getNumeroNota() + " prestador:"
+							+ nf.getInscricaoPrestador()+"\n";
+					msg += "Nota duplicada-> nf nova valor:" + nf.getValorTotalServico().doubleValue()
+							+ " nf banco valor:" + outraNf.getValorTotalServico().doubleValue();
+					log.fillError(linha, msg);
 				}
 			} catch (Exception e1) {
 			}
@@ -782,9 +749,8 @@ public class ExtractorService {
 					trataNumerosTelefones(t);
 					anulaCamposVazios(t);
 
-					// S� salvar tomador se a inscri��o n�o for =
-					// 00000000000;
-					if (!t.getInscricaoTomador().replace("0", "").trim().equals("")) {
+					// S� salvar tomador se a inscri��o n�o for = 00000000000;
+					if (!"".equals(t.getInscricaoTomador().replace("0", "").trim())) {
 						t = tomadoresDao.save(t);
 					}
 
@@ -802,7 +768,7 @@ public class ExtractorService {
 		s.start();
 
 		// -- canceladas
-		if (dlp.getStatusNota().substring(0, 1).equals("C")) {
+		if ("C".equals(dlp.getStatusNota().substring(0, 1))) {
 			NotasThreadService nfCanceladas = new NotasThreadService(p, nf, dlp, log, linha, "C");
 			Thread c = new Thread(nfCanceladas);
 			c.start();
@@ -975,22 +941,22 @@ public class ExtractorService {
 
 		if (pessoa.getCelular() != null) {
 			if (pessoa.getCelular().trim().length() < 10) {
-				if (pessoa.getMunicipio().trim().equals("LAGOA DA PRATA")) {
+				if ("LAGOA DA PRATA".equals(pessoa.getMunicipio().trim())) {
 					pessoa.setCelular(incluiPrefixoLagoa(pessoa.getTelefone()));
 				}
 			} else {
-				if (pessoa.getCelular().substring(0, 1).equals("0")) {
+				if ("0".equals(pessoa.getCelular().substring(0, 1))) {
 					pessoa.setCelular(pessoa.getCelular().substring(1));
 				}
 			}
 		}
 		if (pessoa.getTelefone() != null) {
 			if (pessoa.getTelefone().trim().length() < 10) {
-				if (pessoa.getMunicipio().trim().equals("LAGOA DA PRATA")) {
+				if ("LAGOA DA PRATA".equals(pessoa.getMunicipio().trim())) {
 					pessoa.setTelefone(incluiPrefixoLagoa(pessoa.getTelefone()));
 				}
 			} else {
-				if (pessoa.getTelefone().substring(0, 1).equals("0")) {
+				if ("0".equals(pessoa.getTelefone().substring(0, 1))) {
 					pessoa.setTelefone(pessoa.getCelular().substring(1));
 				}
 			}
@@ -1001,7 +967,10 @@ public class ExtractorService {
 
 	private String incluiPrefixoLagoa(String telefone) {
 		if (telefone != null && !telefone.trim().isEmpty()) {
-			telefone = "37" + telefone;
+			StringBuilder tel = new StringBuilder();
+			tel.append("37");
+			tel.append(telefone);
+			telefone = tel.toString();
 			if (telefone.trim().length() <= 3) {
 				telefone = null;
 			}
@@ -1048,48 +1017,6 @@ public class ExtractorService {
 		}
 
 		return t;
-	}
-
-	public List<String> lerArquivo(String arquivoIn, int qtdeCampos) {
-		File file, fileWr;
-		file = new File("c:/TEMP/lagoa/" + arquivoIn + ".txt");
-		fileWr = new File("c:/TEMP/lagoa/txts_corrigidos/" + arquivoIn + "_new.txt");
-		try {
-			BufferedReader br;
-			OutputStreamWriter bo = new OutputStreamWriter(new FileOutputStream("c:\\temp\\acentos.txt"), "UTF-8");
-			List<String> dadosList = new ArrayList<String>();
-			try {
-				br = new BufferedReader(
-						new InputStreamReader(new FileInputStream("c:/TEMP/lagoa/" + arquivoIn + ".txt"), "UTF-8"));
-				br.readLine(); // cabe�alho
-				while (br.ready()) {
-					StringBuilder linhaDefinitiva = new StringBuilder();
-					String[] arrayAux = { "", "" };
-
-					while (arrayAux != null && arrayAux.length < qtdeCampos) {
-						String linha = br.readLine();
-						linha = preparaParaSplit(linha);
-						linhaDefinitiva.append(linha);
-						arrayAux = linhaDefinitiva.toString().split("#");
-					}
-
-					String linhaAux = linhaDefinitiva.toString();
-					linhaAux = linhaAux.replaceAll("\"", "");
-					dadosList.add(linhaAux);
-					bo.write(linhaAux + "\n");
-
-				}
-				br.close();
-				bo.close();
-				return dadosList;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-
 	}
 
 }

@@ -13,17 +13,11 @@ public class HibernateUtil {
 
 	private static final SessionFactory sessionFactory = buildSessionFactory();
 
-	@SuppressWarnings("deprecation")
 	private static SessionFactory buildSessionFactory() {
 		try {
 
 			File file = new File("hibernate.cfg.xml");
-			if (!file.exists()) {
-				JOptionPane
-						.showMessageDialog(null,
-								"arquivo de configura��o do Banco de Dados n�o encontrado!");
-				throw new ExceptionInInitializerError();
-			} else {
+			if (file.exists()) {
 				AnnotationConfiguration configuration = new AnnotationConfiguration();
 				configuration.addAnnotatedClass(cmm.model.Competencias.class);
 				configuration
@@ -96,6 +90,11 @@ public class HibernateUtil {
 				SessionFactory sessionFactory = configuration.configure(file)
 						.buildSessionFactory();
 				return sessionFactory;
+			} else {
+				JOptionPane
+						.showMessageDialog(null,
+								"arquivo de configura��o do Banco de Dados n�o encontrado!");
+				throw new ExceptionInInitializerError();
 			}
 		} catch (Throwable ex) {
 			JOptionPane.showMessageDialog(null,
