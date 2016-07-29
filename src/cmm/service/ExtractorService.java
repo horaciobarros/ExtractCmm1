@@ -36,7 +36,7 @@ import cmm.model.PrestadoresOptanteSimples;
 import cmm.model.Tomadores;
 import cmm.util.FileLog;
 import cmm.util.Util;
-	
+
 /**
  * 
  * @author jway
@@ -54,16 +54,17 @@ public class ExtractorService {
 	private final PrestadoresOptanteSimplesDao prestadoresOptanteSimplesDao = new PrestadoresOptanteSimplesDao();
 	private final PessoaDao pessoaDao = new PessoaDao();
 	private int linhasMil = 0;
-	private final MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
-	private final TomadoresDao tomadoresDao = new TomadoresDao();
+	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
+	private TomadoresDao tomadoresDao = new TomadoresDao();
+	private NotasFiscais nf;
 
 	public void processaPlanoConta(List<String> dadosList) {/*
 		FileLog log = new FileLog("plano_conta");
 
 		for (String linha : dadosList) {
 			try {
-				//linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("@@\\|");
+				linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@#");
 				PlanoConta pc = new PlanoConta(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3],
 						arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8], arrayLinha[9],
 						arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14]);
@@ -81,8 +82,8 @@ public class ExtractorService {
 		FileLog log = new FileLog("dados_contador");
 		for (String linha : dadosList) {
 			try {
-				//linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("@@\\|");
+				linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@#");
 				DadosContador dc = new DadosContador(Long.valueOf(arrayLinha[0]), arrayLinha[1], arrayLinha[2],
 						arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8],
 						arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14],
@@ -101,8 +102,8 @@ public class ExtractorService {
 		FileLog log = new FileLog("dados_cadastro_acesso");
 		for (String linha : dadosList) {
 			try {
-				//linha = preparaParaSplit(linha);
-				String[] arrayLinha = linha.split("@@\\|");
+				linha = preparaParaSplit(linha);
+				String[] arrayLinha = linha.split("@@#");
 				DadosCadastroAcesso dca = new DadosCadastroAcesso(arrayLinha[0], arrayLinha[1]);
 			} catch (Exception e) {
 				log.fillError(linha, e);
@@ -441,7 +442,9 @@ public class ExtractorService {
 		for (String linha : dadosList) {
 			linhas++;
 			linhasMil++;
-			mostraProgresso(linhas, dadosList.size());
+			if (linhasMil == 1000) {
+				mostraProgresso(linhas, dadosList.size());
+			}
 
 			try {
 
@@ -579,7 +582,9 @@ public class ExtractorService {
 		for (String linha : dadosList) {
 			linhas++;
 			linhasMil++;
-			mostraProgresso(linhas, dadosList.size());
+			if (linhasMil == 1000) {
+				mostraProgresso(linhas, dadosList.size());
+			}
 
 			//linha = preparaParaSplit(linha);
 			String[] arrayLinha = linha.split("@@\\|");
@@ -606,35 +611,8 @@ public class ExtractorService {
 
 				processaDlp(dlp, log, linha);
 
-			} catch (NumberFormatException e) {
-				try {
-					String aux = null;
-					DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
-							arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
-							arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12],
-							arrayLinha[13], arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], aux,
-							util.corrigeDouble(arrayLinha[18]), util.corrigeDouble(arrayLinha[19]),
-							util.corrigeDouble(arrayLinha[20]), util.corrigeDouble(arrayLinha[21]),
-							util.corrigeDouble(arrayLinha[22]), util.corrigeDouble(arrayLinha[23]),
-							util.corrigeDouble(arrayLinha[24]), arrayLinha[25], util.corrigeDouble(arrayLinha[26]),
-							util.corrigeDouble(arrayLinha[27]), util.corrigeDouble(arrayLinha[28]),
-							util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]),
-							util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),
-							util.corrigeDouble(arrayLinha[33]), arrayLinha[34], arrayLinha[35], arrayLinha[36],
-							arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40], arrayLinha[41],
-							arrayLinha[42], arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46],
-							arrayLinha[47], arrayLinha[48], arrayLinha[49], arrayLinha[50], arrayLinha[51],
-							arrayLinha[52], arrayLinha[53], arrayLinha[54], arrayLinha[55], arrayLinha[56],
-							arrayLinha[57], arrayLinha[58], arrayLinha[59], arrayLinha[60], arrayLinha[61],
-							arrayLinha[62], arrayLinha[63], arrayLinha[64]);
-
-					processaDlp(dlp, log, linha);
-
-				} catch (Exception e2) {
-					log.fillError(linha, "Erro NotasFiscais " + e2.getMessage());
-					e2.printStackTrace();
-				}
-
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 		}
@@ -644,7 +622,7 @@ public class ExtractorService {
 
 	// para notas fiscais
 	private void processaDlp(DadosLivroPrestador dlp, FileLog log, String linha) {
-		String inscricaoPrestador = dlp.getCnpjPrestador().trim();
+		String inscricaoPrestador = dlp.getCnpjPrestador().trim();;
 		Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
 		try {
 			if (p == null || p.getId() == 0 || !p.getInscricaoPrestador().equals(inscricaoPrestador.trim())) {
@@ -655,11 +633,11 @@ public class ExtractorService {
 			e.printStackTrace();
 		}
 
-		NotasFiscais nf = new NotasFiscais();
+		nf = new NotasFiscais();
 		// nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
 		nf.setDataHoraEmissao(util.getStringToDate(dlp.getDataCompetencia())); // definido
-																							// pela
-																							// cmm
+																				// pela
+																				// cmm
 		nf.setInscricaoPrestador(dlp.getCnpjPrestador());
 
 		if ("F".equals(util.getTipoPessoa(dlp.getCnpjTomador()))) {
@@ -777,7 +755,6 @@ public class ExtractorService {
 					}
 
 				} catch (Exception e) {
-					log.fillError(linha, "Erro Tomadores " + e.getMessage());
 					e.printStackTrace();
 					t = null;
 				}
@@ -785,12 +762,6 @@ public class ExtractorService {
 			}
 		}
 
-		processaDemaisTiposNotas(p, nf, dlp, log, linha, t);
-
-	}
-
-	private void processaDemaisTiposNotas(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
-			String linha, Tomadores t) {
 		// -- serviços
 		NotasThreadService nfServico = new NotasThreadService(p, nf, dlp, log, linha, "S");
 		Thread s = new Thread(nfServico);
