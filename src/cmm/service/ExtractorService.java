@@ -271,6 +271,8 @@ public class ExtractorService {
 							p.setEmail(dc.getEmail());
 							p.setEnquadramento("N");
 							p.setInscricaoPrestador(dc.getCnpj());
+							p.setMotivo("Solicitar cadastro"); // Pedido do Sandro de enviar como Não autorizadi
+																// Necessita deste campo preenchido
 							p = trataNumerosTelefones(p);
 							p = anulaCamposVazios(p);
 							p = prestadoresDao.save(p);

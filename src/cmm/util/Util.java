@@ -207,11 +207,12 @@ public class Util {
 		}
 		telefone = telefone.trim();
 		telefone = telefone.replaceAll(" ", "");
+		telefone = telefone.replaceAll("\\.", "");
 		telefone = telefone.replaceAll("-", "");
 		telefone = telefone.replaceAll("\\(", "");
 		telefone = telefone.replaceAll("\\)", "");
-		if (telefone.length() >= 11) {
-			telefone = telefone.substring(0, 10);
+		if (telefone.length() > 11) {
+			telefone = telefone.substring(0, 11);
 		}
 		return telefone.trim();
 	}
@@ -375,6 +376,9 @@ public class Util {
 	public static boolean validarCnpj(String cnpj) {
 		if ((cnpj == null) || (cnpj.length() != 14))
 			return false;
+		if (cnpj.equals("11111111111111") || cnpj.equals("11111111111111")){
+			return false;
+		}
 		int soma = 0, dig;
 		String cnpj_calc = cnpj.substring(0, 12);
 
@@ -424,7 +428,7 @@ public class Util {
 	}
 
 	public static void main(String args[]) {
-		System.out.println(new Util().validarCpf("05600766653"));
+		System.out.println(new Util().getLimpaTelefone("037.3261-7859"));
 	}
 
 	public double corrigeDouble(Object obj) {
