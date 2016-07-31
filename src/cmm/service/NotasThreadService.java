@@ -121,7 +121,7 @@ public class NotasThreadService implements Runnable {
 				NotasFiscaisCanceladas nfc = new NotasFiscaisCanceladas();
 				nfc.setDatahoracancelamento(util.getStringToDateHoursMinutes(dlp.getDataCancelamento()));
 				if (nfc.getDatahoracancelamento().getTime() < nf.getDataHoraEmissao().getTime()) {
-					nfc.setDatahoracancelamento(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
+					nfc.setDatahoracancelamento(nf.getDataHoraEmissao());
 				}
 				nfc.setInscricaoPrestador(dlp.getCnpjPrestador());
 				nfc.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
