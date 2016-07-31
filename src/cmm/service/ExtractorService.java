@@ -7,7 +7,11 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import cmm.dao.CompetenciasDao;
 import cmm.dao.Dao;
@@ -56,6 +60,7 @@ public class ExtractorService {
 	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
 	private TomadoresDao tomadoresDao = new TomadoresDao();
 	private NotasFiscais nf;
+	private NotaMaeThreadService notaMaeThread;
 
 	public void processaPlanoConta(List<String> dadosList) {/*
 		FileLog log = new FileLog("plano_conta");
@@ -210,7 +215,7 @@ public class ExtractorService {
 						} else {
 							pessoa.setInscricaoEstadual(dc.getInscricaoEstadual());
 						}
-						pessoa = trataNumerosTelefones(pessoa);
+						pessoa = util.trataNumerosTelefones(pessoa);
 						pessoa.setUf(dc.getEnderecoUf());
 						pessoa.setMunicipioIbge(
 								Long.valueOf(municipiosIbgeDao.getCodigoIbge(pessoa.getMunicipio(), pessoa.getUf())));
@@ -218,7 +223,7 @@ public class ExtractorService {
 						if ("F".equals(pessoa.getTipoPessoa())) {
 							pessoa.setSexo("M");
 						}
-						pessoa = anulaCamposVazios(pessoa);
+						pessoa = util.anulaCamposVazios(pessoa);
 						pessoa = pessoaDao.save(pessoa);
 					} else {
 
@@ -241,8 +246,8 @@ public class ExtractorService {
 							}
 						}
 
-						pessoa = trataNumerosTelefones(pessoa);
-						pessoa = anulaCamposVazios(pessoa);
+						pessoa = util.trataNumerosTelefones(pessoa);
+						pessoa = util.anulaCamposVazios(pessoa);
 						pessoa = pessoaDao.update(pessoa);
 
 					}
@@ -270,8 +275,8 @@ public class ExtractorService {
 							p.setEmail(dc.getEmail());
 							p.setEnquadramento("N");
 							p.setInscricaoPrestador(dc.getCnpj());
-							p = trataNumerosTelefones(p);
-							p = anulaCamposVazios(p);
+							p = util.trataNumerosTelefones(p);
+							p = util.anulaCamposVazios(p);
 							p = prestadoresDao.save(p);
 						} catch (Exception e) {
 							log.fillError(linha, e);
@@ -482,8 +487,8 @@ public class ExtractorService {
 						p.setEnquadramento("N");
 						p.setInscricaoPrestador(inscricaoPrestador.trim());
 						p.setTelefone(dlp.getTelefonePrestador());
-						p = trataNumerosTelefones(p);
-						p = anulaCamposVazios(p);
+						p = util.trataNumerosTelefones(p);
+						p = util.anulaCamposVazios(p);
 						p = prestadoresDao.save(p);
 					} else { // preencher campos vazios
 
@@ -502,8 +507,8 @@ public class ExtractorService {
 								p.setEmail(dlp.getEmailPrestador());
 							}
 						}
-						p = trataNumerosTelefones(p);
-						p = anulaCamposVazios(p);
+						p = util.trataNumerosTelefones(p);
+						p = util.anulaCamposVazios(p);
 						p = prestadoresDao.update(p);
 
 					}
@@ -576,242 +581,40 @@ public class ExtractorService {
 	public void processaDadosNotasFiscais(List<String> dadosList) {
 		FileLog log = new FileLog("dados_livro_prestador_notas_fiscais");
 
-		int linhas = 0;
 		linhasMil = 0;
-
+		
+		long contaArrays = 0;
+		int contaLinhas = 0;
+		Map<Long, List<String>> mapListas = new HashMap<Long, List<String>>();
+	    List<String> listaAux = new ArrayList<String>();
+	    
 		for (String linha : dadosList) {
-			linhas++;
-			linhasMil++;
-			if (linhasMil == 1000) {
-				mostraProgresso(linhas, dadosList.size());
-			}
-
-			//linha = preparaParaSplit(linha);
-			String[] arrayLinha = linha.split("@@\\|");
-
-			try {
-
-				DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1],
-						arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7],
-						arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13],
-						arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17],
-						util.corrigeDouble(arrayLinha[18]), util.corrigeDouble(arrayLinha[19]),
-						util.corrigeDouble(arrayLinha[20]), util.corrigeDouble(arrayLinha[21]),
-						util.corrigeDouble(arrayLinha[22]), util.corrigeDouble(arrayLinha[23]),
-						util.corrigeDouble(arrayLinha[24]), arrayLinha[25], util.corrigeDouble(arrayLinha[26]),
-						util.corrigeDouble(arrayLinha[27]), util.corrigeDouble(arrayLinha[28]),
-						util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]),
-						util.corrigeDouble(arrayLinha[31]), util.corrigeDouble(arrayLinha[32]),
-						util.corrigeDouble(arrayLinha[33]), arrayLinha[34], arrayLinha[35], arrayLinha[36],
-						arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40], arrayLinha[41], arrayLinha[42],
-						arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46], arrayLinha[47], arrayLinha[48],
-						arrayLinha[49], arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53], arrayLinha[54],
-						arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59], arrayLinha[60],
-						arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64]);
-
-				processaDlp(dlp, log, linha);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
-		log.close();
-
-	}
-
-	// para notas fiscais
-	private void processaDlp(DadosLivroPrestador dlp, FileLog log, String linha) {
-		String inscricaoPrestador = dlp.getCnpjPrestador().trim();;
-		Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
-		try {
-			if (p == null || p.getId() == 0 || !p.getInscricaoPrestador().equals(inscricaoPrestador.trim())) {
-				System.out.println("Prestador não encontrado:" + inscricaoPrestador);
-				throw new Exception();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		nf = new NotasFiscais();
-		// nf.setDataHoraEmissao(util.getStringToDateHoursMinutes(dlp.getDataEmissao()));
-		nf.setDataHoraEmissao(util.getStringToDate(dlp.getDataCompetencia())); // definido
-																				// pela
-																				// cmm
-		nf.setInscricaoPrestador(dlp.getCnpjPrestador());
-
-		if ("F".equals(util.getTipoPessoa(dlp.getCnpjTomador()))) {
-			if (Util.validarCpf(dlp.getCnpjTomador())) {
-				nf.setInscricaoTomador(dlp.getCnpjTomador());
-				nf.setNomeTomador(dlp.getRazaoSocialTomador());
-			}
-		} else if ("J".equals(util.getTipoPessoa(dlp.getCnpjTomador()))) {
-			if (Util.validarCnpj(dlp.getCnpjTomador())) {
-				nf.setInscricaoTomador(dlp.getCnpjTomador());
-				nf.setNomeTomador(dlp.getRazaoSocialTomador());
+			contaLinhas++;
+			listaAux.add(linha);
+			if (contaLinhas > 1000) {
+				mapListas.put(contaArrays, listaAux);
+				listaAux = new ArrayList<String>();
+				contaArrays++;
+				contaLinhas = 0;
 			}
 		}
-
-		nf.setNaturezaOperacao(dlp.getNaturezaOperacao());
-		nf.setNomePrestador(dlp.getRazaoSocialPrestador());
-		nf.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
-		nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
-		nf.setPrestadores(p);
-		if ("J".equals(util.getTipoPessoa(p.getInscricaoPrestador()))) {
-			nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
-			nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
+		
+		if (listaAux.size() > 0) {
+			mapListas.put(contaArrays, listaAux);
 		}
-		nf.setValorInss(BigDecimal.valueOf(dlp.getValorInss()));
-		nf.setValorIr(BigDecimal.valueOf(dlp.getValorIr()));
-		nf.setValorOutrasRetencoes(BigDecimal.valueOf(dlp.getValorOutrasRetencoes()));
-		nf.setValorTotalIssOptante(BigDecimal.valueOf(dlp.getValorIss()));
-		nf.setValorTotalServico(BigDecimal.valueOf(dlp.getValorTotalNfse()));
-		nf.setValorTotalIss(BigDecimal.valueOf(dlp.getValorIss()));
-		nf.setSituacaoOriginal(dlp.getStatusNota().trim().substring(0, 1));
-		nf.setSituacao("N");
-		nf.setSituacaoTributaria(util.getSituacaoTributaria(dlp));
-		if (dlp.getCodigoVerificacao() != null && !dlp.getCodigoVerificacao().trim().isEmpty()) {
-			if (dlp.getCodigoVerificacao().length() > 9) {
-				nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim().substring(0, 9));
-			} else {
-				nf.setNumeroVerificacao(dlp.getCodigoVerificacao().trim());
-			}
-		} else {
-			nf.setNumeroVerificacao(util.completarZerosEsquerda(dlp.getIdCodigo().toString(), 9));
+		
+		Set<Long> chave = new HashSet<Long>(mapListas.keySet());
+		int threadsCount = 0;
+		for(Long indice : chave) {
+			NotaMaeThreadService notaMaeThread = new NotaMaeThreadService(mapListas.get(indice), log);
+			Thread thread = new Thread(notaMaeThread);
+			thread.start();
+			threadsCount++;
 		}
-		nf.setNaturezaOperacao("1"); // TODO resolver
-		nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
-		nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
-		nf.setValorTotalDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
-		nf.setServicoPrestadoForaPais("N");
-		// nf.setDataHoraRps(nf.getDataHoraEmissao());
-
-		List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(),
-				nf.getValorIr());
-		BigDecimal descontos = util.getSumOfBigDecimal(lista);
-
-		nf.setValorLiquido(util.getSubtract(BigDecimal.valueOf(dlp.getValorTotalNfse()), descontos));
-		if (nf.getValorLiquido().compareTo(BigDecimal.ZERO) == -1) {
-			nf.setValorLiquido(nf.getValorLiquido().multiply(BigDecimal.valueOf(-1)));
-		}
-
-		try {
-			nf = notasFiscaisDao.save(nf);
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.fillError(linha, e);
-
-			try {
-				NotasFiscais outraNf = notasFiscaisDao.findNotaExistente(nf);
-				if (outraNf != null) {
-					nf.setId(outraNf.getId());
-					String msg = "Nota duplicada-> numero:" + nf.getNumeroNota() + " prestador:"
-							+ nf.getInscricaoPrestador()+"\n";
-					msg += "Nota duplicada-> nf nova valor:" + nf.getValorTotalServico().doubleValue()
-							+ " nf banco valor:" + outraNf.getValorTotalServico().doubleValue();
-					log.fillError(linha, msg);
-				}
-			} catch (Exception e1) {
-			}
-		}
-
-		// tomadores
-		Tomadores t = null;
-
-		if (!util.isEmptyOrNull(nf.getInscricaoTomador()) && !util.isEmptyOrNull(dlp.getRazaoSocialTomador())) {
-			t = tomadoresDao.findByInscricao(nf.getInscricaoTomador(), nf.getInscricaoPrestador());
-			if (t == null || t.getId() == null) {
-				try {
-					t = new Tomadores();
-					t.setOptanteSimples(util.getOptantePeloSimplesNacional("N"));
-					t.setNome(dlp.getRazaoSocialTomador());
-					t.setNomeFantasia(dlp.getRazaoSocialTomador());
-					t.setPrestadores(nf.getPrestadores());
-					t.setTipoPessoa(util.getTipoPessoa(nf.getInscricaoTomador()));
-					t.setInscricaoTomador(nf.getInscricaoTomador());
-					t.setBairro(dlp.getEnderecoBairroTomador());
-					t.setCep(util.trataCep(dlp.getCepTomador()));
-					t.setComplemento(dlp.getEnderecoComplementoTomador());
-					t.setEmail(util.trataEmail(dlp.getEmailTomador()));
-					t.setEndereco(dlp.getEnderecoTomador());
-					t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
-					t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
-					t.setMunicipio(dlp.getMunicipioTomador());
-					t.setTelefone(util.getLimpaTelefone(dlp.getTelefoneTomador().trim()));
-					try {
-						t.setMunicipioIbge(Long.valueOf(
-								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
-					} catch (Exception e) {
-						// log.fillError(linha, e);
-						// e.printStackTrace();
-					}
-
-					trataNumerosTelefones(t);
-					anulaCamposVazios(t);
-
-					// S� salvar tomador se a inscri��o n�o for = 00000000000;
-					if (!"".equals(t.getInscricaoTomador().replace("0", "").trim())) {
-						t = tomadoresDao.save(t);
-					}
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					t = null;
-				}
-
-			}
-		}
-
-		// -- serviços
-		NotasThreadService nfServico = new NotasThreadService(p, nf, dlp, log, linha, "S");
-		Thread s = new Thread(nfServico);
-		s.start();
-
-		// -- canceladas
-		if ("C".equals(dlp.getStatusNota().substring(0, 1))) {
-			NotasThreadService nfCanceladas = new NotasThreadService(p, nf, dlp, log, linha, "C");
-			Thread c = new Thread(nfCanceladas);
-			c.start();
-		}
-
-		// email
-		if (dlp.getEmailPrestador() != null && !dlp.getEmailPrestador().isEmpty()) {
-			NotasThreadService nfEmail = new NotasThreadService(p, nf, dlp, log, linha, "E");
-			Thread e = new Thread(nfEmail);
-			e.start();
-		}
-
-		// notas-fiscais-cond-pagamentos ??
-
-		// notas-fiscais-obras ??
-
-		// notas-fiscais-prestadores
-		NotasThreadService nfPrestadores = new NotasThreadService(p, nf, dlp, log, linha, "P");
-		Thread prestadoresThread = new Thread(nfPrestadores);
-		prestadoresThread.start();
-
-		// guias x notas fiscais
-		Guias g = new Guias();
-		if (dlp.getNossoNumero() != null && !dlp.getNossoNumero().trim().isEmpty()) {
-			g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
-			if (g != null) {
-				NotasThreadService nfGuias = new NotasThreadService(p, nf, dlp, log, linha, "G", g);
-				Thread gThread = new Thread(nfGuias);
-				gThread.start();
-
-			} else {
-				System.out.println("Numero de guia não encontrado: " + dlp.getNossoNumero());
-
-			}
-		}
-
-		// notas fiscais tomadores
-
-		if (t != null && t.getId() != null) {
-			NotasThreadService nfTomadores = new NotasThreadService(p, nf, dlp, log, linha, "T", g, t);
-			Thread nftThread = new Thread(nfTomadores);
-			nftThread.start();
-		}
+		
+		System.out.println("Total de threads criadas:" + threadsCount);
+			
+		
 
 	}
 
@@ -871,152 +674,12 @@ public class ExtractorService {
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
 				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais");
 	}
-
-	private Prestadores trataNumerosTelefones(Prestadores p) {
-
-		if (p.getCelular() != null) {
-			p.setCelular(p.getCelular().replaceAll("\\(", ""));
-			p.setCelular(p.getCelular().replaceAll("\\)", ""));
-			p.setCelular(p.getCelular().replaceAll("-", ""));
-		}
-		if (p.getTelefone() != null) {
-			p.setTelefone(p.getTelefone().replaceAll("\\(", ""));
-			p.setTelefone(p.getTelefone().replaceAll("\\)", ""));
-			p.setTelefone(p.getTelefone().replaceAll("\\-", ""));
-		}
-
-		return p;
+	
+	public Long getNotasFiscaisGravadas() {
+		return notasFiscaisDao.count();
+		
 	}
 
-	private Prestadores anulaCamposVazios(Prestadores p) {
-
-		p.setEmail(util.trataEmail(p.getEmail()));
-
-		if (p.getTelefone() != null && p.getTelefone().trim().isEmpty()) {
-			p.setTelefone(null);
-		}
-		if (p.getCelular() != null && p.getCelular().trim().isEmpty()) {
-			p.setCelular(null);
-		}
-
-		return p;
-	}
-
-	public Pessoa anulaCamposVazios(Pessoa pessoa) {
-		pessoa.setEmail(util.trataEmail(pessoa.getEmail()));
-		if (pessoa.getTelefone() != null && pessoa.getTelefone().trim().isEmpty()) {
-			pessoa.setTelefone(null);
-		}
-		if (pessoa.getCelular() != null && pessoa.getCelular().trim().isEmpty()) {
-			pessoa.setCelular(null);
-		}
-		if (pessoa.getInscricaoEstadual() != null && pessoa.getInscricaoEstadual().isEmpty()) {
-			pessoa.setInscricaoEstadual(null);
-		}
-		if (pessoa.getMunicipioIbge() != null && pessoa.getMunicipioIbge().toString().trim().isEmpty()) {
-			pessoa.setMunicipioIbge(null);
-		}
-		if (pessoa.getCep() != null && pessoa.getCep().trim().isEmpty()) {
-			pessoa.setCep(null);
-		}
-		if (pessoa.getComplemento() != null && pessoa.getComplemento().trim().isEmpty()) {
-			pessoa.setComplemento(null);
-		}
-
-		return pessoa;
-	}
-
-	public Pessoa trataNumerosTelefones(Pessoa pessoa) {
-
-		if (pessoa.getCelular() != null) {
-			pessoa.setCelular(pessoa.getCelular().replaceAll("\\(", ""));
-			pessoa.setCelular(pessoa.getCelular().replaceAll("\\)", ""));
-			pessoa.setCelular(pessoa.getCelular().replaceAll("-", ""));
-		}
-		if (pessoa.getTelefone() != null) {
-			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\(", ""));
-			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\)", ""));
-			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\-", ""));
-		}
-
-		if (pessoa.getCelular() != null) {
-			if (pessoa.getCelular().trim().length() < 10) {
-				if ("LAGOA DA PRATA".equals(pessoa.getMunicipio().trim())) {
-					pessoa.setCelular(incluiPrefixoLagoa(pessoa.getTelefone()));
-				}
-			} else {
-				if ("0".equals(pessoa.getCelular().substring(0, 1))) {
-					pessoa.setCelular(pessoa.getCelular().substring(1));
-				}
-			}
-		}
-		if (pessoa.getTelefone() != null) {
-			if (pessoa.getTelefone().trim().length() < 10) {
-				if ("LAGOA DA PRATA".equals(pessoa.getMunicipio().trim())) {
-					pessoa.setTelefone(incluiPrefixoLagoa(pessoa.getTelefone()));
-				}
-			} else {
-				if ("0".equals(pessoa.getTelefone().substring(0, 1))) {
-					pessoa.setTelefone(pessoa.getCelular().substring(1));
-				}
-			}
-		}
-
-		return pessoa;
-	}
-
-	private String incluiPrefixoLagoa(String telefone) {
-		if (telefone != null && !telefone.trim().isEmpty()) {
-			StringBuilder tel = new StringBuilder();
-			tel.append("37");
-			tel.append(telefone);
-			telefone = tel.toString();
-			if (telefone.trim().length() <= 3) {
-				telefone = null;
-			}
-		}
-		return telefone;
-	}
-
-	private Tomadores anulaCamposVazios(Tomadores t) {
-
-		t.setEmail(util.trataEmail(t.getEmail()));
-
-		if (t.getTelefone() != null && t.getTelefone().trim().isEmpty()) {
-			t.setTelefone(null);
-		}
-		if (t.getCelular() != null && t.getCelular().trim().isEmpty()) {
-			t.setCelular(null);
-		}
-
-		if (util.isEmptyOrNull(t.getInscricaoEstadual())) {
-			t.setInscricaoEstadual(null);
-		}
-		if (util.isEmptyOrNull(t.getInscricaoMunicipal())) {
-			t.setInscricaoMunicipal(null);
-		}
-
-		if (util.isEmptyOrNull(t.getCep())) {
-			t.setCep(null);
-		}
-
-		return t;
-	}
-
-	private Tomadores trataNumerosTelefones(Tomadores t) {
-
-		if (t.getCelular() != null) {
-			t.setCelular(t.getCelular().replaceAll("\\(", ""));
-			t.setCelular(t.getCelular().replaceAll("\\)", ""));
-			t.setCelular(t.getCelular().replaceAll("-", ""));
-		}
-		if (t.getTelefone() != null) {
-			t.setTelefone(t.getTelefone().replaceAll("\\(", ""));
-			t.setTelefone(t.getTelefone().replaceAll("\\)", ""));
-			t.setTelefone(t.getTelefone().replaceAll("\\-", ""));
-		}
-
-		return t;
-	}
+	
 
 }

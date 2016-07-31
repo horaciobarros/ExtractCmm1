@@ -19,15 +19,14 @@ public class Controller {
 	private ExtractorService extractorService = new ExtractorService();
 
 	public void importaNfe() {
-		
+
 		String msg = "Confirma Extract de Lagoa da Prata?";
-		int op = JOptionPane.showConfirmDialog(null, msg,"", JOptionPane.YES_NO_OPTION);
-		if (op != JOptionPane.YES_OPTION){
+		int op = JOptionPane.showConfirmDialog(null, msg, "", JOptionPane.YES_NO_OPTION);
+		if (op != JOptionPane.YES_OPTION) {
 			System.exit(0);
 		}
 
 		int nivelProcessamento = 5;
-		boolean txtsTratados = true;
 
 		System.out.println("Lagoa da Prata - Limpando o banco...");
 
@@ -92,22 +91,44 @@ public class Controller {
 			System.out.println("--- Fim de atividades prestador ---");
 
 		}
-		
+
 		if (nivelProcessamento <= 5) {
 			// notas fiscais
 			System.out.println("Lendo notas fiscais - " + Util.getDateHourMinutes(new Date()));
 			dadosList = extractorService.lerArquivo("dados_livro_prestador");
 			System.out.println("Gravando notas fiscais - " + Util.getDateHourMinutes(new Date()));
 			extractorService.processaDadosNotasFiscais(dadosList);
+
+			boolean prossiga = true;
+			long regs = 0;
+			long contador = 0;
+			long tempo = 0;
+			while (prossiga) {
+				tempo++;
+				if (tempo > 1000) {
+					contador = extractorService.getNotasFiscaisGravadas();
+				}
+
+				if ((contador - regs) > 1000) {
+					System.out.println("Registros processados: " + contador + " de " + dadosList.size() + " "
+							+ Util.getDateHourMinutes(new Date()));
+					regs = contador;
+				}
+
+				if ((contador + 300) > dadosList.size()) {
+					prossiga = false;
+				}
+			}
+
 			System.out.println("--- Fim de notas fiscais ---" + Util.getDateHourMinutes(new Date()));
 		}
-		
-		//desligarComputador();
+
+		// desligarComputador();
 	}
-	
+
 	/**
-	 * M�todo para desligar o computador
-	 * ATEN��O: Para cancelar, entrar no cmd e digitar: shutdown -a
+	 * M�todo para desligar o computador ATEN��O: Para cancelar, entrar no
+	 * cmd e digitar: shutdown -a
 	 */
 	public static void desligarComputador() {
 		try {

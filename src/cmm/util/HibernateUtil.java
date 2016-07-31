@@ -7,6 +7,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 
 import cmm.model.GuiasNumeracaoCmm;
+import cmm.model.TabLog;
 
 
 public class HibernateUtil {
@@ -85,6 +86,9 @@ public class HibernateUtil {
 				
 				configuration
 				.addAnnotatedClass(GuiasNumeracaoCmm.class);
+				
+				configuration
+				.addAnnotatedClass(TabLog.class);
 
 
 				SessionFactory sessionFactory = configuration.configure(file)

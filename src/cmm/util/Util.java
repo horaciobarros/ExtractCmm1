@@ -14,6 +14,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cmm.entidadesOrigem.DadosLivroPrestador;
+import cmm.model.Pessoa;
+import cmm.model.Prestadores;
+import cmm.model.Tomadores;
 
 public class Util {
 
@@ -456,4 +459,170 @@ public class Util {
 
 		return valor;
 	}
+	
+
+	public Prestadores trataNumerosTelefones(Prestadores p) {
+
+		if (p.getCelular() != null) {
+			p.setCelular(p.getCelular().replaceAll("\\(", ""));
+			p.setCelular(p.getCelular().replaceAll("\\)", ""));
+			p.setCelular(p.getCelular().replaceAll("-", ""));
+		}
+		if (p.getTelefone() != null) {
+			p.setTelefone(p.getTelefone().replaceAll("\\(", ""));
+			p.setTelefone(p.getTelefone().replaceAll("\\)", ""));
+			p.setTelefone(p.getTelefone().replaceAll("\\-", ""));
+		}
+
+		return p;
+	}
+	
+	public Pessoa trataNumerosTelefones(Pessoa pessoa) {
+
+		if (pessoa.getCelular() != null) {
+			pessoa.setCelular(pessoa.getCelular().replaceAll("\\(", ""));
+			pessoa.setCelular(pessoa.getCelular().replaceAll("\\)", ""));
+			pessoa.setCelular(pessoa.getCelular().replaceAll("-", ""));
+		}
+		if (pessoa.getTelefone() != null) {
+			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\(", ""));
+			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\)", ""));
+			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\-", ""));
+		}
+
+		if (pessoa.getCelular() != null) {
+			if (pessoa.getCelular().trim().length() < 10) {
+				if ("LAGOA DA PRATA".equals(pessoa.getMunicipio().trim())) {
+					pessoa.setCelular(incluiPrefixoLagoa(pessoa.getTelefone()));
+				}
+			} else {
+				if ("0".equals(pessoa.getCelular().substring(0, 1))) {
+					pessoa.setCelular(pessoa.getCelular().substring(1));
+				}
+			}
+		}
+		if (pessoa.getTelefone() != null) {
+			if (pessoa.getTelefone().trim().length() < 10) {
+				if ("LAGOA DA PRATA".equals(pessoa.getMunicipio().trim())) {
+					pessoa.setTelefone(incluiPrefixoLagoa(pessoa.getTelefone()));
+				}
+			} else {
+				if ("0".equals(pessoa.getTelefone().substring(0, 1))) {
+					pessoa.setTelefone(pessoa.getCelular().substring(1));
+				}
+			}
+		}
+
+		return pessoa;
+	}
+	
+	public Tomadores trataNumerosTelefones(Tomadores t) {
+
+		if (t.getCelular() != null) {
+			t.setCelular(t.getCelular().replaceAll("\\(", ""));
+			t.setCelular(t.getCelular().replaceAll("\\)", ""));
+			t.setCelular(t.getCelular().replaceAll("-", ""));
+		}
+		if (t.getTelefone() != null) {
+			t.setTelefone(t.getTelefone().replaceAll("\\(", ""));
+			t.setTelefone(t.getTelefone().replaceAll("\\)", ""));
+			t.setTelefone(t.getTelefone().replaceAll("\\-", ""));
+		}
+
+		return t;
+	}
+	
+	private String incluiPrefixoLagoa(String telefone) {
+		if (telefone != null && !telefone.trim().isEmpty()) {
+			StringBuilder tel = new StringBuilder();
+			tel.append("37");
+			tel.append(telefone);
+			telefone = tel.toString();
+			if (telefone.trim().length() <= 3) {
+				telefone = null;
+			}
+		}
+		return telefone;
+	}
+	
+
+	public Tomadores anulaCamposVazios(Tomadores t) {
+
+		t.setEmail(trataEmail(t.getEmail()));
+
+		if (t.getTelefone() != null && t.getTelefone().trim().isEmpty()) {
+			t.setTelefone(null);
+		}
+		if (t.getCelular() != null && t.getCelular().trim().isEmpty()) {
+			t.setCelular(null);
+		}
+
+		if (isEmptyOrNull(t.getInscricaoEstadual())) {
+			t.setInscricaoEstadual(null);
+		}
+		if (isEmptyOrNull(t.getInscricaoMunicipal())) {
+			t.setInscricaoMunicipal(null);
+		}
+
+		if (isEmptyOrNull(t.getCep())) {
+			t.setCep(null);
+		}
+
+		return t;
+	}
+	
+	public Prestadores anulaCamposVazios(Prestadores p) {
+
+		p.setEmail(trataEmail(p.getEmail()));
+
+		if (p.getTelefone() != null && p.getTelefone().trim().isEmpty()) {
+			p.setTelefone(null);
+		}
+		if (p.getCelular() != null && p.getCelular().trim().isEmpty()) {
+			p.setCelular(null);
+		}
+
+		return p;
+	}
+
+	public Pessoa anulaCamposVazios(Pessoa pessoa) {
+		pessoa.setEmail(trataEmail(pessoa.getEmail()));
+		if (pessoa.getTelefone() != null && pessoa.getTelefone().trim().isEmpty()) {
+			pessoa.setTelefone(null);
+		}
+		if (pessoa.getCelular() != null && pessoa.getCelular().trim().isEmpty()) {
+			pessoa.setCelular(null);
+		}
+		if (pessoa.getInscricaoEstadual() != null && pessoa.getInscricaoEstadual().isEmpty()) {
+			pessoa.setInscricaoEstadual(null);
+		}
+		if (pessoa.getMunicipioIbge() != null && pessoa.getMunicipioIbge().toString().trim().isEmpty()) {
+			pessoa.setMunicipioIbge(null);
+		}
+		if (pessoa.getCep() != null && pessoa.getCep().trim().isEmpty()) {
+			pessoa.setCep(null);
+		}
+		if (pessoa.getComplemento() != null && pessoa.getComplemento().trim().isEmpty()) {
+			pessoa.setComplemento(null);
+		}
+
+		return pessoa;
+	}
+
+	
+	public void mostraProgresso(int linhas, int dadosSize) {
+		if (linhas == 1000) {
+			double linhasDouble = linhas;
+			double perc = (linhasDouble / dadosSize);
+			perc = perc * 100;
+			perc = Math.round(perc);
+			System.out.println("Percentual registros processados: " + perc + "% - total de linhas:" + dadosSize
+					+ " total lido:" + linhas);
+			linhas = 0;
+		}
+
+	}
+
+
+
 }

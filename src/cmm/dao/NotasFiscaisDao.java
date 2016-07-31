@@ -87,4 +87,17 @@ public class NotasFiscaisDao {
 		return ( !lista.isEmpty() ) ? lista.get(0) : null;
 	}
 
+	public Long count() {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session
+				.createQuery("select count(*) from NotasFiscais ");
+		List<NotasFiscais> lista = query.list();
+		Long count = (Long) query.uniqueResult();
+		tx.commit();
+		session.close();
+		return count;
+		
+	}
+
 }
