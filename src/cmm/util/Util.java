@@ -376,7 +376,7 @@ public class Util {
 	public static boolean validarCnpj(String cnpj) {
 		if ((cnpj == null) || (cnpj.length() != 14))
 			return false;
-		if (cnpj.equals("11111111111111") || cnpj.equals("11111111111111")){
+		if (cnpj.equals("00000000000000") || cnpj.equals("11111111111111")){
 			return false;
 		}
 		int soma = 0, dig;
