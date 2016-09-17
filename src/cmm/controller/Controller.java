@@ -27,7 +27,6 @@ public class Controller {
 		}
 
 		int nivelProcessamento = 5;
-		boolean txtsTratados = true;
 
 		System.out.println("Lagoa da Prata - Limpando o banco...");
 

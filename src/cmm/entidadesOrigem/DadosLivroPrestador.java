@@ -1,5 +1,12 @@
 package cmm.entidadesOrigem;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "dados_livro_prestador")
 public class DadosLivroPrestador {
 	/*
 	 * id_codigo|nosso_numero|numero_nota|serie_nota|tipo_documento|data_emissao|codigo_verificacao|natureza_operacao
@@ -15,6 +22,8 @@ public class DadosLivroPrestador {
 	 * |cep_tomador|telefone_tomador|email_tomador|cnpj_intermediario|inscricao_municipal_intermediario
 	 * |razao_social_intermediario|data_inclusao_registro
 	 */
+	@Id
+	@Column(name = "id")
 	private Long idCodigo;
 	private String nossoNumero;
 	private String numeroNota;
@@ -767,5 +776,9 @@ public class DadosLivroPrestador {
 
 	public void setValorIssRetido(Double valorIssRetido) {
 		this.valorIssRetido = valorIssRetido;
+	}
+	
+	public DadosLivroPrestador() { 
+		
 	}
 }

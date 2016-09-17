@@ -22,6 +22,8 @@ public class Util {
 	private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
 	private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN, Pattern.CASE_INSENSITIVE);
+	
+	private GeraCPF geraCPF = new GeraCPF();
 
 	public static Long castToLong(Object value, Long defaultValue) {
 		if (value != null) {
@@ -459,5 +461,10 @@ public class Util {
 		}
 
 		return valor;
+	}
+
+	public String geraCpfFicticio() {
+		geraCPF = new GeraCPF(); // tem que instanciar de novo, senão gera sempre o mesmo
+		return geraCPF.geraCPFFinal();
 	}
 }

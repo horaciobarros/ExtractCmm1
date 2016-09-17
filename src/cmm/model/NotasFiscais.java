@@ -13,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import cmm.entidadesOrigem.DadosLivroPrestador;
+
 @Entity
 @Table(name = "notas_fiscais")
 public class NotasFiscais implements Serializable {
@@ -49,7 +51,7 @@ public class NotasFiscais implements Serializable {
 	@Column(name = "numero_verificacao")
 	private String numeroVerificacao;
 
-	@Column(name = "natureza_operacao")
+	@Column(name = "natureza_operacao", nullable = false)
 	private String naturezaOperacao;
 
 	@Column(name = "numero_rps")
@@ -144,6 +146,10 @@ public class NotasFiscais implements Serializable {
 
 	@Column(name = "situacao_original")
 	private String situacaoOriginal;
+	
+	@ManyToOne
+	@JoinColumn(name = "dados_livro_prestador_id")
+	private DadosLivroPrestador dadosLivroPrestador;
 
 	public String getSituacaoOriginal() {
 		return situacaoOriginal;
@@ -472,4 +478,14 @@ public class NotasFiscais implements Serializable {
 	public void setHash(String hash) {
 		this.hash = hash;
 	}
+
+	public DadosLivroPrestador getDadosLivroPrestador() {
+		return dadosLivroPrestador;
+	}
+
+	public void setDadosLivroPrestador(DadosLivroPrestador dadosLivroPrestador) {
+		this.dadosLivroPrestador = dadosLivroPrestador;
+	}
+	
+	
 }

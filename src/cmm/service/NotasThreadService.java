@@ -3,6 +3,7 @@ package cmm.service;
 import java.math.BigDecimal;
 
 import cmm.dao.GuiasNotasFiscaisDao;
+import cmm.dao.MunicipiosIbgeDao;
 import cmm.dao.NotasFiscaisCanceladasDao;
 import cmm.dao.NotasFiscaisEmailsDao;
 import cmm.dao.NotasFiscaisPrestadoresDao;
@@ -41,6 +42,7 @@ public class NotasThreadService implements Runnable {
 	private Tomadores tomadores;
 	private NotasFiscaisTomadoresDao notasFiscaisTomadoresDao = new NotasFiscaisTomadoresDao();
 	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
+	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
 
 	public NotasThreadService(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log, String linha,
 			String tipoNotaFilha) {
@@ -80,23 +82,50 @@ public class NotasThreadService implements Runnable {
 
 	@Override
 	public void run() {
-		if (("S").equals(tipoNotaFilha) && !"C".equals(nf.getSituacaoOriginal())) { // serviÃ§os
+		if (("S").equals(tipoNotaFilha)) { // serviÃ§os
 			try {
 
 				NotasFiscaisServicos nfs = new NotasFiscaisServicos();
 				nfs.setInscricaoPrestador(dlp.getCnpjPrestador());
 				nfs.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
-				nfs.setMunicipioIbge(util.CODIGO_IBGE);
-				PrestadoresAtividades pa = prestadoresAtividadesDao.findByInscricao(nfs.getInscricaoPrestador());
-				if (pa == null || pa.getId() == null) {
-					nfs.setItemListaServico("1401");
-				} else {
-					nfs.setItemListaServico(util.completarZerosEsquerda(pa.getCodigoAtividade(), 4));
+
+				if (nf.getNaturezaOperacao().equals("1")) {
+					nfs.setMunicipioIbge(util.CODIGO_IBGE);
+				} else if (nf.getNaturezaOperacao().equals("2")) {
+					try {
+						nfs.setMunicipioIbge(
+								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador()));
+						if(util.isEmptyOrNull(nfs.getMunicipioIbge())) {
+							throw new Exception();
+						}
+					} catch (Exception e) {
+						log.fillError(
+								"Erro: nota fiscal de serviço sem codigo ibge valido. Conteúdo da linha: " + linha, e);
+						e.printStackTrace();
+					}
+				} else if (nf.getNaturezaOperacao().equals("3")) {
+					nfs.setMunicipioIbge(util.CODIGO_IBGE);
 				}
+
+				PrestadoresAtividades pa = prestadoresAtividadesDao.findByInscricao(nfs.getInscricaoPrestador());
+				nfs.setItemListaServico(
+						util.completarZerosEsquerda(dlp.getCodigoAtividadeMunipal().replaceAll("\\.", ""), 4));
+
+				if (nfs.getItemListaServico() == null) {
+					if (pa == null || pa.getId() == null) {
+						nfs.setItemListaServico("1401");
+					} else {
+						nfs.setItemListaServico(util.completarZerosEsquerda(pa.getCodigoAtividade(), 4));
+					}
+				}
+
 				nfs.setDescricao(dlp.getDiscriminacaoServico());
 				if (util.isEmptyOrNull(nfs.getDescricao().trim())) {
-					nfs.setDescricao("ServiÃ§os Diversos");
+					nfs.setDescricao("Serviços Diversos");
 				}
+
+				// --
+
 				nfs.setAliquota(BigDecimal.valueOf(dlp.getValorAliquota()));
 				nfs.setQuantidade(BigDecimal.valueOf(1));
 				nfs.setValorServico(BigDecimal.valueOf(dlp.getValorServico()));
@@ -112,6 +141,7 @@ public class NotasThreadService implements Runnable {
 				}
 				notasFiscaisServicosDao.save(nfs);
 			} catch (Exception e) {
+				log.fillError(linha, e);
 				e.printStackTrace();
 			}
 		}
@@ -188,7 +218,7 @@ public class NotasThreadService implements Runnable {
 			}
 		}
 
-		if ("T".equals(tipoNotaFilha) && tomadores != null && tomadores.getId() != null) {
+		if ("T".equals(tipoNotaFilha)) {
 			try {
 				NotasFiscaisTomadores nft = new NotasFiscaisTomadores();
 				nft.setBairro(tomadores.getBairro());
@@ -219,9 +249,6 @@ public class NotasThreadService implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 		}
-
 	}
-
 }

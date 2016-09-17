@@ -95,6 +95,10 @@ public class Tomadores implements Serializable {
 
 	@Column(name = "hash")
 	private String hash;
+	
+	@Column(name = "tomador_ficticio")
+	private String tomadorFicticio;
+
 
 	public Long getId() {
 		return id;
@@ -114,6 +118,14 @@ public class Tomadores implements Serializable {
 
 	public String getInscricaoTomador() {
 		return inscricaoTomador;
+	}
+
+	public String getTomadorFicticio() {
+		return tomadorFicticio;
+	}
+
+	public void setTomadorFicticio(String tomadorFicticio) {
+		this.tomadorFicticio = tomadorFicticio;
 	}
 
 	public void setInscricaoTomador(String inscricaoTomador) {

@@ -128,5 +128,21 @@ public class TomadoresDao {
 		}
 		return null;
 	}
+	
+	public Tomadores findByNome(String nomeTomador) {
+		Query query = sessionFactory.openSession().createQuery(
+				"from Tomadores t  " + " where t.nome like '%" + nomeTomador.trim() + "%'");
+
+		try {
+			List<Tomadores> tomadores = query.list();
+
+			if (tomadores.size() > 0) {
+				return tomadores.get(0);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 }
