@@ -741,7 +741,7 @@ public class ExtractorService {
 			if (util.isEmptyOrNull(nf.getInscricaoTomador())) {
 				String nomeTomador = dlp.getRazaoSocialTomador();
 				if (util.isEmptyOrNull(nomeTomador)) {
-					nomeTomador = "DIVERSOS";
+					nomeTomador = "Não Informado";
 				}
 				
 				t = tomadoresDao.findByNome(nomeTomador);
