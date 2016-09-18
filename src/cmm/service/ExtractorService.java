@@ -28,7 +28,7 @@ public class ExtractorService {
 
 	public void processaDadosCadastroAtividade(List<String> dadosList) {
 		final FileLog log = new FileLog("dados_cadastro_atividade");
-		ExecutorService executor = Executors.newFixedThreadPool(300);
+		ExecutorService executor = Executors.newFixedThreadPool(400);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
 				break;
@@ -63,13 +63,13 @@ public class ExtractorService {
 
 	public void processaDadosGuiaCompetencias(List<String> dadosList) {
 		FileLog log = new FileLog("dados_guia");
-		ExecutorService executor = Executors.newFixedThreadPool(300);
+		ExecutorService executor = Executors.newFixedThreadPool(400);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
 				break;
 			}
 			GuiaThread thread = new GuiaThread(linha, util, log);
-			executor.equals(thread);
+			executor.execute(thread);
 		}
 		Util.pausar(3000);
 		executor.shutdown();
