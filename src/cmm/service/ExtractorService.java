@@ -1,7 +1,6 @@
 package cmm.service;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class ExtractorService {
 
 	public void processaDadosCadastroAtividade(List<String> dadosList) {
 		final FileLog log = new FileLog("dados_cadastro_atividade");
-		ExecutorService executor = Executors.newFixedThreadPool(400);
+		ExecutorService executor = Executors.newFixedThreadPool(350);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
 				break;
@@ -63,7 +62,7 @@ public class ExtractorService {
 
 	public void processaDadosGuiaCompetencias(List<String> dadosList) {
 		FileLog log = new FileLog("dados_guia");
-		ExecutorService executor = Executors.newFixedThreadPool(400);
+		ExecutorService executor = Executors.newFixedThreadPool(350);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
 				break;
@@ -80,7 +79,7 @@ public class ExtractorService {
 
 	public void processaDadosLivroPrestador(List<String> dadosList) {
 		FileLog log = new FileLog("dados_livro_prestador");
-		ExecutorService executor = Executors.newFixedThreadPool(600);
+		ExecutorService executor = Executors.newFixedThreadPool(300);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
 				break;
@@ -148,6 +147,7 @@ public class ExtractorService {
 
 	public void processaDadosNotasFiscais(List<String> dadosList) {
 		FileLog log = new FileLog("dados_livro_prestador_notas_fiscais");
+		Util.pausar(5000);
 		ExecutorService executor = Executors.newFixedThreadPool(300);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
@@ -187,7 +187,7 @@ public class ExtractorService {
 	public List<String> excluiParaProcessarNivel1() {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos", "NotasFiscaisEmails", "NotasFiscaisObras",
 				"NotasFiscaisPrestadores", "NotasFiscaisServicos", "NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "Pagamentos",
-				"PrestadoresAtividades", "" + "PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais", "Tomadores", "Prestadores", "Pessoa","DadosLivroPrestador");
+				"PrestadoresAtividades", "" + "PrestadoresOptanteSimples", "Guias", "Competencias", "NotasFiscais", "Tomadores", "Prestadores", "Pessoa");
 
 	}
 

@@ -26,7 +26,7 @@ public class Controller {
 			System.exit(0);
 		}
 
-		int nivelProcessamento = 3;
+		int nivelProcessamento = 1;
 
 		System.out.println("Lagoa da Prata - Limpando o banco...");
 
@@ -63,7 +63,7 @@ public class Controller {
 			extractorService.processaDadosCadastro(dadosList);
 			System.out.println("--- Fim de ajustes ---" + Util.getDataHoraAtual());
 
-			System.out.println("Lendo prestador" + Util.getDataHoraAtual()); // prestador
+			System.out.println("Lendo prestador " + Util.getDataHoraAtual()); // prestador
 			dadosList = extractorService.lerArquivo("dados_livro_prestador");
 			System.out.println("Gravando prestador " + Util.getDataHoraAtual()); // prestador
 			extractorService.processaDadosLivroPrestador(dadosList);

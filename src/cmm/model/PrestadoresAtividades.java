@@ -49,6 +49,9 @@ public class PrestadoresAtividades implements Serializable {
 	@Column(name = "codigo_atividade")
 	private String codigoAtividade;
 
+	@Column(name = "grupo_atividade")
+	private String grupoAtividade;
+
 	public String getCodigoAtividade() {
 		return codigoAtividade;
 	}
@@ -119,5 +122,13 @@ public class PrestadoresAtividades implements Serializable {
 
 	public void setHash(String hash) {
 		this.hash = hash;
+	}
+
+	public String getGrupoAtividade() {
+		return grupoAtividade;
+	}
+
+	public void setGrupoAtividade(String grupoAtividade) {
+		this.grupoAtividade = grupoAtividade;
 	}
 }

@@ -257,7 +257,7 @@ public class NotasMaeThread implements Runnable {
 
 					t = tomadoresDao.save(t);
 
-					log.fillError(linha, "Warn: foi gravado gerado um cpf ficticio para o tomador " + nomeTomador);
+					//log.fillError(linha, "Warn: foi gravado gerado um cpf ficticio para o tomador " + nomeTomador);
 				}
 			}
 		}

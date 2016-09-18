@@ -33,6 +33,23 @@ public class DadosLivroPrestadorDao {
 		}
 	}
 
+	public DadosLivroPrestador findByPrestadorAndCodigoAtividade(String inscricaoPrestador, String codigoAtividade) {
+		Query query = sessionFactory.openSession().createQuery("from DadosLivroPrestador dlp  " + " where dlp.cnpjPrestador like :cnpj and dlp.codigoAtividadeMunipal like :codigoAtividade ")
+				.setParameter("cnpj", inscricaoPrestador)
+				.setParameter("codigoAtividade", codigoAtividade);
+
+		try {
+			List<DadosLivroPrestador> dlps = query.list();
+
+			if (dlps.size() > 0) {
+				return dlps.get(0);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public DadosLivroPrestador findById(Long id) {
 		Query query = sessionFactory.openSession().createQuery("from DadosLivroPrestador dlp  " + " where dlp.idCodigo = " + id);
 

@@ -2,9 +2,13 @@ package cmm.service;
 
 import java.math.BigDecimal;
 
+import cmm.dao.CnaeDao;
+import cmm.dao.DadosLivroPrestadorDao;
 import cmm.dao.PrestadoresAtividadesDao;
 import cmm.dao.PrestadoresDao;
 import cmm.entidadesOrigem.DadosCadastroAtividade;
+import cmm.entidadesOrigem.DadosLivroPrestador;
+import cmm.model.Cnae;
 import cmm.model.Prestadores;
 import cmm.model.PrestadoresAtividades;
 import cmm.util.FileLog;
@@ -38,14 +42,22 @@ public class CadastroAtividadeThread implements Runnable {
 			Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
 			if (p != null && p.getId() != 0) {
 				try {
+					dca.setAtividadeFederal(dca.getAtividadeFederal().replace(".", ""));
 					PrestadoresAtividades pa = new PrestadoresAtividades();
 					pa.setAliquota(BigDecimal.valueOf(dca.getAliquota()));
-					// pa.setIcnaes(null);
-					pa.setIlistaservicos(util.completarZerosEsquerda(dca.getGrupoAtividade(), 4));
+					pa.setIlistaservicos(util.completarZerosEsquerda(dca.getAtividadeFederal(), 4));
 					pa.setInscricaoPrestador(inscricaoPrestador);
 					pa.setPrestadores(p);
-					dca.setAtividadeFederal(dca.getAtividadeFederal().replace(".", ""));
+					pa.setGrupoAtividade(dca.getGrupoAtividade());
 					pa.setCodigoAtividade(dca.getAtividadeFederal());
+					DadosLivroPrestador dlp = new DadosLivroPrestadorDao().findByPrestadorAndCodigoAtividade(inscricaoPrestador, dca.getAtividadeMunicipio());
+					
+					if (dlp != null && !util.isEmptyOrNull(util.getStringLimpa(dlp.getCodigoCnae()))){
+						Cnae cnae = new CnaeDao().findByCodigo(dlp.getCodigoCnae());
+						if (cnae!=null && !util.isEmptyOrNull(cnae.getCnae())){
+							pa.setIcnaes(util.getStringLimpa(cnae.getCnae()));
+						}
+					}
 					prestadoresAtividadesDao.save(pa);
 				} catch (Exception e) {
 					e.printStackTrace();

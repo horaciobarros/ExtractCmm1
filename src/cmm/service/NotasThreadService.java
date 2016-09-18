@@ -100,7 +100,7 @@ public class NotasThreadService implements Runnable {
 							throw new Exception();
 						}
 					} catch (Exception e) {
-						log.fillError("Erro: nota fiscal de serviço sem codigo ibge valido. Conteúdo da linha: " + linha,"Nota Fiscal Serviço ", e);
+						log.fillError("Erro: nota fiscal de serviço sem codigo ibge valido. "+dlp.getMunicipioTomador()+"/"+ dlp.getUfTomador() +" Conteúdo da linha: " + linha,"Nota Fiscal Serviço ", e);
 						e.printStackTrace();
 					}
 				} else if (nf.getNaturezaOperacao().equals("3")) {
