@@ -14,14 +14,13 @@ public class CompetenciasDao {
 
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
-	
+
 	public CompetenciasDao() {
 		sessionFactory = HibernateUtil.getSessionFactory();
 	}
 
 	public Competencias findByDescricao(String descricao) {
-		Query query = sessionFactory.openSession()
-				.createQuery("from Competencias cp  " + " where cp.descricao like '%" + descricao.trim() + "%'");
+		Query query = sessionFactory.openSession().createQuery("from Competencias cp  " + " where cp.descricao like '%" + descricao.trim() + "%'");
 
 		try {
 			List<Competencias> competencias = query.list();
@@ -37,45 +36,45 @@ public class CompetenciasDao {
 
 	public void save(Competencias cp) {
 		Session session = sessionFactory.openSession();
-		try{
+		try {
 			session.beginTransaction();
 			session.save(cp);
 			session.getTransaction().commit();
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
-		}
-		finally{
+		} finally {
 			session.close();
 		}
 	}
-	
+
 	public List<Competencias> findNaoEnviados() {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = session
-				.createQuery("from Competencias c where hash is null order by dataInicio").setFirstResult(0).setMaxResults(1);;
+		Query query = session.createQuery("from Competencias c where hash is null order by dataInicio").setFirstResult(0).setMaxResults(1);
+		;
 		List<Competencias> lista = query.list();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 
 		return lista;
 	}
 
-	public void saveHash(List<Competencias> listaAtualizados, String hash){
+	public void saveHash(List<Competencias> listaAtualizados, String hash) {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
-		builder.append("update Competencias set hash = '"+hash+"' where ");
-		
-		for (Competencias c : listaAtualizados){
-			builder.append("id = "+c.getId()+" or ");
+		builder.append("update Competencias set hash = '" + hash + "' where ");
+
+		for (Competencias c : listaAtualizados) {
+			builder.append("id = " + c.getId() + " or ");
 		}
-		
+
 		String sql = builder.toString();
-		sql = sql.toString().substring(0,sql.length()-4);
+		sql = sql.toString().substring(0, sql.length() - 4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 	}
 }

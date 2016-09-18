@@ -2,8 +2,10 @@ package cmm.entidadesOrigem;
 
 public class DadosContador {
 	/*
-	 * id_codigo|cnpj|inscricao_municipal|inscricao_estadual|razao_social|nome_fantasia|endereco|endereco_numero
-	 * |endereco_complemento|endereco_bairro|municipio|endereco_uf|endereco_cep|telefone|fax
+	 * id_codigo|cnpj|inscricao_municipal|inscricao_estadual|razao_social|
+	 * nome_fantasia|endereco|endereco_numero
+	 * |endereco_complemento|endereco_bairro
+	 * |municipio|endereco_uf|endereco_cep|telefone|fax
 	 * |email|status|cd_crc|crc_uf|crc_dt_registro
 	 */
 
@@ -27,29 +29,11 @@ public class DadosContador {
 	private String cdCrc;
 	private String crcUf;
 	private String crcDtRegistro;
-	
-	public DadosContador (Long idCodigo,
-			 String cnpj,
-			 String inscricaoMunicipal,
-			 String inscricaoEstadual,
-			 String razaoSocial,
-			 String nomeFantasia,
-			 String endereco,
-			 String enderecoNumero,
-			 String enderecoComplemento,
-			 String enderecoBairro,
-			 String municipio,
-			 String enderecoUf,
-			 String enderecoCep,
-			 String telefone,
-			 String fax,
-			 String email,
-			 String status,
-			 String cdCrc,
-			 String crcUf,
-			 String crcDtRegistro) {
-		
-		
+
+	public DadosContador(Long idCodigo, String cnpj, String inscricaoMunicipal, String inscricaoEstadual, String razaoSocial, String nomeFantasia, String endereco,
+			String enderecoNumero, String enderecoComplemento, String enderecoBairro, String municipio, String enderecoUf, String enderecoCep, String telefone,
+			String fax, String email, String status, String cdCrc, String crcUf, String crcDtRegistro) {
+
 		this.idCodigo = idCodigo;
 		this.cnpj = cnpj;
 		this.inscricaoMunicipal = inscricaoMunicipal;
@@ -70,7 +54,7 @@ public class DadosContador {
 		this.cdCrc = cdCrc;
 		this.crcUf = crcUf;
 		this.crcDtRegistro = crcDtRegistro;
-		
+
 	}
 
 	public Long getIdCodigo() {
@@ -232,8 +216,5 @@ public class DadosContador {
 	public void setCrcDtRegistro(String crcDtRegistro) {
 		this.crcDtRegistro = crcDtRegistro;
 	}
-	
-	
-	
-	
+
 }

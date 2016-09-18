@@ -23,9 +23,8 @@ public class PlanoConta {
 	private Double vlImposto;
 	private String dataInclusao;
 
-	public PlanoConta(String idCodigo, String cdConta, String cnpj, String inscricaoMunicipal, String titulo,
-			String codigoGuia, String codigoCosif, String codigoAtividade, String tributavel,
-			String anoCompetencia, String mesCompetencia, String vlReceita, String vlAliquota, String vlImposto,
+	public PlanoConta(String idCodigo, String cdConta, String cnpj, String inscricaoMunicipal, String titulo, String codigoGuia, String codigoCosif,
+			String codigoAtividade, String tributavel, String anoCompetencia, String mesCompetencia, String vlReceita, String vlAliquota, String vlImposto,
 			String dataInclusao) {
 		this.idCodigo = Long.valueOf(idCodigo);
 		this.cdConta = cdConta;

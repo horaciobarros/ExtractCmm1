@@ -21,16 +21,14 @@ public class GuiasNotasFiscaisDao {
 
 	public void save(GuiasNotasFiscais gnf) {
 		Session session = sessionFactory.openSession();
-		try{
+		try {
 			session.beginTransaction();
 			session.save(gnf);
 			session.getTransaction().commit();
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
-		}
-		finally{
+		} finally {
 			session.close();
 		}
 	}
@@ -64,8 +62,7 @@ public class GuiasNotasFiscaisDao {
 		session.close();
 	}
 
-	public List<GuiasNotasFiscais> findPorNumeroGuia(
-			Long numeroGuia) {
+	public List<GuiasNotasFiscais> findPorNumeroGuia(Long numeroGuia) {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		Query query = session.createQuery("from GuiasNotasFiscais gnf where numeroGuia = " + numeroGuia + "");

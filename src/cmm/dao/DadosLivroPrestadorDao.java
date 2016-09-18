@@ -5,10 +5,8 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 import cmm.entidadesOrigem.DadosLivroPrestador;
-import cmm.model.Pessoa;
 import cmm.util.HibernateUtil;
 
 public class DadosLivroPrestadorDao {
@@ -36,8 +34,7 @@ public class DadosLivroPrestadorDao {
 	}
 
 	public DadosLivroPrestador findById(Long id) {
-		Query query = sessionFactory.openSession()
-				.createQuery("from DadosLivroPrestador dlp  " + " where dlp.idCodigo = " + id);
+		Query query = sessionFactory.openSession().createQuery("from DadosLivroPrestador dlp  " + " where dlp.idCodigo = " + id);
 
 		try {
 			List<DadosLivroPrestador> dlps = query.list();
@@ -52,8 +49,7 @@ public class DadosLivroPrestadorDao {
 	}
 
 	public boolean exists(Long id) {
-		Query query = sessionFactory.openSession()
-				.createQuery("from DadosLivroPrestador dlp  where dlp.idCodigo = " + id);
+		Query query = sessionFactory.openSession().createQuery("from DadosLivroPrestador dlp  where dlp.idCodigo = " + id);
 
 		try {
 			List<DadosLivroPrestador> dlps = query.list();

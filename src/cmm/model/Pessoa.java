@@ -92,13 +92,12 @@ public class Pessoa implements Serializable {
 
 	@Column(name = "hash")
 	private String hash;
-	
+
 	@Column(name = "uf")
 	private String uf;
-	
+
 	@Column(name = "sexo")
 	private String sexo;
-
 
 	public String getSexo() {
 		return sexo;
@@ -124,7 +123,6 @@ public class Pessoa implements Serializable {
 		this.id = id;
 	}
 
-	
 	public Long getPessoaId() {
 		return pessoaId;
 	}

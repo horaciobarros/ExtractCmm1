@@ -21,46 +21,45 @@ public class PagamentosDao {
 
 	public void save(Pagamentos p) {
 		Session session = sessionFactory.openSession();
-		try{
+		try {
 			session.beginTransaction();
 			session.save(p);
 			session.getTransaction().commit();
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
-		}
-		finally{
+		} finally {
 			session.close();
 		}
 	}
-	
+
 	public List<Pagamentos> findNaoEnviados() {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = session
-				.createQuery("from Pagamentos c where hash is null").setFirstResult(0).setMaxResults(1000);
+		Query query = session.createQuery("from Pagamentos c where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<Pagamentos> lista = query.list();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 
 		return lista;
 	}
 
-	public void saveHash(List<Pagamentos> listaAtualizados, String hash){
+	public void saveHash(List<Pagamentos> listaAtualizados, String hash) {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
-		builder.append("update Pagamentos set hash = '"+hash+"' where ");
-		
-		for (Pagamentos c : listaAtualizados){
-			builder.append("id = "+c.getId()+" or ");
+		builder.append("update Pagamentos set hash = '" + hash + "' where ");
+
+		for (Pagamentos c : listaAtualizados) {
+			builder.append("id = " + c.getId() + " or ");
 		}
-		
+
 		String sql = builder.toString();
-		sql = sql.toString().substring(0,sql.length()-4);
+		sql = sql.toString().substring(0, sql.length() - 4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 	}
 
 }

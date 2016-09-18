@@ -1,4 +1,4 @@
-package cmm.model; 
+package cmm.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -13,113 +13,122 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-@Entity 
-@Table(name="notas_fiscais_cond_pagamentos")
+@Entity
+@Table(name = "notas_fiscais_cond_pagamentos")
 public class NotasFiscaisCondPagamentos implements Serializable {
 
-   private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @Column(name="id")
-   private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 
-   @ManyToOne
-   @JoinColumn(name = "nota_id")
-   private NotasFiscais notasFiscais;
+	@ManyToOne
+	@JoinColumn(name = "nota_id")
+	private NotasFiscais notasFiscais;
 
-   @Column(name="numero_nota")
-   private Long numeroNota;
+	@Column(name = "numero_nota")
+	private Long numeroNota;
 
-   @Column(name="inscricao_prestador")
-   private String inscricaoPrestador;
+	@Column(name = "inscricao_prestador")
+	private String inscricaoPrestador;
 
-   @Column(name="numero_parcela")
-   private Long numeroParcela;
+	@Column(name = "numero_parcela")
+	private Long numeroParcela;
 
-   @Column(name="data_vencimento")
-   private Date dataVencimento;
+	@Column(name = "data_vencimento")
+	private Date dataVencimento;
 
-   @Column(name="valor_parcela")
-   private BigDecimal valorParcela;
+	@Column(name = "valor_parcela")
+	private BigDecimal valorParcela;
 
-   @Column(name="tipo")
-   private Long tipo;
+	@Column(name = "tipo")
+	private Long tipo;
 
-   @Column(name="dh_envio")
-   private Date dhEnvio;
+	@Column(name = "dh_envio")
+	private Date dhEnvio;
 
-   @Column(name="hash")
-   private String hash;
+	@Column(name = "hash")
+	private String hash;
 
-   public Long getId() { 
-      return id;
-   }
-   public void  setId(Long id) { 
-      this.id = id;
-   }
+	public Long getId() {
+		return id;
+	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-   public  NotasFiscais  getNotasFiscais() { 
-      return notasFiscais;
-   }
-   public void  setNotasFiscais(NotasFiscais notasFiscais) { 
-      this.notasFiscais = notasFiscais;
-   }
+	public NotasFiscais getNotasFiscais() {
+		return notasFiscais;
+	}
 
-   public Long getNumeroNota() { 
-      return numeroNota;
-   }
-   public void  setNumeroNota(Long numeroNota) { 
-      this.numeroNota = numeroNota;
-   }
+	public void setNotasFiscais(NotasFiscais notasFiscais) {
+		this.notasFiscais = notasFiscais;
+	}
 
-   public String getInscricaoPrestador() { 
-      return inscricaoPrestador;
-   }
-   public void  setInscricaoPrestador(String inscricaoPrestador) { 
-      this.inscricaoPrestador = inscricaoPrestador;
-   }
+	public Long getNumeroNota() {
+		return numeroNota;
+	}
 
-   public Long getNumeroParcela() { 
-      return numeroParcela;
-   }
-   public void  setNumeroParcela(Long numeroParcela) { 
-      this.numeroParcela = numeroParcela;
-   }
+	public void setNumeroNota(Long numeroNota) {
+		this.numeroNota = numeroNota;
+	}
 
-   public Date getDataVencimento() { 
-      return dataVencimento;
-   }
-   public void  setDataVencimento(Date dataVencimento) { 
-      this.dataVencimento = dataVencimento;
-   }
+	public String getInscricaoPrestador() {
+		return inscricaoPrestador;
+	}
 
-   public BigDecimal getValorParcela() { 
-      return valorParcela;
-   }
-   public void  setValorParcela(BigDecimal valorParcela) { 
-      this.valorParcela = valorParcela;
-   }
+	public void setInscricaoPrestador(String inscricaoPrestador) {
+		this.inscricaoPrestador = inscricaoPrestador;
+	}
 
-   public Long getTipo() { 
-      return tipo;
-   }
-   public void  setTipo(Long tipo) { 
-      this.tipo = tipo;
-   }
+	public Long getNumeroParcela() {
+		return numeroParcela;
+	}
 
-   public Date getDhEnvio() { 
-      return dhEnvio;
-   }
-   public void  setDhEnvio(Date dhEnvio) { 
-      this.dhEnvio = dhEnvio;
-   }
+	public void setNumeroParcela(Long numeroParcela) {
+		this.numeroParcela = numeroParcela;
+	}
 
-   public String getHash() { 
-      return hash;
-   }
-   public void  setHash(String hash) { 
-      this.hash = hash;
-   }
+	public Date getDataVencimento() {
+		return dataVencimento;
+	}
+
+	public void setDataVencimento(Date dataVencimento) {
+		this.dataVencimento = dataVencimento;
+	}
+
+	public BigDecimal getValorParcela() {
+		return valorParcela;
+	}
+
+	public void setValorParcela(BigDecimal valorParcela) {
+		this.valorParcela = valorParcela;
+	}
+
+	public Long getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(Long tipo) {
+		this.tipo = tipo;
+	}
+
+	public Date getDhEnvio() {
+		return dhEnvio;
+	}
+
+	public void setDhEnvio(Date dhEnvio) {
+		this.dhEnvio = dhEnvio;
+	}
+
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
 }

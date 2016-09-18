@@ -95,10 +95,9 @@ public class Tomadores implements Serializable {
 
 	@Column(name = "hash")
 	private String hash;
-	
+
 	@Column(name = "tomador_ficticio")
 	private String tomadorFicticio;
-
 
 	public Long getId() {
 		return id;

@@ -20,9 +20,8 @@ public class TomadoresDao {
 	}
 
 	public Tomadores findByInscricao(String inscricaoTomador, String inscricaoPrestador) {
-		Query query = sessionFactory.openSession()
-				.createQuery("select t from Tomadores t  inner join t.prestadores p "
-						+ " where t.inscricaoTomador like '%" + inscricaoTomador.trim() + "%' "
+		Query query = sessionFactory.openSession().createQuery(
+				"select t from Tomadores t  inner join t.prestadores p " + " where t.inscricaoTomador like '%" + inscricaoTomador.trim() + "%' "
 						+ " and p.inscricaoPrestador like '%" + inscricaoPrestador + "%'");
 
 		try {
@@ -40,16 +39,14 @@ public class TomadoresDao {
 	public Tomadores save(Tomadores t) {
 
 		Session session = sessionFactory.openSession();
-		try{
+		try {
 			session.beginTransaction();
 			session.save(t);
 			session.getTransaction().commit();
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
-		}
-		finally{
+		} finally {
 			session.close();
 		}
 		return t;
@@ -70,8 +67,7 @@ public class TomadoresDao {
 	}
 
 	public Tomadores findByInscricaoMunicipal(String inscMunicipal) {
-		Query query = sessionFactory.openSession().createQuery(
-				"from Tomadores t  " + " where t.inscricaoMunicipal like '%" + inscMunicipal.trim() + "%'");
+		Query query = sessionFactory.openSession().createQuery("from Tomadores t  " + " where t.inscricaoMunicipal like '%" + inscMunicipal.trim() + "%'");
 
 		try {
 			List<Tomadores> tomadores = query.list();
@@ -88,7 +84,7 @@ public class TomadoresDao {
 	public List<Tomadores> findNaoEnviados() {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = session.createQuery("from Tomadores c where hash is null and inscricao_tomador!="+00000000000).setFirstResult(0).setMaxResults(10000);
+		Query query = session.createQuery("from Tomadores c where hash is null and inscricao_tomador!=" + 00000000000).setFirstResult(0).setMaxResults(10000);
 		List<Tomadores> lista = query.list();
 		tx.commit();
 		session.close();
@@ -128,10 +124,9 @@ public class TomadoresDao {
 		}
 		return null;
 	}
-	
+
 	public Tomadores findByNome(String nomeTomador) {
-		Query query = sessionFactory.openSession().createQuery(
-				"from Tomadores t  " + " where t.nome like '%" + nomeTomador.trim() + "%'");
+		Query query = sessionFactory.openSession().createQuery("from Tomadores t  " + " where t.nome like '%" + nomeTomador.trim() + "%'");
 
 		try {
 			List<Tomadores> tomadores = query.list();

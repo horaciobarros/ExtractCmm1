@@ -19,14 +19,14 @@ public class Controller {
 	private ExtractorService extractorService = new ExtractorService();
 
 	public void importaNfe() {
-		
+
 		String msg = "Confirma Extract de Lagoa da Prata?";
-		int op = JOptionPane.showConfirmDialog(null, msg,"", JOptionPane.YES_NO_OPTION);
-		if (op != JOptionPane.YES_OPTION){
+		int op = JOptionPane.showConfirmDialog(null, msg, "", JOptionPane.YES_NO_OPTION);
+		if (op != JOptionPane.YES_OPTION) {
 			System.exit(0);
 		}
 
-		int nivelProcessamento = 5;
+		int nivelProcessamento = 3;
 
 		System.out.println("Lagoa da Prata - Limpando o banco...");
 
@@ -52,46 +52,48 @@ public class Controller {
 			}
 		}
 
-		System.out.println(
-				"Lagoa da Prata - Leitura de arquivos txt - Início Processando no nível: " + nivelProcessamento);
+		System.out.println("Lagoa da Prata - Leitura de arquivos txt - Início Processando no nível: " + nivelProcessamento);
 		List<String> dadosList;
 
 		if (nivelProcessamento == 1) {
 
-			System.out.println("Lendo contribuintes");
+			System.out.println("Lendo contribuintes " + Util.getDataHoraAtual());
 			dadosList = extractorService.lerArquivo("dados_cadastro");
-			System.out.println("Gravando contribuintes");
+			System.out.println("Gravando contribuintes " + Util.getDataHoraAtual());
 			extractorService.processaDadosCadastro(dadosList);
-			System.out.println("--- Fim de ajustes ---");
+			System.out.println("--- Fim de ajustes ---" + Util.getDataHoraAtual());
 
-			System.out.println("Lendo prestador"); // prestador
+			System.out.println("Lendo prestador" + Util.getDataHoraAtual()); // prestador
 			dadosList = extractorService.lerArquivo("dados_livro_prestador");
-			System.out.println("Gravando prestador"); // prestador
+			System.out.println("Gravando prestador " + Util.getDataHoraAtual()); // prestador
 			extractorService.processaDadosLivroPrestador(dadosList);
-			System.out.println("--- Fim de prestador ---");
+			System.out.println("--- Fim de prestador --- " + Util.getDataHoraAtual());
 
 		}
 
 		if (nivelProcessamento <= 3) {
 			// competencias e guias
-			System.out.println("Lendo competencias e guias");
+			System.out.println("Gravando competencias " + Util.getDataHoraAtual());
+			extractorService.incluiCompetencias();
+			System.out.println("--- Fim de competencias ---");
+			System.out.println("Lendo guias " + Util.getDataHoraAtual());
 			dadosList = extractorService.lerArquivo("dados_guia");
-			System.out.println("Gravando competencias e guias");
+			System.out.println("Gravando guias " + Util.getDataHoraAtual());
 			extractorService.processaDadosGuiaCompetencias(dadosList);
-			System.out.println("--- Fim de competencias e guias ---");
+			System.out.println("--- Fim de guias --- " + Util.getDataHoraAtual());
 
 		}
 
 		if (nivelProcessamento <= 4) {
 			// atividades prestador
-			System.out.println("Lendo atividades prestador");
+			System.out.println("Lendo atividades prestador " + Util.getDataHoraAtual());
 			dadosList = extractorService.lerArquivo("dados_cadastro_atividade");
-			System.out.println("Gravando atividades prestador");
+			System.out.println("Gravando atividades prestador " + Util.getDataHoraAtual());
 			extractorService.processaDadosCadastroAtividade(dadosList);
 			System.out.println("--- Fim de atividades prestador ---");
 
 		}
-		
+
 		if (nivelProcessamento <= 5) {
 			// notas fiscais
 			System.out.println("Lendo notas fiscais - " + Util.getDateHourMinutes(new Date()));
@@ -100,13 +102,13 @@ public class Controller {
 			extractorService.processaDadosNotasFiscais(dadosList);
 			System.out.println("--- Fim de notas fiscais ---" + Util.getDateHourMinutes(new Date()));
 		}
-		
-		//desligarComputador();
+
+		// desligarComputador();
 	}
-	
+
 	/**
-	 * Mï¿½todo para desligar o computador
-	 * ATENï¿½ï¿½O: Para cancelar, entrar no cmd e digitar: shutdown -a
+	 * Mï¿½todo para desligar o computador ATENï¿½ï¿½O: Para cancelar, entrar no
+	 * cmd e digitar: shutdown -a
 	 */
 	public static void desligarComputador() {
 		try {

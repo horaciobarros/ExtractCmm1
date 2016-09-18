@@ -1,4 +1,4 @@
-package cmm.model; 
+package cmm.model;
 
 import java.io.Serializable;
 import java.sql.Blob;
@@ -13,83 +13,89 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-@Entity 
-@Table(name="notas_fiscais_xml")
+@Entity
+@Table(name = "notas_fiscais_xml")
 public class NotasFiscaisXml implements Serializable {
 
-   private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @Column(name="id")
-   private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 
-   @ManyToOne
-   @JoinColumn(name = "nota_id")
-   private NotasFiscais notasFiscais;
+	@ManyToOne
+	@JoinColumn(name = "nota_id")
+	private NotasFiscais notasFiscais;
 
-   @Column(name="inscricao_prestador")
-   private String inscricaoPrestador;
+	@Column(name = "inscricao_prestador")
+	private String inscricaoPrestador;
 
-   @Column(name="numero_nota")
-   private Long numeroNota;
+	@Column(name = "numero_nota")
+	private Long numeroNota;
 
-   @Column(name="xml_nota")
-   private Blob xmlNota;
+	@Column(name = "xml_nota")
+	private Blob xmlNota;
 
-   @Column(name="dh_envio")
-   private Date dhEnvio;
+	@Column(name = "dh_envio")
+	private Date dhEnvio;
 
-   @Column(name="hash")
-   private String hash;
+	@Column(name = "hash")
+	private String hash;
 
-   public Long getId() { 
-      return id;
-   }
-   public void  setId(Long id) { 
-      this.id = id;
-   }
+	public Long getId() {
+		return id;
+	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-   public  NotasFiscais  getNotasFiscais() { 
-      return notasFiscais;
-   }
-   public void  setNotasFiscais(NotasFiscais notasFiscais) { 
-      this.notasFiscais = notasFiscais;
-   }
+	public NotasFiscais getNotasFiscais() {
+		return notasFiscais;
+	}
 
-   public String getInscricaoPrestador() { 
-      return inscricaoPrestador;
-   }
-   public void  setInscricaoPrestador(String inscricaoPrestador) { 
-      this.inscricaoPrestador = inscricaoPrestador;
-   }
+	public void setNotasFiscais(NotasFiscais notasFiscais) {
+		this.notasFiscais = notasFiscais;
+	}
 
-   public Long getNumeroNota() { 
-      return numeroNota;
-   }
-   public void  setNumeroNota(Long numeroNota) { 
-      this.numeroNota = numeroNota;
-   }
+	public String getInscricaoPrestador() {
+		return inscricaoPrestador;
+	}
 
-   public Blob getXmlNota() { 
-      return xmlNota;
-   }
-   public void  setXmlNota(Blob xmlNota) { 
-      this.xmlNota = xmlNota;
-   }
+	public void setInscricaoPrestador(String inscricaoPrestador) {
+		this.inscricaoPrestador = inscricaoPrestador;
+	}
 
-   public Date getDhEnvio() { 
-      return dhEnvio;
-   }
-   public void  setDhEnvio(Date dhEnvio) { 
-      this.dhEnvio = dhEnvio;
-   }
+	public Long getNumeroNota() {
+		return numeroNota;
+	}
 
-   public String getHash() { 
-      return hash;
-   }
-   public void  setHash(String hash) { 
-      this.hash = hash;
-   }
+	public void setNumeroNota(Long numeroNota) {
+		this.numeroNota = numeroNota;
+	}
+
+	public Blob getXmlNota() {
+		return xmlNota;
+	}
+
+	public void setXmlNota(Blob xmlNota) {
+		this.xmlNota = xmlNota;
+	}
+
+	public Date getDhEnvio() {
+		return dhEnvio;
+	}
+
+	public void setDhEnvio(Date dhEnvio) {
+		this.dhEnvio = dhEnvio;
+	}
+
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
 }

@@ -1,15 +1,16 @@
 package cmm.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.text.MaskFormatter;
 
 public class GeraCPF {
 	private List<Integer> listaAleatoria = new ArrayList<Integer>();
 	private List<Integer> listaNumMultiplicados = new ArrayList<Integer>();
-	
+
 	// Metodo para geracao de um numero aleatorio en;
-	//		tre 0 e 9
+	// tre 0 e 9
 	public int geraNumAleatorio() {
 		// Note que foi preciso fazer um cast para int, ja que Math.random()
 		// retorna um double

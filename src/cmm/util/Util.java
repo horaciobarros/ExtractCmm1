@@ -1,5 +1,6 @@
 package cmm.util;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -14,6 +15,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cmm.entidadesOrigem.DadosLivroPrestador;
+import cmm.model.Pessoa;
+import cmm.model.Prestadores;
+import cmm.model.Tomadores;
 
 public class Util {
 
@@ -22,7 +26,7 @@ public class Util {
 	private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
 	private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN, Pattern.CASE_INSENSITIVE);
-	
+
 	private GeraCPF geraCPF = new GeraCPF();
 
 	public static Long castToLong(Object value, Long defaultValue) {
@@ -129,7 +133,15 @@ public class Util {
 	}
 
 	public String getTipoPessoa(String inscricao) {
-		return (inscricao.trim().length() == 11 ? "F" : "J");
+		if (inscricao == null || inscricao.trim().isEmpty()) {
+			return "O";
+		} else if (inscricao.trim().length() == 11) {
+			return "F";
+		} else if (inscricao.trim().length() == 14) {
+			return "J";
+		} else {
+			return "O";
+		}
 	}
 
 	public BigDecimal getSumOfBigDecimal(List<BigDecimal> lista) {
@@ -203,17 +215,26 @@ public class Util {
 		return calendar.getTime();
 	}
 
+	public Date getVencimentoCompetencia(Date dataFim) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dataFim);
+		calendar.set(Calendar.MONTH, calendar.get(calendar.MONTH) + 1);
+		calendar.set(Calendar.DAY_OF_MONTH, 28);
+
+		return calendar.getTime();
+	}
+
 	public String getLimpaTelefone(String telefone) {
-		if (telefone == null) {
-			return telefone;
+		if (telefone == null || telefone.isEmpty()) {
+			return null;
 		}
 		telefone = telefone.trim();
 		telefone = telefone.replaceAll(" ", "");
-		telefone = telefone.replaceAll("\\.", "");
 		telefone = telefone.replaceAll("-", "");
+		telefone = telefone.replaceAll("_", "");
 		telefone = telefone.replaceAll("\\(", "");
 		telefone = telefone.replaceAll("\\)", "");
-		if (telefone.length() > 11) {
+		if (telefone.length() >= 11) {
 			telefone = telefone.substring(0, 11);
 		}
 		return telefone.trim();
@@ -248,6 +269,9 @@ public class Util {
 				}
 
 			}
+			if (email != null && email.length() > 100) {
+				email = email.substring(0, 100);
+			}
 		}
 		return email;
 	}
@@ -274,6 +298,8 @@ public class Util {
 
 	public String trataCep(String cep) {
 		if (!isEmptyOrNull(cep)) {
+			cep = cep.replaceAll("-", "");
+			cep = cep.replaceAll("_", "");
 			if (cep.length() < 8) {
 				cep = completarZerosDireita(cep, 8);
 				return cep;
@@ -306,17 +332,50 @@ public class Util {
 	}
 
 	public static boolean validarEmail(String email) {
-		if (email == null){return false;}
+		if (email == null || email.trim().isEmpty()) {
+			return false;
+		}
 		Matcher matcher = pattern.matcher(email);
 		return matcher.matches();
+	}
+
+	public String getCpfCnpj(String cpfCnpj) {
+		if (cpfCnpj == null || cpfCnpj.trim().isEmpty()) {
+			return null;
+		}
+		if (cpfCnpj.length() == 15 && cpfCnpj.endsWith("0")) {
+			cpfCnpj = cpfCnpj.substring(0, 14);
+		}
+		cpfCnpj = cpfCnpj.replaceAll("\\.", "");
+		cpfCnpj = cpfCnpj.replaceAll("-", "");
+		cpfCnpj = cpfCnpj.replaceAll("/", "");
+		cpfCnpj = cpfCnpj.replaceAll(" ", "");
+		return cpfCnpj.trim();
+	}
+
+	public String getStringLimpa(String string) {
+		if (string == null || string.trim().isEmpty()) {
+			return null;
+		}
+		string = string.replaceAll("\\.", "");
+		string = string.replaceAll("-", "");
+		string = string.replaceAll("/", "");
+		string = string.replaceAll(" ", "");
+		return string.trim();
+	}
+
+	public BigDecimal getStringToBigDecimal(String valor) {
+		valor = valor.replace(",", ".");
+		Double value = Double.valueOf(valor);
+		return BigDecimal.valueOf(value);
 	}
 
 	public static boolean validarCpf(String cpf) {
 		if ((cpf == null) || (cpf.length() != 11))
 			return false;
 		// considera-se erro cpf's formados por uma sequencia de numeros iguais
-		if ("00000000000".equals(cpf) || "11111111111".equals(cpf) || "22222222222".equals(cpf) || "33333333333".equals(cpf) || "44444444444".equals(cpf)
-				|| "55555555555".equals(cpf) || "66666666666".equals(cpf) || "77777777777".equals(cpf) || "88888888888".equals(cpf) || "99999999999".equals(cpf)
+		if (cpf.equals("00000000000") || cpf.equals("11111111111") || cpf.equals("22222222222") || cpf.equals("33333333333") || cpf.equals("44444444444")
+				|| cpf.equals("55555555555") || cpf.equals("66666666666") || cpf.equals("77777777777") || cpf.equals("88888888888") || cpf.equals("99999999999")
 				|| (cpf.length() != 11))
 			return (false);
 
@@ -339,12 +398,11 @@ public class Util {
 			}
 
 			r = 11 - (sm % 11);
-			if ((r == 10) || (r == 11)) {
+			if ((r == 10) || (r == 11))
 				dig10 = '0';
-			} else {
+			else
 				dig10 = (char) (r + 48); // converte no respectivo caractere
 											// numerico
-			}
 
 			// Calculo do 2o. Digito Verificador
 			sm = 0;
@@ -356,19 +414,17 @@ public class Util {
 			}
 
 			r = 11 - (sm % 11);
-			if ((r == 10) || (r == 11)) {
+			if ((r == 10) || (r == 11))
 				dig11 = '0';
-			} else {
+			else
 				dig11 = (char) (r + 48);
-			}
 
 			// Verifica se os digitos calculados conferem com os digitos
 			// informados.
-			if ((dig10 == cpf.charAt(9)) && (dig11 == cpf.charAt(10))) {
+			if ((dig10 == cpf.charAt(9)) && (dig11 == cpf.charAt(10)))
 				return (true);
-			} else {
+			else
 				return (false);
-			}
 		} catch (InputMismatchException erro) {
 			return (false);
 		}
@@ -378,11 +434,14 @@ public class Util {
 	public static boolean validarCnpj(String cnpj) {
 		if ((cnpj == null) || (cnpj.length() != 14))
 			return false;
-		if (cnpj.equals("00000000000000") || cnpj.equals("11111111111111")){
+		if (cnpj.equals("00000000000000") || cnpj.equals("11111111111111")) {
 			return false;
 		}
-		int soma = 0, dig;
+		int soma = 0, aux, dig;
 		String cnpj_calc = cnpj.substring(0, 12);
+
+		if (cnpj.length() != 14)
+			return false;
 
 		char[] chr_cnpj = cnpj.toCharArray();
 
@@ -429,6 +488,39 @@ public class Util {
 		}
 	}
 
+	public String trataEndereco(String logradouro) {
+
+		String logradouroAux = logradouro.replaceAll("\\.", "");
+		logradouroAux = logradouroAux.replaceAll(",", "");
+		logradouroAux = logradouroAux.replaceAll("-", "");
+		logradouroAux = logradouroAux.replaceAll("Rua", "R.");
+		logradouroAux = logradouroAux.replaceAll("\"", "");
+		if (!logradouroAux.isEmpty()) {
+			if (logradouroAux.length() > 50) {
+				logradouroAux = logradouroAux.substring(0, 50);
+			}
+			logradouro = logradouroAux;
+		}
+		return logradouro;
+	}
+
+	public static String getDataHoraAtual() {
+		Calendar calendar = new GregorianCalendar();
+		SimpleDateFormat out = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+		Date date = new Date();
+		calendar.setTime(date);
+		return (out.format(calendar.getTime()));
+	}
+
+	public static void desligarComputador() {
+		try {
+			Runtime.getRuntime().exec("shutdown -s -t 480");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public static void main(String args[]) {
 		System.out.println(new Util().getLimpaTelefone("037.3261-7859"));
 	}
@@ -464,7 +556,171 @@ public class Util {
 	}
 
 	public String geraCpfFicticio() {
-		geraCPF = new GeraCPF(); // tem que instanciar de novo, senão gera sempre o mesmo
+		geraCPF = new GeraCPF(); // tem que instanciar de novo, senão gera
+									// sempre o mesmo
 		return geraCPF.geraCPFFinal();
+	}
+
+	public Tomadores trataNumerosTelefones(Tomadores t) {
+
+		if (t.getCelular() != null) {
+			t.setCelular(t.getCelular().replaceAll("\\(", ""));
+			t.setCelular(t.getCelular().replaceAll("\\)", ""));
+			t.setCelular(t.getCelular().replaceAll("-", ""));
+		}
+		if (t.getTelefone() != null) {
+			t.setTelefone(t.getTelefone().replaceAll("\\(", ""));
+			t.setTelefone(t.getTelefone().replaceAll("\\)", ""));
+			t.setTelefone(t.getTelefone().replaceAll("\\-", ""));
+		}
+
+		return t;
+	}
+
+	public Tomadores anulaCamposVazios(Tomadores t) {
+
+		t.setEmail(trataEmail(t.getEmail()));
+
+		if (t.getTelefone() != null && t.getTelefone().trim().isEmpty()) {
+			t.setTelefone(null);
+		}
+		if (t.getCelular() != null && t.getCelular().trim().isEmpty()) {
+			t.setCelular(null);
+		}
+
+		if (isEmptyOrNull(t.getInscricaoEstadual())) {
+			t.setInscricaoEstadual(null);
+		}
+		if (isEmptyOrNull(t.getInscricaoMunicipal())) {
+			t.setInscricaoMunicipal(null);
+		}
+
+		if (isEmptyOrNull(t.getCep())) {
+			t.setCep(null);
+		}
+
+		if (isEmptyOrNull(t.getNumero())) {
+			t.setNumero(null);
+		}
+
+		if (isEmptyOrNull(t.getTipoPessoa())) {
+			t.setTipoPessoa(null);
+		}
+		return t;
+	}
+
+	public Prestadores trataNumerosTelefones(Prestadores p) {
+
+		if (p.getCelular() != null) {
+			p.setCelular(p.getCelular().replaceAll("\\(", ""));
+			p.setCelular(p.getCelular().replaceAll("\\)", ""));
+			p.setCelular(p.getCelular().replaceAll("-", ""));
+		}
+		if (p.getTelefone() != null) {
+			p.setTelefone(p.getTelefone().replaceAll("\\(", ""));
+			p.setTelefone(p.getTelefone().replaceAll("\\)", ""));
+			p.setTelefone(p.getTelefone().replaceAll("\\-", ""));
+		}
+
+		return p;
+	}
+
+	public Prestadores anulaCamposVazios(Prestadores p) {
+
+		p.setEmail(trataEmail(p.getEmail()));
+
+		if (p.getTelefone() != null && p.getTelefone().trim().isEmpty()) {
+			p.setTelefone(null);
+		}
+		if (p.getCelular() != null && p.getCelular().trim().isEmpty()) {
+			p.setCelular(null);
+		}
+
+		return p;
+	}
+
+	public Pessoa anulaCamposVazios(Pessoa pessoa) {
+		pessoa.setEmail(trataEmail(pessoa.getEmail()));
+		if (pessoa.getTelefone() != null && pessoa.getTelefone().trim().isEmpty()) {
+			pessoa.setTelefone(null);
+		}
+		if (pessoa.getCelular() != null && pessoa.getCelular().trim().isEmpty()) {
+			pessoa.setCelular(null);
+		}
+		if (pessoa.getInscricaoEstadual() != null && pessoa.getInscricaoEstadual().isEmpty()) {
+			pessoa.setInscricaoEstadual(null);
+		}
+		if (pessoa.getMunicipioIbge() != null && pessoa.getMunicipioIbge().toString().trim().isEmpty()) {
+			pessoa.setMunicipioIbge(null);
+		}
+		if (pessoa.getCep() != null && pessoa.getCep().trim().isEmpty()) {
+			pessoa.setCep(null);
+		}
+		if (pessoa.getComplemento() != null && pessoa.getComplemento().trim().isEmpty()) {
+			pessoa.setComplemento(null);
+		}
+
+		return pessoa;
+	}
+
+	public Pessoa trataNumerosTelefones(Pessoa pessoa) {
+
+		if (pessoa.getCelular() != null) {
+			pessoa.setCelular(pessoa.getCelular().replaceAll("\\(", ""));
+			pessoa.setCelular(pessoa.getCelular().replaceAll("\\)", ""));
+			pessoa.setCelular(pessoa.getCelular().replaceAll("-", ""));
+		}
+		if (pessoa.getTelefone() != null) {
+			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\(", ""));
+			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\)", ""));
+			pessoa.setTelefone(pessoa.getTelefone().replaceAll("\\-", ""));
+		}
+
+		if (pessoa.getCelular() != null) {
+			if (pessoa.getCelular().trim().length() < 10) {
+				if ("LAGOA DA PRATA".equals(pessoa.getMunicipio().trim())) {
+					pessoa.setCelular(incluiPrefixoLagoa(pessoa.getCelular()));
+				}
+			} else {
+				if ("0".equals(pessoa.getCelular().substring(0, 1))) {
+					pessoa.setCelular(pessoa.getCelular().substring(1));
+				}
+			}
+		}
+		if (pessoa.getTelefone() != null) {
+			if (pessoa.getTelefone().trim().length() < 10) {
+				if ("LAGOA DA PRATA".equals(pessoa.getMunicipio().trim())) {
+					pessoa.setTelefone(incluiPrefixoLagoa(pessoa.getTelefone()));
+				}
+			} else {
+				if ("0".equals(pessoa.getTelefone().substring(0, 1))) {
+					pessoa.setTelefone(pessoa.getTelefone().substring(1));
+				}
+			}
+		}
+
+		return pessoa;
+	}
+
+	private String incluiPrefixoLagoa(String telefone) {
+		if (telefone != null && !telefone.trim().isEmpty()) {
+			StringBuilder tel = new StringBuilder();
+			tel.append("37");
+			tel.append(telefone);
+			telefone = tel.toString();
+			if (telefone.trim().length() <= 3) {
+				telefone = null;
+			}
+		}
+		return telefone;
+	}
+
+	public static void pausar(int milesimos) {
+		try {
+			Thread.sleep(milesimos);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

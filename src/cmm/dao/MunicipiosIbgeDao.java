@@ -8,8 +8,8 @@ import org.hibernate.SessionFactory;
 import cmm.model.MunicipiosIbge;
 import cmm.util.HibernateUtil;
 
-public class MunicipiosIbgeDao  {
-	
+public class MunicipiosIbgeDao {
+
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
 
@@ -17,14 +17,9 @@ public class MunicipiosIbgeDao  {
 		sessionFactory = HibernateUtil.getSessionFactory();
 	}
 
-	
 	public String getCodigoIbge(String nomeMunicipio, String uf) {
-		Query query = sessionFactory.openSession()
-				.createQuery("from MunicipiosIbge m  where upper(m.municipio) like :nomemun"
-						+ " and upper(m.uf) like :uf")
-		.setParameter("nomemun", "%" + nomeMunicipio.trim().toUpperCase()+ "%")
-		.setParameter("uf", "%" + uf.trim().toUpperCase() + "%");
-		
+		Query query = sessionFactory.openSession().createQuery("from MunicipiosIbge m  where upper(m.municipio) like :nomemun" + " and upper(m.uf) like :uf")
+				.setParameter("nomemun", "%" + nomeMunicipio.trim().toUpperCase() + "%").setParameter("uf", "%" + uf.trim().toUpperCase() + "%");
 
 		try {
 			List<MunicipiosIbge> municipios = query.list();
@@ -38,11 +33,8 @@ public class MunicipiosIbgeDao  {
 		return null;
 	}
 
-
 	public String findUfByCodigoIbge(Long codigo) {
-		Query query = sessionFactory.openSession()
-				.createQuery("from MunicipiosIbge m where m.codigo = :codigo" 
-						).setParameter("codigo", codigo);
+		Query query = sessionFactory.openSession().createQuery("from MunicipiosIbge m where m.codigo = :codigo").setParameter("codigo", codigo);
 
 		try {
 			List<MunicipiosIbge> municipios = query.list();
@@ -55,5 +47,5 @@ public class MunicipiosIbgeDao  {
 		}
 		return null;
 	}
-	
+
 }

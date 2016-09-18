@@ -21,16 +21,14 @@ public class GuiasDao {
 
 	public void save(Guias g) {
 		Session session = sessionFactory.openSession();
-		try{
+		try {
 			session.beginTransaction();
 			session.save(g);
 			session.getTransaction().commit();
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
-		}
-		finally{
+		} finally {
 			session.close();
 		}
 	}

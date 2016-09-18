@@ -9,20 +9,20 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "guias_numeracao_cmm")
-public class GuiasNumeracaoCmm implements Serializable{
-	
+public class GuiasNumeracaoCmm implements Serializable {
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="numero_guia_origem")
+	@Column(name = "numero_guia_origem")
 	private String numeroGuiaOrigem;
-	
-	@Column(name="sequencial_cmm")
+
+	@Column(name = "sequencial_cmm")
 	private String sequencialCmm;
-	
+
 	public String getNumeroGuiaOrigem() {
 		return numeroGuiaOrigem;
 	}
@@ -47,12 +47,7 @@ public class GuiasNumeracaoCmm implements Serializable{
 		this.numeroPagamento = numeroPagamento;
 	}
 
-	@Column(name="numero_pagamento")
+	@Column(name = "numero_pagamento")
 	private String numeroPagamento;
-	
-	
-	
-	
-	
 
 }

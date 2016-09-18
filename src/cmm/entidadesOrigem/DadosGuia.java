@@ -56,15 +56,12 @@ public class DadosGuia {
 	private String motivoBaixa;
 	private String dataCredito;
 
-	public DadosGuia(String codigo, String nossoNumero, String parcela, String cnpj, String inscMunicipal, String mes,
-			String ano, Double imposto, Double correcaoMonetaria, Double juros, Double multa, Double valorTotal,
-			String dataVencimento, String dataBoleto, String status, String tipoGuia, String dataVia1, String via1,
-			String pago, String dataPagamento, String valorPago, String razaoSocial, String emailContribuinte,
-			String cnpjContador, String dataCancelamento, String motivoCancelamento, String anoProcessoCancelamento,
-			String dataEstorno, String dataDividaAtiva, Double valorEstimado, Double valorEstimativa,
-			String nomeArquivo, String dataInclusao, String dataAlteracao, String baixaTipo, String baixaVlAcrescimos,
-			String baixaArquivoNome, String codigoBanco, String codigoConvenio, String dataBaixa, String motivoBaixa,
-			String dataCredito) {
+	public DadosGuia(String codigo, String nossoNumero, String parcela, String cnpj, String inscMunicipal, String mes, String ano, Double imposto,
+			Double correcaoMonetaria, Double juros, Double multa, Double valorTotal, String dataVencimento, String dataBoleto, String status, String tipoGuia,
+			String dataVia1, String via1, String pago, String dataPagamento, String valorPago, String razaoSocial, String emailContribuinte, String cnpjContador,
+			String dataCancelamento, String motivoCancelamento, String anoProcessoCancelamento, String dataEstorno, String dataDividaAtiva, Double valorEstimado,
+			Double valorEstimativa, String nomeArquivo, String dataInclusao, String dataAlteracao, String baixaTipo, String baixaVlAcrescimos,
+			String baixaArquivoNome, String codigoBanco, String codigoConvenio, String dataBaixa, String motivoBaixa, String dataCredito) {
 		this.codigo = codigo;
 		this.nossoNumero = nossoNumero;
 		this.parcela = parcela;

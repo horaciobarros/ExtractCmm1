@@ -2,10 +2,13 @@ package cmm.entidadesOrigem;
 
 public class DadosCadastro {
 	/*
-	 * id_codigo|cnpj|inscricao_municipal|inscricao_estadual|razao_social|nome_fantasia|endereco|endereco_numero
-	 * |endereco_complemento|endereco_bairro|municipio|endereco_uf|endereco_cep|telefone|fax|email|dt_inicio_atividade
-	 * |dt_fim_atividade|regime_tributacao|optante_simples_nacional|status|data_inclusao_registro
-	 * |responsavel_cpf_cnpj|es_contador
+	 * id_codigo|cnpj|inscricao_municipal|inscricao_estadual|razao_social|
+	 * nome_fantasia|endereco|endereco_numero
+	 * |endereco_complemento|endereco_bairro
+	 * |municipio|endereco_uf|endereco_cep|telefone
+	 * |fax|email|dt_inicio_atividade
+	 * |dt_fim_atividade|regime_tributacao|optante_simples_nacional
+	 * |status|data_inclusao_registro |responsavel_cpf_cnpj|es_contador
 	 */
 
 	private String idCodigo;
@@ -32,32 +35,12 @@ public class DadosCadastro {
 	private String dataInclusaoRegistro;
 	private String responsavelCpfCnpj;
 	private String esContador;
-	
-	public DadosCadastro(String idCodigo,
-			 String cnpj,
-			 String inscricaoMunicipal,
-			 String inscricaoEstadual,
-			 String razaoSocial,
-			 String nomeFantasia,
-			 String endereco,
-			 String enderecoNumero,
-			 String enderecoComplemento,
-			 String enderecoBairro,
-			 String municipio,
-			 String enderecoUf,
-			 String enderecoCep,
-			 String telefone,
-			 String fax,
-			 String email,
-			 String dtInicioAtividade,
-			 String dtFimAtividade,
-			 String regimeTributacao,
-			 String optanteSimplesNacional,
-			 String status,
-			 String dataInclusaoRegistro,
-			 String responsavelCpfCnpj
-			) {
-		
+
+	public DadosCadastro(String idCodigo, String cnpj, String inscricaoMunicipal, String inscricaoEstadual, String razaoSocial, String nomeFantasia,
+			String endereco, String enderecoNumero, String enderecoComplemento, String enderecoBairro, String municipio, String enderecoUf, String enderecoCep,
+			String telefone, String fax, String email, String dtInicioAtividade, String dtFimAtividade, String regimeTributacao, String optanteSimplesNacional,
+			String status, String dataInclusaoRegistro, String responsavelCpfCnpj) {
+
 		this.idCodigo = idCodigo;
 		this.cnpj = cnpj;
 		this.inscricaoMunicipal = inscricaoMunicipal;
@@ -81,8 +64,8 @@ public class DadosCadastro {
 		this.status = status;
 		this.dataInclusaoRegistro = dataInclusaoRegistro;
 		this.responsavelCpfCnpj = responsavelCpfCnpj;
-		//this.esContador = esContador;
-		
+		// this.esContador = esContador;
+
 	}
 
 	public String getIdCodigo() {
@@ -276,7 +259,5 @@ public class DadosCadastro {
 	public void setEsContador(String esContador) {
 		this.esContador = esContador;
 	}
-	
-	
-	
+
 }

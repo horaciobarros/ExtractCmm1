@@ -1,4 +1,4 @@
-	package cmm.util;
+package cmm.util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,19 +13,17 @@ public class TrataTxts {
 
 	String pastaOrigem = "C:\\Temp\\lagoa\\";
 	String pastaDestino = "C:\\Temp\\lagoa\\tratados\\";
-	
-	
-	
-	public static void main(String args[]){
+
+	public static void main(String args[]) {
 		new TrataTxts().processa();
 	}
-	
-	public void processa(){
+
+	public void processa() {
 		File dirOrigem = new File(pastaOrigem);
 		File dirDestino = new File(pastaDestino);
 		dirDestino.mkdirs();
 		File[] listaArquivos = dirOrigem.listFiles();
-		for (File arqOrigem : listaArquivos){
+		for (File arqOrigem : listaArquivos) {
 			switch (arqOrigem.getName()) {
 				case "dados_livro_prestador.txt":
 					lerArquivo(arqOrigem, 63);
@@ -56,7 +54,7 @@ public class TrataTxts {
 			}
 		}
 	}
-	
+
 	public List<String> lerArquivo(File arqOrigem, int qtdeCampos) {
 		try {
 			BufferedReader br;
@@ -67,22 +65,22 @@ public class TrataTxts {
 				br = new BufferedReader(new InputStreamReader(new FileInputStream(arqOrigem), "UTF-8"));
 				br.readLine(); // cabe�alho
 				while (br.ready()) {
-					
+
 					StringBuilder linhaDefinitiva = new StringBuilder();
 					String[] campos = {};
 
 					while (campos != null && campos.length < qtdeCampos) {
 						contaLinhas++;
-						if (contaLinhas==8304){
+						if (contaLinhas == 8304) {
 							System.out.println();
 						}
 						String linha = br.readLine();
-						if (linha != null && !linha.trim().isEmpty()){
+						if (linha != null && !linha.trim().isEmpty()) {
 							linha = preparaParaSplit(linha);
 							linhaDefinitiva = new StringBuilder(linhaDefinitiva.toString() + linha);
 							campos = linhaDefinitiva.toString().split("@@|");
 						}
-						
+
 					}
 
 					String linhaAux = linhaDefinitiva.toString();
@@ -103,9 +101,9 @@ public class TrataTxts {
 		return null;
 
 	}
-	
+
 	public String preparaParaSplit(String linha) {
-		while (linha.contains("@@\"|")){
+		while (linha.contains("@@\"|")) {
 			linha = linha.replace("@@\"|", "@@|");
 		}
 		while (linha.contains("@@|@@|")) {
@@ -121,7 +119,7 @@ public class TrataTxts {
 		}
 		return linha;
 	}
-	
+
 	public String preparaParaSplit2(String linha) {
 		while (linha.contains("\\|\\|")) {
 			linha = linha.replace("\\|\\||", "\\| \\|");

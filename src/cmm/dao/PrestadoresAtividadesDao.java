@@ -21,16 +21,14 @@ public class PrestadoresAtividadesDao {
 
 	public void save(PrestadoresAtividades pa) {
 		Session session = sessionFactory.openSession();
-		try{
+		try {
 			session.beginTransaction();
 			session.save(pa);
 			session.getTransaction().commit();
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
-		}
-		finally{
+		} finally {
 			session.close();
 		}
 	}
@@ -38,36 +36,35 @@ public class PrestadoresAtividadesDao {
 	public List<PrestadoresAtividades> findNaoEnviados() {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = session
-				.createQuery("from PrestadoresAtividades pa where hash is null").setFirstResult(0).setMaxResults(1000);
+		Query query = session.createQuery("from PrestadoresAtividades pa where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<PrestadoresAtividades> lista = query.list();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 
 		return lista;
 	}
-	
-	public void saveHash(List<PrestadoresAtividades> listaAtualizados, String hash){
+
+	public void saveHash(List<PrestadoresAtividades> listaAtualizados, String hash) {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
-		builder.append("update PrestadoresAtividades set hash = '"+hash+"' where ");
-		
-		for (PrestadoresAtividades pa : listaAtualizados){
-			builder.append("id = "+pa.getId()+" or ");
+		builder.append("update PrestadoresAtividades set hash = '" + hash + "' where ");
+
+		for (PrestadoresAtividades pa : listaAtualizados) {
+			builder.append("id = " + pa.getId() + " or ");
 		}
-		
+
 		String sql = builder.toString();
-		sql = sql.toString().substring(0,sql.length()-4);
+		sql = sql.toString().substring(0, sql.length() - 4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 	}
-	
-	public PrestadoresAtividades findByInscricao(String inscricao) {
-		Query query = sessionFactory.openSession()
-				.createQuery("from PrestadoresAtividades pa  " + " where pa.inscricaoPrestador like '%" + inscricao.trim() + "%'");
 
-		
+	public PrestadoresAtividades findByInscricao(String inscricao) {
+		Query query = sessionFactory.openSession().createQuery("from PrestadoresAtividades pa  " + " where pa.inscricaoPrestador like '%" + inscricao.trim() + "%'");
+
 		try {
 			List<PrestadoresAtividades> prestadoresAtividadesList = query.list();
 
@@ -78,7 +75,7 @@ public class PrestadoresAtividadesDao {
 			e.printStackTrace();
 		}
 		return null;
-	
+
 	}
 
 }

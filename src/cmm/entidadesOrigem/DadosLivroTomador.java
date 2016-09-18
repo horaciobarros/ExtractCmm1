@@ -1,23 +1,36 @@
 package cmm.entidadesOrigem;
 
 public class DadosLivroTomador {
-	/* 
-	 * id_codigo|nosso_numero|numero_nota|serie_nota|tipo_documento|data_emissao|codigo_verificacao|natureza_operacao
-	 * |regime_tributacao|optante_pelo_simples_nacional|status_nota|data_cancelamento|motivo_cancelamento
-	 * |data_competencia|outras_informacoes|codigo_atividade_municipal|codigo_cnae|discriminacao_servico
-	 * |valor_servico|valor_deducao|valor_pis|valor_cofins|valor_inss|valor_ir|valor_csll|tipo_retencao|valor_iss
-	 * |valor_iss_retido|valor_outras_retencoes|valor_base_calculo|valor_aliquota|valor_total_nfse
-	 * |valor_desconto_incondicionado|valor_desconto_condicionado|cnpj_tomador|inscricao_municipal_tomador
-	 * |inscricao_estadual_tomador|razao_social_tomador|nome_fantasia_tomador|endereco_tomador|endereco_numero_tomador
-	 * |endereco_complemento_tomador|endereco_bairro_tomador|municipio_tomador|uf_tomador|cep_tomador
-	 * |telefone_tomador|email_tomador|cnpj_prestador|inscricao_municipal_prestador|inscricao_estadual_prestador
-	 * |razao_social_prestador|nome_fantasia_prestador|endereco_prestador|endereco_numero_prestador
-	 * |endereco_complemento_prestador|endereco_bairro_prestador|cidade_prestador|uf_prestador|cep_prestador
-	 * |telefone_prestador|email_prestador|cnpj_intermediario|inscricao_municipal_intermediario
+	/*
+	 * id_codigo|nosso_numero|numero_nota|serie_nota|tipo_documento|data_emissao|
+	 * codigo_verificacao|natureza_operacao
+	 * |regime_tributacao|optante_pelo_simples_nacional
+	 * |status_nota|data_cancelamento|motivo_cancelamento
+	 * |data_competencia|outras_informacoes
+	 * |codigo_atividade_municipal|codigo_cnae|discriminacao_servico
+	 * |valor_servico
+	 * |valor_deducao|valor_pis|valor_cofins|valor_inss|valor_ir|valor_csll
+	 * |tipo_retencao|valor_iss
+	 * |valor_iss_retido|valor_outras_retencoes|valor_base_calculo
+	 * |valor_aliquota|valor_total_nfse
+	 * |valor_desconto_incondicionado|valor_desconto_condicionado
+	 * |cnpj_tomador|inscricao_municipal_tomador
+	 * |inscricao_estadual_tomador|razao_social_tomador
+	 * |nome_fantasia_tomador|endereco_tomador|endereco_numero_tomador
+	 * |endereco_complemento_tomador
+	 * |endereco_bairro_tomador|municipio_tomador|uf_tomador|cep_tomador
+	 * |telefone_tomador
+	 * |email_tomador|cnpj_prestador|inscricao_municipal_prestador
+	 * |inscricao_estadual_prestador
+	 * |razao_social_prestador|nome_fantasia_prestador
+	 * |endereco_prestador|endereco_numero_prestador
+	 * |endereco_complemento_prestador
+	 * |endereco_bairro_prestador|cidade_prestador|uf_prestador|cep_prestador
+	 * |telefone_prestador
+	 * |email_prestador|cnpj_intermediario|inscricao_municipal_intermediario
 	 * |razao_social_intermediario|data_inclusao_registro
-	 * 
-	 * */
-	
+	 */
+
 	private Long idCodigo;
 	private String nossoNumero;
 	private String numeroNota;
@@ -84,75 +97,21 @@ public class DadosLivroTomador {
 	private String inscricaoMunicipalIntermediario;
 	private String razaoSocialIntermediario;
 	private String dataInclusaoRegistro;
-	
-	public DadosLivroTomador( Long idCodigo,
-			 String nossoNumero,
-			 String numeroNota,
-			 String serieNota,
-			 String tipoDocumento,
-			 String dataEmissao,
-			 String codigoVerificacao,
-			 String naturezaOperacao,
-			 String regimeTributacao,
-			 String optantePeloSimplesNacional,
-			 String statusNota,
-			 String dataCancelamento,
-			 String motivoCancelamento,
-			 String dataCompetencia,
-			 String outrasInformacoes,
-			 String codigoAtividadeMunipal,
-			 String codigoCnae,
-			 String discriminacaoServico,
-			 Double valorServico,
-			 Double valorDeducao,
-			 Double valorPis,
-			 Double valorCofins,
-			 Double valorInss,
-			 Double valorIr,
-			 Double valorCsll,
-			 String tipoRetencao,
-			 Double valorIss,
-			 Double valorIssRetido,
-			 Double valorOutrasRetencoes,
-			 Double valorBaseCalculo,
-			 Double valorAliquota,
-			 Double valorTotalNfse,
-			 Double valorDescontoIncondicionado,
-			 Double valorDescontoCondicionado,
-			 String cnpjTomador,
-			 String inscricaoMunicipalTomador,
-			 String inscricaoEstadualTomador,
-			 String razaoSocialTomador,
-			 String nomeFantasiaTomador,
-			 String enderecoTomador,
-			 String enderecoNumeroTomador,
-			 String enderecoComplementoTomador,
-			 String enderecoBairroTomador,
-			 String cidadeTomador,
-			 String ufTomador,
-			 String cepTomador,
-			 String telefoneTomador,
-			 String emailTomador,
-			 String cnpjPrestador,
-			 String inscricaoMunicipalPrestador,
-			 String inscricaoEstadualPrestador,
-			 String razaoSocialPrestador,
-			 String nomeFantasiaPrestador,
-			 String enderecoPrestador,
-			 String enderecoNumeroPrestador,
-			 String enderecoComplementoPrestador,
-			 String enderecoBairroPrestador,
-			 String cidadePrestador,
-			 String ufPrestador,
-			 String cepPrestador,
-			 String telefonePrestador,
-			 String emailPrestador,
-			 String cnpjIntermediario,
-			 String inscricaoMunicipalIntermediario,
-			 String razaoSocialIntermediario,
-			 String dataInclusaoRegistro) {
-		
-		
+
+	public DadosLivroTomador(Long idCodigo, String nossoNumero, String numeroNota, String serieNota, String tipoDocumento, String dataEmissao,
+			String codigoVerificacao, String naturezaOperacao, String regimeTributacao, String optantePeloSimplesNacional, String statusNota,
+			String dataCancelamento, String motivoCancelamento, String dataCompetencia, String outrasInformacoes, String codigoAtividadeMunipal, String codigoCnae,
+			String discriminacaoServico, Double valorServico, Double valorDeducao, Double valorPis, Double valorCofins, Double valorInss, Double valorIr,
+			Double valorCsll, String tipoRetencao, Double valorIss, Double valorIssRetido, Double valorOutrasRetencoes, Double valorBaseCalculo,
+			Double valorAliquota, Double valorTotalNfse, Double valorDescontoIncondicionado, Double valorDescontoCondicionado, String cnpjTomador,
+			String inscricaoMunicipalTomador, String inscricaoEstadualTomador, String razaoSocialTomador, String nomeFantasiaTomador, String enderecoTomador,
+			String enderecoNumeroTomador, String enderecoComplementoTomador, String enderecoBairroTomador, String cidadeTomador, String ufTomador,
+			String cepTomador, String telefoneTomador, String emailTomador, String cnpjPrestador, String inscricaoMunicipalPrestador,
+			String inscricaoEstadualPrestador, String razaoSocialPrestador, String nomeFantasiaPrestador, String enderecoPrestador, String enderecoNumeroPrestador,
+			String enderecoComplementoPrestador, String enderecoBairroPrestador, String cidadePrestador, String ufPrestador, String cepPrestador,
+			String telefonePrestador, String emailPrestador, String cnpjIntermediario, String inscricaoMunicipalIntermediario, String razaoSocialIntermediario,
+			String dataInclusaoRegistro) {
+
 		this.idCodigo = idCodigo;
 		this.nossoNumero = nossoNumero;
 		this.numeroNota = numeroNota;
@@ -217,7 +176,7 @@ public class DadosLivroTomador {
 		this.inscricaoMunicipalIntermediario = inscricaoMunicipalIntermediario;
 		this.razaoSocialIntermediario = razaoSocialIntermediario;
 		this.dataInclusaoRegistro = dataInclusaoRegistro;
-		
+
 	}
 
 	public Long getIdCodigo() {
@@ -747,8 +706,5 @@ public class DadosLivroTomador {
 	public void setDataInclusaoRegistro(String dataInclusaoRegistro) {
 		this.dataInclusaoRegistro = dataInclusaoRegistro;
 	}
-	
-	
-	
 
 }

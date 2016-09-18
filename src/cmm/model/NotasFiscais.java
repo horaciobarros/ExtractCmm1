@@ -146,7 +146,7 @@ public class NotasFiscais implements Serializable {
 
 	@Column(name = "situacao_original")
 	private String situacaoOriginal;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "dados_livro_prestador_id")
 	private DadosLivroPrestador dadosLivroPrestador;
@@ -486,6 +486,5 @@ public class NotasFiscais implements Serializable {
 	public void setDadosLivroPrestador(DadosLivroPrestador dadosLivroPrestador) {
 		this.dadosLivroPrestador = dadosLivroPrestador;
 	}
-	
-	
+
 }

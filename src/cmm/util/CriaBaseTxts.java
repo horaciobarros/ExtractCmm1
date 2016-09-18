@@ -18,8 +18,7 @@ import java.util.List;
 public class CriaBaseTxts {
 
 	public static void main(String args[]) {
-		List<String> files = Arrays.asList("dados_guia", "dados_livro_prestador", "dados_livro_tomador",
-				"dados_cadastro_atividade", "dados_cadastro");
+		List<String> files = Arrays.asList("dados_guia", "dados_livro_prestador", "dados_livro_tomador", "dados_cadastro_atividade", "dados_cadastro");
 
 		File file, fileOut;
 		FileReader fr;
@@ -60,7 +59,6 @@ public class CriaBaseTxts {
 			}
 			bw.close();
 			fw.close();
-			
 
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block

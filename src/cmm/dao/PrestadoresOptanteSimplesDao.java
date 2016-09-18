@@ -21,16 +21,14 @@ public class PrestadoresOptanteSimplesDao {
 
 	public void save(PrestadoresOptanteSimples pos) {
 		Session session = sessionFactory.openSession();
-		try{
+		try {
 			session.beginTransaction();
 			session.save(pos);
 			session.getTransaction().commit();
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
-		}
-		finally{
+		} finally {
 			session.close();
 		}
 	}
@@ -38,29 +36,30 @@ public class PrestadoresOptanteSimplesDao {
 	public List<PrestadoresOptanteSimples> findNaoEnviados() {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = session
-				.createQuery("from PrestadoresOptanteSimples pos where hash is null").setFirstResult(0).setMaxResults(1000);
+		Query query = session.createQuery("from PrestadoresOptanteSimples pos where hash is null").setFirstResult(0).setMaxResults(1000);
 		List<PrestadoresOptanteSimples> lista = query.list();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 
 		return lista;
 	}
-	
-	public void saveHash(List<PrestadoresOptanteSimples> listaAtualizados, String hash){
+
+	public void saveHash(List<PrestadoresOptanteSimples> listaAtualizados, String hash) {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		StringBuilder builder = new StringBuilder();
-		builder.append("update PrestadoresOptanteSimples set hash = '"+hash+"' where ");
-		
-		for (PrestadoresOptanteSimples pos : listaAtualizados){
-			builder.append("id = "+pos.getId()+" or ");
+		builder.append("update PrestadoresOptanteSimples set hash = '" + hash + "' where ");
+
+		for (PrestadoresOptanteSimples pos : listaAtualizados) {
+			builder.append("id = " + pos.getId() + " or ");
 		}
-		
+
 		String sql = builder.toString();
-		sql = sql.toString().substring(0,sql.length()-4);
+		sql = sql.toString().substring(0, sql.length() - 4);
 		Query query = session.createQuery(sql);
 		query.executeUpdate();
-		tx.commit();session.close();
+		tx.commit();
+		session.close();
 	}
 
 }

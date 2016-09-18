@@ -3,7 +3,8 @@ package cmm.entidadesOrigem;
 public class DadosCadastroAtividade {
 	/*
 	 * cnpj|codigo_cadastro|atividade
-	 * |atividade_municipio|atividade_federal|aliquota|dedutivel|grupo_atividade|mes_inicio|ano_inicio
+	 * |atividade_municipio|atividade_federal|aliquota
+	 * |dedutivel|grupo_atividade|mes_inicio|ano_inicio
 	 * |mes_fim|ano_fim|tributavel
 	 */
 
@@ -20,21 +21,10 @@ public class DadosCadastroAtividade {
 	private String mesFim;
 	private String anoFim;
 	private String tributavel;
-	
-	public DadosCadastroAtividade(String cnpj,
-			 String codigoCadastro,
-			 String atividade,
-			 String atividadeMunicipio,
-			 String atividadeFederal,
-			 Double aliquota,
-			 String dedutivel,
-			 String grupoAtividade,
-			 String mesInicio,
-			 String anoInicio,
-			 String mesFim,
-			 String anoFim,
-			 String tributavel) {
-		
+
+	public DadosCadastroAtividade(String cnpj, String codigoCadastro, String atividade, String atividadeMunicipio, String atividadeFederal, Double aliquota,
+			String dedutivel, String grupoAtividade, String mesInicio, String anoInicio, String mesFim, String anoFim, String tributavel) {
+
 		this.cnpj = cnpj;
 		this.codigoCadastro = codigoCadastro;
 		this.atividade = atividade;
@@ -48,7 +38,7 @@ public class DadosCadastroAtividade {
 		this.mesFim = mesFim;
 		this.anoFim = anoFim;
 		this.tributavel = tributavel;
-		
+
 	}
 
 	public String getCnpj() {
@@ -154,6 +144,5 @@ public class DadosCadastroAtividade {
 	public void setTributavel(String tributavel) {
 		this.tributavel = tributavel;
 	}
-	
-	
+
 }
