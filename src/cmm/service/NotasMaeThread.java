@@ -4,16 +4,34 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import cmm.dao.CnaeDao;
 import cmm.dao.DadosLivroPrestadorDao;
 import cmm.dao.GuiasDao;
+import cmm.dao.GuiasNotasFiscaisDao;
 import cmm.dao.MunicipiosIbgeDao;
+import cmm.dao.NotasFiscaisCanceladasDao;
 import cmm.dao.NotasFiscaisDao;
+import cmm.dao.NotasFiscaisEmailsDao;
+import cmm.dao.NotasFiscaisPrestadoresDao;
+import cmm.dao.NotasFiscaisServicosDao;
+import cmm.dao.NotasFiscaisTomadoresDao;
+import cmm.dao.PessoaDao;
+import cmm.dao.PrestadoresAtividadesDao;
 import cmm.dao.PrestadoresDao;
 import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosLivroPrestador;
+import cmm.model.Cnae;
 import cmm.model.Guias;
+import cmm.model.GuiasNotasFiscais;
 import cmm.model.NotasFiscais;
+import cmm.model.NotasFiscaisCanceladas;
+import cmm.model.NotasFiscaisEmails;
+import cmm.model.NotasFiscaisPrestadores;
+import cmm.model.NotasFiscaisServicos;
+import cmm.model.NotasFiscaisTomadores;
+import cmm.model.Pessoa;
 import cmm.model.Prestadores;
+import cmm.model.PrestadoresAtividades;
 import cmm.model.Tomadores;
 import cmm.util.FileLog;
 import cmm.util.Util;
@@ -30,6 +48,13 @@ public class NotasMaeThread implements Runnable {
 	private Util util;
 	private FileLog log;
 	private NotasFiscais nf;
+	private NotasFiscaisTomadoresDao notasFiscaisTomadoresDao = new NotasFiscaisTomadoresDao();
+	private NotasFiscaisServicosDao notasFiscaisServicosDao = new NotasFiscaisServicosDao();
+	private NotasFiscaisCanceladasDao notasFiscaisCanceladasDao = new NotasFiscaisCanceladasDao();
+	private NotasFiscaisEmailsDao notasFiscaisEmailsDao = new NotasFiscaisEmailsDao();
+	private NotasFiscaisPrestadoresDao notasFiscaisPrestadoresDao = new NotasFiscaisPrestadoresDao();
+	private GuiasNotasFiscaisDao guiasNotasFiscaisDao = new GuiasNotasFiscaisDao();
+	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
 
 	public NotasMaeThread(String linha, Util util, FileLog log) {
 		this.linha = linha;
@@ -263,22 +288,17 @@ public class NotasMaeThread implements Runnable {
 		}
 
 		// -- servi√ßos
-		NotasThreadService nfServico = new NotasThreadService(p, nf, dlp, log, linha, "S");
-		Thread s = new Thread(nfServico);
-		s.start();
+		
+		processaNotasFilhaServico(p, nf, dlp, log, linha, "S");
 
 		// -- canceladas
 		if ("C".equals(dlp.getStatusNota().substring(0, 1))) {
-			NotasThreadService nfCanceladas = new NotasThreadService(p, nf, dlp, log, linha, "C");
-			Thread c = new Thread(nfCanceladas);
-			c.start();
+			processaNotasFilhaCancelada(p, nf, dlp, log, linha, "C");
 		}
 
 		// email
 		if (dlp.getEmailPrestador() != null && !dlp.getEmailPrestador().isEmpty()) {
-			NotasThreadService nfEmail = new NotasThreadService(p, nf, dlp, log, linha, "E");
-			Thread e = new Thread(nfEmail);
-			e.start();
+			processaNotasFilhaEmail(p, nf, dlp, log, linha, "E");
 		}
 
 		// notas-fiscais-cond-pagamentos ??
@@ -286,18 +306,14 @@ public class NotasMaeThread implements Runnable {
 		// notas-fiscais-obras ??
 
 		// notas-fiscais-prestadores
-		NotasThreadService nfPrestadores = new NotasThreadService(p, nf, dlp, log, linha, "P");
-		Thread prestadoresThread = new Thread(nfPrestadores);
-		prestadoresThread.start();
+		processaNotasFilhaPrestadores(p, nf, dlp, log, linha, "P");
 
 		// guias x notas fiscais
 		Guias g = new Guias();
 		if (dlp.getNossoNumero() != null && !dlp.getNossoNumero().trim().isEmpty()) {
 			g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
 			if (g != null) {
-				NotasThreadService nfGuias = new NotasThreadService(p, nf, dlp, log, linha, "G", g);
-				Thread gThread = new Thread(nfGuias);
-				gThread.start();
+				processaNotasFilhaGuias(p, nf, dlp, log, linha, "G", g);
 
 			} else {
 				System.out.println("Numero de guia n√£o encontrado: " + dlp.getNossoNumero());
@@ -308,11 +324,203 @@ public class NotasMaeThread implements Runnable {
 		// notas fiscais tomadores
 
 		if (t != null && t.getId() != null) {
-			NotasThreadService nfTomadores = new NotasThreadService(p, nf, dlp, log, linha, "T", g, t);
-			Thread nftThread = new Thread(nfTomadores);
-			nftThread.start();
+			processaNotasFilhaTomadores(p, nf, dlp, log, linha, "T", g, t);
 		}
 
+	}
+
+	private void processaNotasFilhaTomadores(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
+			String linha, String string, Guias g, Tomadores t) {
+		try {
+			NotasFiscaisTomadores nft = new NotasFiscaisTomadores();
+			nft.setBairro(t.getBairro());
+			nft.setCelular(t.getCelular());
+			nft.setCep(t.getCep());
+			nft.setComplemento(t.getComplemento());
+			nft.setEmail(t.getEmail());
+			nft.setEndereco(t.getEndereco());
+			nft.setInscricaoEstadual(t.getInscricaoEstadual());
+			nft.setInscricaoMunicipal(t.getInscricaoMunicipal());
+			nft.setInscricaoPrestador(nf.getInscricaoPrestador());
+			nft.setInscricaoTomador(t.getInscricaoTomador());
+			nft.setMunicipio(t.getMunicipio());
+			if (t.getMunicipioIbge() != null) {
+				nft.setMunicipioIbge(Long.toString(t.getMunicipioIbge()));
+			}
+			nft.setNome(t.getNome());
+			nft.setNomeFantasia(t.getNomeFantasia());
+			if (nft.getNomeFantasia() == null) {
+				nft.setNomeFantasia(t.getNome());
+			}
+			nft.setNotasFiscais(nf);
+			nft.setNumero(t.getNumero());
+			nft.setNumeroNota(nf.getNumeroNota());
+			nft.setOptanteSimples(t.getOptanteSimples());
+			nft.setTipoPessoa(t.getTipoPessoa());
+			notasFiscaisTomadoresDao.save(nft);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.fillError(linha,"Nota Fiscal Tomadores ", e);
+		}
+	}
+		
+	private void processaNotasFilhaGuias(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
+			String linha, String string, Guias guia) {
+		try {
+			Pessoa pessoa = new PessoaDao().findByCnpjCpf(p.getInscricaoPrestador());
+			if (pessoa != null && pessoa.getOptanteSimples().equals("S")) {
+				return;
+			}
+			GuiasNotasFiscais gnf = new GuiasNotasFiscais();
+			gnf.setGuias(guia);
+			gnf.setInscricaoPrestador(p.getInscricaoPrestador());
+			// gnf.setNumeroGuia(g.getNumeroGuia());
+			gnf.setNumeroGuia(guia.getNumeroGuia()); // acertar depois
+			gnf.setNumeroNota(nf.getNumeroNota());
+			guiasNotasFiscaisDao.save(gnf);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.fillError(linha,"Guia Nota Fiscal ", e);
+		}
+		
+	}
+
+	private void processaNotasFilhaPrestadores(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
+			String linha, String tipoNotaFilha) {
+		try {
+			NotasFiscaisPrestadores nfp = new NotasFiscaisPrestadores();
+			nfp.setBairro(dlp.getEnderecoBairroPrestador());
+			nfp.setTelefone(p.getTelefone());
+			nfp.setCep(dlp.getCepPrestador());
+			nfp.setComplemento(dlp.getEnderecoComplementoPrestador());
+			nfp.setEmail(p.getEmail());
+			nfp.setEndereco(dlp.getEnderecoPrestador());
+			nfp.setInscricaoPrestador(p.getInscricaoPrestador());
+			nfp.setNome(dlp.getRazaoSocialPrestador());
+			nfp.setNomeFantasia(dlp.getNomeFantasiaPrestador());
+			nfp.setNotasFiscais(nf);
+			nfp.setNumero(dlp.getEnderecoNumeroPrestador());
+			nfp.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
+			nfp.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
+			nfp.setTipoPessoa(util.getTipoPessoa(p.getInscricaoPrestador()));
+			notasFiscaisPrestadoresDao.save(nfp);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.fillError(linha,"Nota Fiscal Prestador ", e);
+		}
+		
+	}
+
+	private void processaNotasFilhaEmail(Prestadores p, NotasFiscais nf2, DadosLivroPrestador dlp, FileLog log2,
+			String linha2, String string) {
+		try {
+			NotasFiscaisEmails nfe = new NotasFiscaisEmails();
+			nfe.setEmail(p.getEmail());
+			nfe.setInscricaoPrestador(p.getInscricaoPrestador());
+			nfe.setNotasFiscais(nf);
+			nfe.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
+			notasFiscaisEmailsDao.save(nfe);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.fillError(linha,"Nota Fiscal Email ", e);
+		}
+		
+	}
+
+	private void processaNotasFilhaCancelada(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
+			String linha, String tipoNotaFilha) {
+		try {
+			NotasFiscaisCanceladas nfc = new NotasFiscaisCanceladas();
+			nfc.setDatahoracancelamento(util.getStringToDateHoursMinutes(dlp.getDataCancelamento()));
+			if (nfc.getDatahoracancelamento().getTime() < nf.getDataHoraEmissao().getTime()) {
+				nfc.setDatahoracancelamento(nf.getDataHoraEmissao());
+			}
+			nfc.setInscricaoPrestador(util.getCpfCnpj(dlp.getCnpjPrestador()));
+			nfc.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
+			nfc.setMotivo(dlp.getMotivoCancelamento());
+			if (util.isEmptyOrNull(nfc.getMotivo())) {
+				nfc.setMotivo("Dados incorretos");
+			}
+			nfc.setNotasFiscais(nf);
+			notasFiscaisCanceladasDao.save(nfc);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.fillError(linha,"Nota Fiscal Cancelada ", e);
+		}
+
+		
+	}
+
+	private void processaNotasFilhaServico(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
+			String linha, String tipoNotaFilha) {
+
+			try {
+
+				NotasFiscaisServicos nfs = new NotasFiscaisServicos();
+				nfs.setInscricaoPrestador(util.getCpfCnpj(dlp.getCnpjPrestador()));
+				nfs.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
+
+				if (nf.getNaturezaOperacao().equals("1")) {
+					nfs.setMunicipioIbge(util.CODIGO_IBGE);
+				} else if (nf.getNaturezaOperacao().equals("2")) {
+					try {
+						nfs.setMunicipioIbge(municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador()));
+						if (util.isEmptyOrNull(nfs.getMunicipioIbge())) {
+							throw new Exception();
+						}
+					} catch (Exception e) {
+						log.fillError("Erro: nota fiscal de serviÁo sem codigo ibge valido. "+dlp.getMunicipioTomador()+"/"+ dlp.getUfTomador() +" Conte˙do da linha: " + linha,"Nota Fiscal ServiÁo ", e);
+						e.printStackTrace();
+					}
+				} else if (nf.getNaturezaOperacao().equals("3")) {
+					nfs.setMunicipioIbge(util.CODIGO_IBGE);
+				}
+
+				PrestadoresAtividades pa = prestadoresAtividadesDao.findByInscricao(nfs.getInscricaoPrestador());
+				nfs.setItemListaServico(util.completarZerosEsquerda(dlp.getCodigoAtividadeMunipal().replaceAll("\\.", ""), 4));
+
+				if (nfs.getItemListaServico() == null) {
+					if (pa == null || pa.getId() == null) {
+						nfs.setItemListaServico(null);
+					} else {
+						nfs.setItemListaServico(util.completarZerosEsquerda(pa.getCodigoAtividade(), 4));
+					}
+				}
+				String cnae = util.getStringLimpa(dlp.getCodigoCnae());
+				if (cnae != null) {
+					nfs.setIcnaes(cnae);
+				}
+				Cnae c = new CnaeDao().findByCodigo(cnae);
+				if (c != null && !util.isEmptyOrNull(c.getDescricao())) {
+					nfs.setDescricaoCnae(c.getDescricao());
+				}
+				nfs.setDescricao(dlp.getDiscriminacaoServico());
+				if (util.isEmptyOrNull(nfs.getDescricao().trim())) {
+					nfs.setDescricao("ServiÁos Diversos");
+				}
+
+				// --
+
+				nfs.setAliquota(BigDecimal.valueOf(dlp.getValorAliquota()));
+				nfs.setQuantidade(BigDecimal.valueOf(1));
+				nfs.setValorServico(BigDecimal.valueOf(dlp.getValorServico()));
+				nfs.setValorDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
+				nfs.setValorDescCondicionado(BigDecimal.valueOf(dlp.getValorDescontoCondicionado()));
+				nfs.setValorDescIncondicionado(BigDecimal.valueOf(dlp.getValorDescontoIncondicionado()));
+				nfs.setValorBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
+				nfs.setValorIss(BigDecimal.valueOf(dlp.getValorIss()));
+				nfs.setNotasFiscais(nf);
+				nfs.setValorUnitario(BigDecimal.valueOf(dlp.getValorServico()));
+				if (nfs.getAliquota().compareTo(BigDecimal.ZERO) == 0) {
+					nfs.setAliquota(BigDecimal.valueOf(1));
+				}
+				notasFiscaisServicosDao.save(nfs);
+			} catch (Exception e) {
+				log.fillError(linha,"Nota Fiscal ServiÁo ", e);
+				e.printStackTrace();
+			}
 	}
 
 }
