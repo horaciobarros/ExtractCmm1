@@ -316,7 +316,7 @@ public class NotasMaeThread implements Runnable {
 				processaNotasFilhaGuias(p, nf, dlp, log, linha, "G", g);
 
 			} else {
-				log.fillError(linha, "Numero de guia não encontrado: " + dlp.getNossoNumero());
+				//log.fillError(linha, "Numero de guia não encontrado: " + dlp.getNossoNumero());
 
 			}
 		}

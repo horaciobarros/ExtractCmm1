@@ -126,7 +126,8 @@ public class TomadoresDao {
 	}
 
 	public Tomadores findByNome(String nomeTomador) {
-		Query query = sessionFactory.openSession().createQuery("from Tomadores t  " + " where t.nome like '%" + nomeTomador.trim() + "%'");
+		Query query = sessionFactory.openSession().createQuery("from Tomadores t  " + " where t.nome like :nome")
+				.setParameter("nome", "%" + nomeTomador.trim() + "%");
 
 		try {
 			List<Tomadores> tomadores = query.list();

@@ -64,7 +64,7 @@ public class GuiaThread implements Runnable {
 					Prestadores prestadores = prestadoresDao.findByInscricao(inscricaoPrestador);
 					Pessoa pessoa = pessoaDao.findByCnpjCpf(inscricaoPrestador);
 					if (pessoa != null && pessoa.getOptanteSimples().equals("S")) {
-						log.fillError(linha, "Guia não gerada. Prestador Simples. " +inscricaoPrestador);
+						//log.fillError(linha, "Guia não gerada. Prestador Simples. " +inscricaoPrestador);
 						return;
 					}
 					if (prestadores == null) {
