@@ -18,7 +18,7 @@ public class CnaeDao {
 	}
 
 	public Cnae findByCodigo(String codigo) {
-		Query query = sessionFactory.openSession().createQuery("from Cnae c where c.cnae = :cnae").setParameter("cnae","%"+ codigo+"%");
+		Query query = sessionFactory.openSession().createQuery("from Cnae c where c.cnae like :cnae").setParameter("cnae","%"+ codigo+"%");
 
 		try {
 			List<Cnae> cnaes = query.list();
