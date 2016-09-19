@@ -18,7 +18,21 @@ public class CnaeDao {
 	}
 
 	public Cnae findByCodigo(String codigo) {
-		Query query = sessionFactory.openSession().createQuery("from Cnae c where c.cnae like :cnae").setParameter("cnae","%"+ codigo+"%");
+		int caracteres = codigo.length();
+		Cnae c = null;
+		while (caracteres>=4 && c == null){
+			c = findByCodigo(codigo, caracteres);
+			caracteres--;
+		}
+		return c;
+	}
+
+	private Cnae findByCodigo(String codigo, int caracteres){
+		if (codigo!=null && codigo.length()>=caracteres){
+			codigo = codigo.substring(0, caracteres);
+		}
+		Query query = sessionFactory.openSession().createQuery("from Cnae c where c.cnae like :cnae").setParameter("cnae", codigo+"%");
+		
 
 		try {
 			List<Cnae> cnaes = query.list();
