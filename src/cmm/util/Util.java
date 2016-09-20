@@ -219,7 +219,7 @@ public class Util {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(dataFim);
 		calendar.set(Calendar.MONTH, calendar.get(calendar.MONTH) + 1);
-		calendar.set(Calendar.DAY_OF_MONTH, 28);
+		calendar.set(Calendar.DAY_OF_MONTH, 20);
 
 		return calendar.getTime();
 	}

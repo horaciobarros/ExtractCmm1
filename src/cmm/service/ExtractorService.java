@@ -11,7 +11,13 @@ import java.util.concurrent.Executors;
 
 import cmm.dao.CompetenciasDao;
 import cmm.dao.Dao;
+import cmm.dao.GuiasDao;
+import cmm.dao.PessoaDao;
+import cmm.dao.PrestadoresAtividadesDao;
+import cmm.dao.PrestadoresDao;
+import cmm.dao.PrestadoresOptanteSimplesDao;
 import cmm.model.Competencias;
+import cmm.model.Guias;
 import cmm.util.FileLog;
 import cmm.util.Util;
 
@@ -24,6 +30,9 @@ public class ExtractorService {
 	private final Util util = new Util();
 	private final CompetenciasDao competenciasDao = new CompetenciasDao();	
 	private final Dao dao = new Dao();
+	private PrestadoresDao prestadoresDao = new PrestadoresDao(); 
+	private PessoaDao pessoaDao = new PessoaDao();
+	private GuiasDao guiasDao = new GuiasDao();
 
 	public void processaDadosCadastroAtividade(List<String> dadosList) {
 		final FileLog log = new FileLog("dados_cadastro_atividade");
@@ -213,6 +222,37 @@ public class ExtractorService {
 	public List<String> excluiParaProcessarNivel5() {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos", "NotasFiscaisEmails", "NotasFiscaisObras",
 				"NotasFiscaisPrestadores", "NotasFiscaisServicos", "NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais", "Tomadores");
+	}
+	
+	public void processaExclusaoPrestadoresSemNotas() {
+		System.out.println("Excluindo Prestadores Atividades");
+		new PrestadoresAtividadesDao().excluiPrestadoresSemNotas();
+		System.out.println("Excluindo Prestadores optante simples");
+		new PrestadoresOptanteSimplesDao().excluiPrestadoresSemNotas();
+		System.out.println("Excluindo Prestadores");
+		prestadoresDao.excluiPrestadoresSemNotas();
+		System.out.println("Excluindo Pessoas");
+		pessoaDao.excluiPrestadoresSemNotas();
+	}
+	
+	public void excluiGuiasSemNotas() {
+		
+		GuiasDao guiasDao = new GuiasDao();
+
+		System.out.println("Excluindo guias " );
+		ExecutorService executor = Executors.newFixedThreadPool(300);
+		for (Guias guias : guiasDao.findAll()) {
+			ExcluirGuiasThread thread = new ExcluirGuiasThread(guias);
+			executor.execute(thread);
+		}
+		executor.shutdown();
+		while (!executor.isTerminated()) {
+		}
+		System.out.println("Guias excluidas");
+	}
+	
+	public Long count(String nomeEntidade) {
+		return dao.count(nomeEntidade);
 	}
 
 }

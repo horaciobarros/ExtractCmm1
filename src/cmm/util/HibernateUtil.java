@@ -7,9 +7,11 @@ import javax.swing.JOptionPane;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 
+import cmm.entidadesOrigem.DadosGuia;
 import cmm.entidadesOrigem.DadosLivroPrestador;
 import cmm.model.Cnae;
 import cmm.model.GuiasNumeracaoCmm;
+import cmm.model.ListaServicos;
 
 public class HibernateUtil {
 
@@ -69,6 +71,10 @@ public class HibernateUtil {
 				configuration.addAnnotatedClass(DadosLivroPrestador.class);
 				
 				configuration.addAnnotatedClass(Cnae.class);
+				
+				configuration.addAnnotatedClass(ListaServicos.class);
+				
+				configuration.addAnnotatedClass(DadosGuia.class);
 
 				SessionFactory sessionFactory = configuration.configure(file).buildSessionFactory();
 				return sessionFactory;

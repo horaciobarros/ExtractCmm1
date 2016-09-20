@@ -26,7 +26,7 @@ public class Controller {
 			System.exit(0);
 		}
 
-		int nivelProcessamento = 1;
+		int nivelProcessamento = 3;
 
 		System.out.println("Lagoa da Prata - Limpando o banco...");
 
@@ -52,7 +52,8 @@ public class Controller {
 			}
 		}
 
-		System.out.println("Lagoa da Prata - Leitura de arquivos txt - Início Processando no nível: " + nivelProcessamento);
+		System.out.println(
+				"Lagoa da Prata - Leitura de arquivos txt - Início Processando no nível: " + nivelProcessamento);
 		List<String> dadosList;
 
 		if (nivelProcessamento == 1) {
@@ -101,6 +102,25 @@ public class Controller {
 			System.out.println("Gravando notas fiscais - " + Util.getDateHourMinutes(new Date()));
 			extractorService.processaDadosNotasFiscais(dadosList);
 			System.out.println("--- Fim de notas fiscais ---" + Util.getDateHourMinutes(new Date()));
+		}
+
+		if (nivelProcessamento <= 6) {
+
+			System.out.println("Iniciando processo de excluir guias sem notas... ");
+			extractorService.excluiGuiasSemNotas();
+
+			System.out.println("Limpando Prestadores Sem Notas");
+			extractorService.processaExclusaoPrestadoresSemNotas();
+		}
+		
+		System.out.println("--- Processo encerrado. " + Util.getDataHoraAtual() + " Registros gravados: ");
+
+		for (String nomeEntidade : entidades) {
+			try {
+				System.out.println(nomeEntidade + " -->" + extractorService.count(nomeEntidade));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		// desligarComputador();

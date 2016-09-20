@@ -1,5 +1,12 @@
 package cmm.entidadesOrigem;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table (name = "dados_guia")
 public class DadosGuia {
 	/*
 	 * codigo|nosso_numero|parcela|cnpj|insc_municipal|mes|ano|imposto|
@@ -13,6 +20,8 @@ public class DadosGuia {
 	 * |baixa_tipo|baixa_vl_acrescimos|baixa_arquivo_nome|codigo_banco|
 	 * codigo_convenio|data_baixa|motivo_baixa|data_credito
 	 */
+	@Id
+	@Column(name = "id")
 	private String codigo;
 	private String nossoNumero;
 	private String parcela;
@@ -457,6 +466,10 @@ public class DadosGuia {
 
 	public void setDataCredito(String dataCredito) {
 		this.dataCredito = dataCredito;
+	}
+	
+	public DadosGuia() {
+		
 	}
 
 }

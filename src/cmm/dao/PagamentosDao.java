@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import cmm.model.Guias;
 import cmm.model.Pagamentos;
 import cmm.util.HibernateUtil;
 
@@ -60,6 +61,17 @@ public class PagamentosDao {
 		query.executeUpdate();
 		tx.commit();
 		session.close();
+	}
+	
+	public void deleteByGuia(Guias guia) {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		StringBuilder builder = new StringBuilder();
+		builder.append("delete from pagamentos where guia_id = " + guia.getId());
+		String sql = builder.toString();
+		Query query = session.createSQLQuery(sql);
+		query.executeUpdate();
+		tx.commit();session.close();
 	}
 
 }

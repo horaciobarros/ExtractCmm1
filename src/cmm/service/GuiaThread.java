@@ -3,6 +3,7 @@ package cmm.service;
 import java.math.BigDecimal;
 
 import cmm.dao.CompetenciasDao;
+import cmm.dao.DadosGuiaDao;
 import cmm.dao.GuiasDao;
 import cmm.dao.PagamentosDao;
 import cmm.dao.PessoaDao;
@@ -26,7 +27,7 @@ public class GuiaThread implements Runnable {
 	private String linha;
 	private Util util;
 	private FileLog log;
-
+	private DadosGuiaDao dadosGuiaDao = new DadosGuiaDao();
 	public GuiaThread(String linha, Util util, FileLog log) {
 		this.linha = linha;
 		this.util = util;
@@ -46,6 +47,10 @@ public class GuiaThread implements Runnable {
 					arrayLinha[33], arrayLinha[34], arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40], arrayLinha[41]);
 			String descricao = util.getNomeMes(dg.getMes()) + "/" + dg.getAno();
 			Competencias cp = competenciasDao.findByDescricao(descricao);
+			
+			if (!dadosGuiaDao.exists(Long.parseLong(dg.getCodigo()))) {
+				dg = dadosGuiaDao.save(dg);
+			}
 
 			try {
 				if ("GUIA_PRESTADOR".equals(dg.getTipoGuia().trim())) {

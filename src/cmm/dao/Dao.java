@@ -1,6 +1,7 @@
 package cmm.dao;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -64,5 +65,20 @@ public class Dao {
 		}
 
 		return obj;
+	}
+	
+	public Long count(String nomeEntidade) {
+		Query query = sessionFactory.openSession()
+				.createQuery("select count(*) from " + nomeEntidade );
+
+		try {
+			List<Long> qtdes = query.list();
+			return qtdes.get(0);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+
 	}
 }

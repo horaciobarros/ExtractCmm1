@@ -8,6 +8,7 @@ import cmm.dao.CnaeDao;
 import cmm.dao.DadosLivroPrestadorDao;
 import cmm.dao.GuiasDao;
 import cmm.dao.GuiasNotasFiscaisDao;
+import cmm.dao.ListaServicosDao;
 import cmm.dao.MunicipiosIbgeDao;
 import cmm.dao.NotasFiscaisCanceladasDao;
 import cmm.dao.NotasFiscaisDao;
@@ -23,6 +24,7 @@ import cmm.entidadesOrigem.DadosLivroPrestador;
 import cmm.model.Cnae;
 import cmm.model.Guias;
 import cmm.model.GuiasNotasFiscais;
+import cmm.model.ListaServicos;
 import cmm.model.NotasFiscais;
 import cmm.model.NotasFiscaisCanceladas;
 import cmm.model.NotasFiscaisEmails;
@@ -55,6 +57,7 @@ public class NotasMaeThread implements Runnable {
 	private NotasFiscaisPrestadoresDao notasFiscaisPrestadoresDao = new NotasFiscaisPrestadoresDao();
 	private GuiasNotasFiscaisDao guiasNotasFiscaisDao = new GuiasNotasFiscaisDao();
 	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
+	private ListaServicosDao listaServicosDao = new ListaServicosDao();
 
 	public NotasMaeThread(String linha, Util util, FileLog log) {
 		this.linha = linha;
@@ -69,16 +72,22 @@ public class NotasMaeThread implements Runnable {
 
 		try {
 
-			DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1], arrayLinha[2], arrayLinha[3], arrayLinha[4],
-					arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13],
-					arrayLinha[14], arrayLinha[15], arrayLinha[16], arrayLinha[17], util.corrigeDouble(arrayLinha[18]), util.corrigeDouble(arrayLinha[19]),
-					util.corrigeDouble(arrayLinha[20]), util.corrigeDouble(arrayLinha[21]), util.corrigeDouble(arrayLinha[22]), util.corrigeDouble(arrayLinha[23]),
-					util.corrigeDouble(arrayLinha[24]), arrayLinha[25], util.corrigeDouble(arrayLinha[26]), util.corrigeDouble(arrayLinha[27]),
-					util.corrigeDouble(arrayLinha[28]), util.corrigeDouble(arrayLinha[29]), util.corrigeDouble(arrayLinha[30]), util.corrigeDouble(arrayLinha[31]),
-					util.corrigeDouble(arrayLinha[32]), util.corrigeDouble(arrayLinha[33]), arrayLinha[34], arrayLinha[35], arrayLinha[36], arrayLinha[37],
-					arrayLinha[38], arrayLinha[39], arrayLinha[40], arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46],
-					arrayLinha[47], arrayLinha[48], arrayLinha[49], arrayLinha[50], arrayLinha[51], arrayLinha[52], arrayLinha[53], arrayLinha[54], arrayLinha[55],
-					arrayLinha[56], arrayLinha[57], arrayLinha[58], arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64]);
+			DadosLivroPrestador dlp = new DadosLivroPrestador(Long.valueOf(arrayLinha[0]), arrayLinha[1], arrayLinha[2],
+					arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8],
+					arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14],
+					arrayLinha[15], arrayLinha[16], arrayLinha[17], util.corrigeDouble(arrayLinha[18]),
+					util.corrigeDouble(arrayLinha[19]), util.corrigeDouble(arrayLinha[20]),
+					util.corrigeDouble(arrayLinha[21]), util.corrigeDouble(arrayLinha[22]),
+					util.corrigeDouble(arrayLinha[23]), util.corrigeDouble(arrayLinha[24]), arrayLinha[25],
+					util.corrigeDouble(arrayLinha[26]), util.corrigeDouble(arrayLinha[27]),
+					util.corrigeDouble(arrayLinha[28]), util.corrigeDouble(arrayLinha[29]),
+					util.corrigeDouble(arrayLinha[30]), util.corrigeDouble(arrayLinha[31]),
+					util.corrigeDouble(arrayLinha[32]), util.corrigeDouble(arrayLinha[33]), arrayLinha[34],
+					arrayLinha[35], arrayLinha[36], arrayLinha[37], arrayLinha[38], arrayLinha[39], arrayLinha[40],
+					arrayLinha[41], arrayLinha[42], arrayLinha[43], arrayLinha[44], arrayLinha[45], arrayLinha[46],
+					arrayLinha[47], arrayLinha[48], arrayLinha[49], arrayLinha[50], arrayLinha[51], arrayLinha[52],
+					arrayLinha[53], arrayLinha[54], arrayLinha[55], arrayLinha[56], arrayLinha[57], arrayLinha[58],
+					arrayLinha[59], arrayLinha[60], arrayLinha[61], arrayLinha[62], arrayLinha[63], arrayLinha[64]);
 
 			if (!dadosLivroPrestadorDao.exists(dlp.getIdCodigo())) {
 				dlp = dadosLivroPrestadorDao.save(dlp);
@@ -163,9 +172,14 @@ public class NotasMaeThread implements Runnable {
 		nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
 		nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
 		nf.setValorTotalDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
-		nf.setServicoPrestadoForaPais("N");
+		if ("EXTERIOR/EX".equals(dlp.getMunicipioTomador().trim())) {
+			nf.setServicoPrestadoForaPais("S");
+		} else {
+			nf.setServicoPrestadoForaPais("N");
+		}
 
-		List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(), nf.getValorIr());
+		List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(),
+				nf.getValorIr());
 		BigDecimal descontos = util.getSumOfBigDecimal(lista);
 
 		nf.setValorLiquido(util.getSubtract(BigDecimal.valueOf(dlp.getValorTotalNfse()), descontos));
@@ -177,15 +191,16 @@ public class NotasMaeThread implements Runnable {
 			nf = notasFiscaisDao.save(nf);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.fillError(linha,"Nota Fiscal ", e);
+			log.fillError(linha, "Nota Fiscal ", e);
 
 			try {
 				NotasFiscais outraNf = notasFiscaisDao.findNotaExistente(nf);
 				if (outraNf != null) {
 					nf.setId(outraNf.getId());
-					String msg = "Nota duplicada-> numero:" + nf.getNumeroNota() + " prestador:" + nf.getInscricaoPrestador() + "\n";
-					msg += "Nota duplicada-> nf nova valor:" + nf.getValorTotalServico().doubleValue() + " nf banco valor:"
-							+ outraNf.getValorTotalServico().doubleValue();
+					String msg = "Nota duplicada-> numero:" + nf.getNumeroNota() + " prestador:"
+							+ nf.getInscricaoPrestador() + "\n";
+					msg += "Nota duplicada-> nf nova valor:" + nf.getValorTotalServico().doubleValue()
+							+ " nf banco valor:" + outraNf.getValorTotalServico().doubleValue();
 					log.fillError(linha, msg);
 				}
 			} catch (Exception e1) {
@@ -217,10 +232,11 @@ public class NotasMaeThread implements Runnable {
 					t.setMunicipio(dlp.getMunicipioTomador());
 					t.setTelefone(util.getLimpaTelefone(dlp.getTelefoneTomador()));
 					try {
-						t.setMunicipioIbge(Long.valueOf(municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
+						t.setMunicipioIbge(Long.valueOf(
+								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
 					} catch (Exception e) {
-						//log.fillError(linha,"Nota Fiscal Tomadores ", e);
-						//e.printStackTrace();
+						// log.fillError(linha,"Nota Fiscal Tomadores ", e);
+						// e.printStackTrace();
 					}
 
 					util.trataNumerosTelefones(t);
@@ -234,7 +250,7 @@ public class NotasMaeThread implements Runnable {
 
 				} catch (Exception e) {
 					e.printStackTrace();
-					log.fillError(linha,"Nota Fiscal Tomadores ", e);
+					log.fillError(linha, "Nota Fiscal Tomadores ", e);
 					t = null;
 				}
 
@@ -269,7 +285,8 @@ public class NotasMaeThread implements Runnable {
 					t.setMunicipio(dlp.getMunicipioTomador());
 					t.setTelefone(util.getLimpaTelefone(dlp.getTelefoneTomador()));
 					try {
-						t.setMunicipioIbge(Long.valueOf(municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
+						t.setMunicipioIbge(Long.valueOf(
+								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
 					} catch (Exception e) {
 						t.setMunicipioIbge(Long.valueOf(util.CODIGO_IBGE));
 						e.printStackTrace();
@@ -282,13 +299,14 @@ public class NotasMaeThread implements Runnable {
 
 					t = tomadoresDao.save(t);
 
-					//log.fillError(linha, "Warn: foi gravado gerado um cpf ficticio para o tomador " + nomeTomador);
+					// log.fillError(linha, "Warn: foi gravado gerado um cpf
+					// ficticio para o tomador " + nomeTomador);
 				}
 			}
 		}
 
 		// -- serviÃ§os
-		
+
 		processaNotasFilhaServico(p, nf, dlp, log, linha, "S");
 
 		// -- canceladas
@@ -316,7 +334,8 @@ public class NotasMaeThread implements Runnable {
 				processaNotasFilhaGuias(p, nf, dlp, log, linha, "G", g);
 
 			} else {
-				//log.fillError(linha, "Numero de guia nÃ£o encontrado: " + dlp.getNossoNumero());
+				// log.fillError(linha, "Numero de guia nÃ£o encontrado: " +
+				// dlp.getNossoNumero());
 
 			}
 		}
@@ -360,10 +379,10 @@ public class NotasMaeThread implements Runnable {
 			notasFiscaisTomadoresDao.save(nft);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.fillError(linha,"Nota Fiscal Tomadores ", e);
+			log.fillError(linha, "Nota Fiscal Tomadores ", e);
 		}
 	}
-		
+
 	private void processaNotasFilhaGuias(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
 			String linha, String string, Guias guia) {
 		try {
@@ -380,9 +399,9 @@ public class NotasMaeThread implements Runnable {
 			guiasNotasFiscaisDao.save(gnf);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.fillError(linha,"Guia Nota Fiscal ", e);
+			log.fillError(linha, "Guia Nota Fiscal ", e);
 		}
-		
+
 	}
 
 	private void processaNotasFilhaPrestadores(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
@@ -407,9 +426,9 @@ public class NotasMaeThread implements Runnable {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.fillError(linha,"Nota Fiscal Prestador ", e);
+			log.fillError(linha, "Nota Fiscal Prestador ", e);
 		}
-		
+
 	}
 
 	private void processaNotasFilhaEmail(Prestadores p, NotasFiscais nf2, DadosLivroPrestador dlp, FileLog log2,
@@ -423,9 +442,9 @@ public class NotasMaeThread implements Runnable {
 			notasFiscaisEmailsDao.save(nfe);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.fillError(linha,"Nota Fiscal Email ", e);
+			log.fillError(linha, "Nota Fiscal Email ", e);
 		}
-		
+
 	}
 
 	private void processaNotasFilhaCancelada(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
@@ -447,80 +466,91 @@ public class NotasMaeThread implements Runnable {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.fillError(linha,"Nota Fiscal Cancelada ", e);
+			log.fillError(linha, "Nota Fiscal Cancelada ", e);
 		}
 
-		
 	}
 
 	private void processaNotasFilhaServico(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
 			String linha, String tipoNotaFilha) {
 
-			try {
+		try {
 
-				NotasFiscaisServicos nfs = new NotasFiscaisServicos();
-				nfs.setInscricaoPrestador(util.getCpfCnpj(dlp.getCnpjPrestador()));
-				nfs.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
+			NotasFiscaisServicos nfs = new NotasFiscaisServicos();
+			nfs.setInscricaoPrestador(util.getCpfCnpj(dlp.getCnpjPrestador()));
+			nfs.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 
-				if (nf.getNaturezaOperacao().equals("1")) {
-					nfs.setMunicipioIbge(util.CODIGO_IBGE);
-				} else if (nf.getNaturezaOperacao().equals("2")) {
-					try {
-						nfs.setMunicipioIbge(municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador()));
-						if (util.isEmptyOrNull(nfs.getMunicipioIbge())) {
-							throw new Exception();
-						}
-					} catch (Exception e) {
-						log.fillError("Erro: nota fiscal de serviço sem codigo ibge valido. "+dlp.getMunicipioTomador()+"/"+ dlp.getUfTomador() +" Conteúdo da linha: " + linha,"Nota Fiscal Serviço ", e);
-						e.printStackTrace();
+			if (nf.getNaturezaOperacao().equals("1")) {
+				nfs.setMunicipioIbge(util.CODIGO_IBGE);
+			} else if (nf.getNaturezaOperacao().equals("2")) {
+				try {
+					nfs.setMunicipioIbge(
+							municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador()));
+					if (util.isEmptyOrNull(nfs.getMunicipioIbge())) {
+						throw new Exception();
 					}
-				} else if (nf.getNaturezaOperacao().equals("3")) {
-					nfs.setMunicipioIbge(util.CODIGO_IBGE);
+				} catch (Exception e) {
+					log.fillError("Erro: nota fiscal de serviço sem codigo ibge valido. " + dlp.getMunicipioTomador()
+							+ "/" + dlp.getUfTomador() + " Conteúdo da linha: " + linha, "Nota Fiscal Serviço ", e);
+					e.printStackTrace();
 				}
-
-				PrestadoresAtividades pa = prestadoresAtividadesDao.findByInscricao(nfs.getInscricaoPrestador());
-				nfs.setItemListaServico(util.completarZerosEsquerda(dlp.getCodigoAtividadeMunipal().replaceAll("\\.", ""), 4));
-
-				if (nfs.getItemListaServico() == null) {
-					if (pa == null || pa.getId() == null) {
-						nfs.setItemListaServico(null);
-					} else {
-						nfs.setItemListaServico(util.completarZerosEsquerda(pa.getCodigoAtividade(), 4));
-					}
-				}
-				String cnae = util.getStringLimpa(dlp.getCodigoCnae());
-				if (cnae != null) {
-					nfs.setIcnaes(cnae);
-				}
-				Cnae c = new CnaeDao().findByCodigo(cnae);
-				if (c != null && !util.isEmptyOrNull(c.getDescricao())) {
-					nfs.setDescricaoCnae(c.getDescricao());
-				}
-				nfs.setDescricao(dlp.getDiscriminacaoServico());
-				if (util.isEmptyOrNull(nfs.getDescricao().trim())) {
-					nfs.setDescricao("Serviços Diversos");
-				}
-
-				// --
-
-				nfs.setAliquota(BigDecimal.valueOf(dlp.getValorAliquota()));
-				nfs.setQuantidade(BigDecimal.valueOf(1));
-				nfs.setValorServico(BigDecimal.valueOf(dlp.getValorServico()));
-				nfs.setValorDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
-				nfs.setValorDescCondicionado(BigDecimal.valueOf(dlp.getValorDescontoCondicionado()));
-				nfs.setValorDescIncondicionado(BigDecimal.valueOf(dlp.getValorDescontoIncondicionado()));
-				nfs.setValorBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
-				nfs.setValorIss(BigDecimal.valueOf(dlp.getValorIss()));
-				nfs.setNotasFiscais(nf);
-				nfs.setValorUnitario(BigDecimal.valueOf(dlp.getValorServico()));
-				if (nfs.getAliquota().compareTo(BigDecimal.ZERO) == 0) {
-					nfs.setAliquota(BigDecimal.valueOf(1));
-				}
-				notasFiscaisServicosDao.save(nfs);
-			} catch (Exception e) {
-				log.fillError(linha,"Nota Fiscal Serviço ", e);
-				e.printStackTrace();
+			} else if (nf.getNaturezaOperacao().equals("3")) {
+				nfs.setMunicipioIbge(util.CODIGO_IBGE);
 			}
+
+			PrestadoresAtividades pa = prestadoresAtividadesDao.findByInscricao(nfs.getInscricaoPrestador());
+			
+			
+			nfs.setItemListaServico(
+					util.completarZerosEsquerda(converteItemListaServico(dlp.getCodigoAtividadeMunipal()).replaceAll("\\.", ""), 4));
+			
+			if (nfs.getItemListaServico() == null) {
+				if (pa == null || pa.getId() == null) {
+					nfs.setItemListaServico(null);
+				} else {
+					nfs.setItemListaServico(util.completarZerosEsquerda(pa.getCodigoAtividade(), 4));
+				}
+				
+			}
+			String cnae = util.getStringLimpa(dlp.getCodigoCnae());
+			if (cnae != null) {
+				nfs.setIcnaes(cnae);
+			}
+			Cnae c = new CnaeDao().findByCodigo(cnae);
+			if (c != null && !util.isEmptyOrNull(c.getDescricao())) {
+				nfs.setDescricaoCnae(c.getDescricao());
+			}
+			nfs.setDescricao(dlp.getDiscriminacaoServico());
+			if (util.isEmptyOrNull(nfs.getDescricao().trim())) {
+				nfs.setDescricao("Serviços Diversos");
+			}
+
+			// --
+
+			nfs.setAliquota(BigDecimal.valueOf(dlp.getValorAliquota()));
+			nfs.setQuantidade(BigDecimal.valueOf(1));
+			nfs.setValorServico(BigDecimal.valueOf(dlp.getValorServico()));
+			nfs.setValorDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
+			nfs.setValorDescCondicionado(BigDecimal.valueOf(dlp.getValorDescontoCondicionado()));
+			nfs.setValorDescIncondicionado(BigDecimal.valueOf(dlp.getValorDescontoIncondicionado()));
+			nfs.setValorBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
+			nfs.setValorIss(BigDecimal.valueOf(dlp.getValorIss()));
+			nfs.setNotasFiscais(nf);
+			nfs.setValorUnitario(BigDecimal.valueOf(dlp.getValorServico()));
+			if (nfs.getAliquota().compareTo(BigDecimal.ZERO) == 0) {
+				nfs.setAliquota(BigDecimal.valueOf(1));
+			}
+			notasFiscaisServicosDao.save(nfs);
+		} catch (Exception e) {
+			log.fillError(linha, "Nota Fiscal Serviço ", e);
+			e.printStackTrace();
+		}
+	}
+
+	private String converteItemListaServico(String itemListaServico) {
+		
+		ListaServicos ls = listaServicosDao.findByCodigo(itemListaServico);
+		return ls.getLc116();
 	}
 
 }

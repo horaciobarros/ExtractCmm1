@@ -7,8 +7,11 @@ import org.hibernate.SessionFactory;
 
 import cmm.model.Cnae;
 import cmm.util.HibernateUtil;
+import cmm.util.Util;
 
 public class CnaeDao {
+	
+	private Util util = new Util();
 
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
@@ -18,8 +21,13 @@ public class CnaeDao {
 	}
 
 	public Cnae findByCodigo(String codigo) {
-		int caracteres = codigo.length();
+		
+		if (util.isEmptyOrNull(codigo)) {
+			return null;
+		}
+		
 		Cnae c = null;
+		int caracteres = codigo.length();
 		while (caracteres>=4 && c == null){
 			c = findByCodigo(codigo, caracteres);
 			caracteres--;
