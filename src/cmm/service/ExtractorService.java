@@ -54,7 +54,7 @@ public class ExtractorService {
 
 	public void processaDadosCadastro(List<String> dadosList) {
 		FileLog log = new FileLog("dados_cadastro");
-		ExecutorService executor = Executors.newFixedThreadPool(600);
+		ExecutorService executor = Executors.newFixedThreadPool(400);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
 				break;
@@ -62,10 +62,10 @@ public class ExtractorService {
 			ContribuinteThread thread = new ContribuinteThread(linha, util, log);
 			executor.execute(thread);
 		}
-		Util.pausar(3000);
 		executor.shutdown();
 		while (!executor.isTerminated()) {
 		}
+		Util.pausar(3000);
 		log.close();
 	}
 
@@ -79,16 +79,16 @@ public class ExtractorService {
 			GuiaThread thread = new GuiaThread(linha, util, log);
 			executor.execute(thread);
 		}
-		Util.pausar(3000);
 		executor.shutdown();
 		while (!executor.isTerminated()) {
 		}
+		Util.pausar(3000);
 		log.close();
 	}
 
 	public void processaDadosLivroPrestador(List<String> dadosList) {
 		FileLog log = new FileLog("dados_livro_prestador");
-		ExecutorService executor = Executors.newFixedThreadPool(300);
+		ExecutorService executor = Executors.newFixedThreadPool(250);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
 				break;
@@ -96,10 +96,10 @@ public class ExtractorService {
 			PrestadorThread thread = new PrestadorThread(linha, util, log);
 			executor.execute(thread);
 		}
-		Util.pausar(3000);
 		executor.shutdown();
 		while (!executor.isTerminated()) {
 		}
+		Util.pausar(3000);
 		log.close();
 	}
 
