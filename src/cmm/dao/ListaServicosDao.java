@@ -25,7 +25,7 @@ public class ListaServicosDao {
 			return null;
 		}
 		
-		Query query = sessionFactory.openSession().createQuery("from ListaServicos s where s.lc127 = :lc127").setParameter("lc127", lc127);
+		Query query = sessionFactory.openSession().createQuery("from ListaServicos s where s.lc127 like :lc127").setParameter("lc127", lc127);
 		
 
 		try {

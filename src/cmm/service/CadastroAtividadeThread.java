@@ -62,6 +62,8 @@ public class CadastroAtividadeThread implements Runnable {
 					prestadoresAtividadesDao.save(pa);
 				} catch (Exception e) {
 					e.printStackTrace();
+					System.out.println("Linha: "+linha);
+					System.out.println("Atividade federal: "+dca.getAtividadeFederal());
 				}
 			}
 		} catch (Exception e) {

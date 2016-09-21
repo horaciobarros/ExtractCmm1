@@ -731,6 +731,11 @@ public class Util {
 	public String converteItemListaServico(String itemListaServico) {
 		
 		ListaServicos ls = listaServicosDao.findByCodigo(itemListaServico);
-		return ls.getLc116();
+		if (ls != null && ! isEmptyOrNull(ls.getLc116())){
+			return ls.getLc116();
+		}
+		else{
+			return itemListaServico;
+		}
 	}
 }
