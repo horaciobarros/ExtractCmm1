@@ -35,7 +35,7 @@ public class ExtractorService {
 	private GuiasDao guiasDao = new GuiasDao();
 
 	public void processaDadosCadastroAtividade(List<String> dadosList) {
-		final FileLog log = new FileLog("dados_cadastro_atividade");
+		FileLog log = new FileLog("dados_cadastro_atividade");
 		ExecutorService executor = Executors.newFixedThreadPool(350);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
@@ -44,10 +44,10 @@ public class ExtractorService {
 			CadastroAtividadeThread thread = new CadastroAtividadeThread(linha, util, log);
 			executor.execute(thread);
 		}
-		Util.pausar(3000);
 		executor.shutdown();
 		while (!executor.isTerminated()) {
 		}
+		Util.pausar(3000);
 		log.close();
 
 	}
