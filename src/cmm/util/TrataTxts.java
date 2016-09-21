@@ -58,7 +58,6 @@ public class TrataTxts {
 	public List<String> lerArquivo(File arqOrigem, int qtdeCampos) {
 		try {
 			BufferedReader br;
-			int contaLinhas = 0;
 			OutputStreamWriter bo = new OutputStreamWriter(new FileOutputStream(pastaDestino + arqOrigem.getName()), "UTF-8");
 			List<String> dadosList = new ArrayList<String>();
 			try {
@@ -70,10 +69,6 @@ public class TrataTxts {
 					String[] campos = {};
 
 					while (campos != null && campos.length < qtdeCampos) {
-						contaLinhas++;
-						if (contaLinhas == 8304) {
-							System.out.println();
-						}
 						String linha = br.readLine();
 						if (linha != null && !linha.trim().isEmpty()) {
 							linha = preparaParaSplit(linha);

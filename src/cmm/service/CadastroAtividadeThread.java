@@ -42,10 +42,11 @@ public class CadastroAtividadeThread implements Runnable {
 			Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
 			if (p != null && p.getId() != 0) {
 				try {
-					dca.setAtividadeFederal(dca.getAtividadeFederal().replace(".", ""));
+					String iListaServicos = util.converteItemListaServico(dca.getAtividadeFederal());
+					iListaServicos = util.completarZerosEsquerda(iListaServicos.replace(".", ""), 4);
 					PrestadoresAtividades pa = new PrestadoresAtividades();
 					pa.setAliquota(BigDecimal.valueOf(dca.getAliquota()));
-					pa.setIlistaservicos(util.completarZerosEsquerda(dca.getAtividadeFederal(), 4));
+					pa.setIlistaservicos(iListaServicos);
 					pa.setInscricaoPrestador(inscricaoPrestador);
 					pa.setPrestadores(p);
 					pa.setGrupoAtividade(dca.getGrupoAtividade());

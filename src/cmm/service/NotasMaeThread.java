@@ -502,7 +502,7 @@ public class NotasMaeThread implements Runnable {
 			
 			
 			nfs.setItemListaServico(
-					util.completarZerosEsquerda(converteItemListaServico(dlp.getCodigoAtividadeMunipal()).replaceAll("\\.", ""), 4));
+					util.completarZerosEsquerda(util.converteItemListaServico(dlp.getCodigoAtividadeMunipal()).replaceAll("\\.", ""), 4));
 			
 			if (nfs.getItemListaServico() == null) {
 				if (pa == null || pa.getId() == null) {
@@ -545,12 +545,6 @@ public class NotasMaeThread implements Runnable {
 			log.fillError(linha, "Nota Fiscal Serviço ", e);
 			e.printStackTrace();
 		}
-	}
-
-	private String converteItemListaServico(String itemListaServico) {
-		
-		ListaServicos ls = listaServicosDao.findByCodigo(itemListaServico);
-		return ls.getLc116();
 	}
 
 }

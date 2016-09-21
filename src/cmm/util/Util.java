@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cmm.dao.ListaServicosDao;
 import cmm.entidadesOrigem.DadosLivroPrestador;
+import cmm.model.ListaServicos;
 import cmm.model.Pessoa;
 import cmm.model.Prestadores;
 import cmm.model.Tomadores;
@@ -28,6 +30,8 @@ public class Util {
 	private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN, Pattern.CASE_INSENSITIVE);
 
 	private GeraCPF geraCPF = new GeraCPF();
+	
+	private ListaServicosDao listaServicosDao = new ListaServicosDao();
 
 	public static Long castToLong(Object value, Long defaultValue) {
 		if (value != null) {
@@ -722,5 +726,11 @@ public class Util {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public String converteItemListaServico(String itemListaServico) {
+		
+		ListaServicos ls = listaServicosDao.findByCodigo(itemListaServico);
+		return ls.getLc116();
 	}
 }

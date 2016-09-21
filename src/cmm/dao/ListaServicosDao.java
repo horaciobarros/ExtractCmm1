@@ -12,8 +12,6 @@ import cmm.util.Util;
 
 public class ListaServicosDao {
 	
-	private Util util = new Util();
-	
 	StringBuilder hql;
 	private SessionFactory sessionFactory;
 
@@ -23,7 +21,7 @@ public class ListaServicosDao {
 
 	public ListaServicos findByCodigo(String lc127) {
 		
-		if (util.isEmptyOrNull(lc127)) {
+		if (lc127 == null || lc127.trim().isEmpty()) {
 			return null;
 		}
 		

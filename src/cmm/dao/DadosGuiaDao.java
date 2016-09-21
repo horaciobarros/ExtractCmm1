@@ -34,8 +34,8 @@ public class DadosGuiaDao {
 	}
 
 	
-	public DadosGuia findById(Long id) {
-		Query query = sessionFactory.openSession().createQuery("from DadosGuia dg  " + " where dg.codigo = " + id);
+	public DadosGuia findByCodigo(Long codigo) {
+		Query query = sessionFactory.openSession().createQuery("from DadosGuia dg  " + " where dg.codigo = " + codigo);
 
 		try {
 			List<DadosGuia> dgs = query.list();

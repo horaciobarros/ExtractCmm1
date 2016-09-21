@@ -2,9 +2,11 @@ package cmm.util;
 
 import java.util.List;
 
+import cmm.dao.DadosGuiaDao;
 import cmm.dao.MunicipiosIbgeDao;
 import cmm.dao.PessoaDao;
 import cmm.dao.TomadoresDao;
+import cmm.entidadesOrigem.DadosGuia;
 import cmm.service.ExtractorService;
 
 public class MainTest {
@@ -16,12 +18,15 @@ public class MainTest {
 	private MunicipiosIbgeDao municipiosIbgeDao = new MunicipiosIbgeDao();
 
 	public static void main(String args[]) {
-
-		// notas fiscais
-		MainTest m = new MainTest();
-		List<String> dadosList = m.extractorService.lerArquivo("dados_livro_prestador");
-		m.processaDadosNotasFiscaisAux(dadosList);
-
+		try{
+			DadosGuiaDao dao = new DadosGuiaDao();
+			DadosGuia d = new DadosGuia();
+			d.setCodigo("1");
+			dao.save(d);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	private void processaDadosNotasFiscaisAux(List<String> dadosList) {
