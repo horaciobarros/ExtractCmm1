@@ -352,12 +352,12 @@ public class NotasMaeThread implements Runnable {
 			String linha, String string, Guias g, Tomadores t) {
 		try {
 			NotasFiscaisTomadores nft = new NotasFiscaisTomadores();
-			nft.setBairro(t.getBairro());
+			nft.setBairro(dlp.getEnderecoBairroTomador());
 			nft.setCelular(t.getCelular());
-			nft.setCep(t.getCep());
-			nft.setComplemento(t.getComplemento());
-			nft.setEmail(t.getEmail());
-			nft.setEndereco(t.getEndereco());
+			nft.setCep(dlp.getCepTomador());
+			nft.setComplemento(dlp.getEnderecoComplementoTomador());
+			nft.setEmail(dlp.getEmailTomador());
+			nft.setEndereco(dlp.getEnderecoBairroTomador());
 			nft.setInscricaoEstadual(t.getInscricaoEstadual());
 			nft.setInscricaoMunicipal(t.getInscricaoMunicipal());
 			nft.setInscricaoPrestador(nf.getInscricaoPrestador());
@@ -366,13 +366,13 @@ public class NotasMaeThread implements Runnable {
 			if (t.getMunicipioIbge() != null) {
 				nft.setMunicipioIbge(Long.toString(t.getMunicipioIbge()));
 			}
-			nft.setNome(t.getNome());
+			nft.setNome(dlp.getRazaoSocialTomador());
 			nft.setNomeFantasia(t.getNomeFantasia());
 			if (nft.getNomeFantasia() == null) {
 				nft.setNomeFantasia(t.getNome());
 			}
 			nft.setNotasFiscais(nf);
-			nft.setNumero(t.getNumero());
+			nft.setNumero(dlp.getEnderecoNumeroTomador());
 			nft.setNumeroNota(nf.getNumeroNota());
 			nft.setOptanteSimples(t.getOptanteSimples());
 			nft.setTipoPessoa(t.getTipoPessoa());
