@@ -26,7 +26,7 @@ public class Controller {
 			System.exit(0);
 		}
 
-		int nivelProcessamento = 4;
+		int nivelProcessamento = 5;
 
 		System.out.println("Lagoa da Prata - Limpando o banco...");
 

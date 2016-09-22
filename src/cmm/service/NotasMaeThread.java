@@ -356,7 +356,7 @@ public class NotasMaeThread implements Runnable {
 			nft.setCelular(t.getCelular());
 			nft.setCep(dlp.getCepTomador());
 			nft.setComplemento(dlp.getEnderecoComplementoTomador());
-			nft.setEmail(dlp.getEmailTomador());
+			nft.setEmail(util.trataEmail(dlp.getEmailTomador()));
 			nft.setEndereco(dlp.getEnderecoBairroTomador());
 			nft.setInscricaoEstadual(t.getInscricaoEstadual());
 			nft.setInscricaoMunicipal(t.getInscricaoMunicipal());
@@ -378,6 +378,7 @@ public class NotasMaeThread implements Runnable {
 			nft.setTipoPessoa(t.getTipoPessoa());
 			notasFiscaisTomadoresDao.save(nft);
 		} catch (Exception e) {
+			
 			e.printStackTrace();
 			log.fillError(linha, "Nota Fiscal Tomadores ", e);
 		}
