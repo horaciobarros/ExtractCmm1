@@ -60,17 +60,19 @@ public class PrestadorThread implements Runnable {
 					p = util.anulaCamposVazios(p);
 					p = prestadoresDao.save(p);
 				} else { // preencher campos vazios
-					if (p.getTelefone() == null || p.getTelefone().isEmpty()) {
-						p.setTelefone(dlp.getTelefonePrestador());
+					if (util.isEmptyOrNull(p.getTelefone())) {
+						p.setTelefone(util.getLimpaTelefone(dlp.getTelefonePrestador()));
 					}
-
-					if (p.getEmail() == null || p.getEmail().isEmpty()) {
-						p.setEmail(dlp.getEmailPrestador());
-					} else {
-						if (!p.getEmail().contains("@")) {
+					String email = util.trataEmail(p.getEmail());
+					if (Util.validarEmail(email)){
+						p.setEmail(email);
+					}
+					else{
+						if (Util.validarEmail(p.getEmail())){
 							p.setEmail(dlp.getEmailPrestador());
 						}
 					}
+
 					p = util.trataNumerosTelefones(p);
 					p = util.anulaCamposVazios(p);
 					p = prestadoresDao.update(p);

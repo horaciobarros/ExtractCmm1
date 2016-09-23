@@ -141,7 +141,7 @@ public class ContribuinteThread implements Runnable {
 						pos.setInscricaoPrestador(cnpjCpf);
 						pos.setDescricao(dc.getRegimeTributacao());
 						pos.setMei("N"); // ver com cmm
-						pos.setMotivo("OpÃ§Ã£o do Contribuinte");
+						pos.setMotivo("Opção do Contribuinte");
 						pos.setOptante("S");
 						pos.setOrgao("M");
 						pos.setPrestadores(p);

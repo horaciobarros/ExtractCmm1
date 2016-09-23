@@ -212,7 +212,7 @@ public class NotasMaeThread implements Runnable {
 
 		if (!util.isEmptyOrNull(nf.getInscricaoTomador()) && !util.isEmptyOrNull(dlp.getRazaoSocialTomador())) {
 
-			t = tomadoresDao.findByInscricao(nf.getInscricaoTomador(), nf.getInscricaoPrestador());
+			t = tomadoresDao.findByInscricao(inscricaoTomador, nf.getInscricaoPrestador());
 			if (t == null || t.getId() == null) {
 				try {
 					t = new Tomadores();
@@ -220,8 +220,8 @@ public class NotasMaeThread implements Runnable {
 					t.setNome(dlp.getRazaoSocialTomador());
 					t.setNomeFantasia(dlp.getRazaoSocialTomador());
 					t.setPrestadores(nf.getPrestadores());
-					t.setTipoPessoa(util.getTipoPessoa(nf.getInscricaoTomador()));
-					t.setInscricaoTomador(nf.getInscricaoTomador());
+					t.setTipoPessoa(util.getTipoPessoa(inscricaoTomador));
+					t.setInscricaoTomador(inscricaoTomador);
 					t.setBairro(dlp.getEnderecoBairroTomador());
 					t.setCep(util.trataCep(dlp.getCepTomador()));
 					t.setComplemento(dlp.getEnderecoComplementoTomador());
@@ -274,7 +274,7 @@ public class NotasMaeThread implements Runnable {
 					t.setNome(nomeTomador);
 					t.setPrestadores(nf.getPrestadores());
 					t.setTipoPessoa("O");
-					t.setInscricaoTomador(inscricaoTomadorFicticio);
+					t.setInscricaoTomador(util.getCpfCnpj(inscricaoTomadorFicticio));
 					t.setBairro(dlp.getEnderecoBairroTomador());
 					t.setCep(util.trataCep(dlp.getCepTomador()));
 					t.setComplemento(dlp.getEnderecoComplementoTomador());
@@ -514,13 +514,19 @@ public class NotasMaeThread implements Runnable {
 				
 			}
 			String cnae = util.getStringLimpa(dlp.getCodigoCnae());
-			if (cnae != null) {
-				nfs.setIcnaes(cnae);
+			
+			if (!util.isEmptyOrNull(cnae)) {
+				Cnae c = new CnaeDao().findByCodigo(cnae);
+				if (c != null && !util.isEmptyOrNull(c.getDescricao())) {
+					nfs.setDescricaoCnae(c.getDescricao());
+					nfs.setIcnaes(c.getCnae());
+				}
+				else{
+					nfs.setIcnaes(util.completarZerosDireita(cnae, 7));
+				}
 			}
-			Cnae c = new CnaeDao().findByCodigo(cnae);
-			if (c != null && !util.isEmptyOrNull(c.getDescricao())) {
-				nfs.setDescricaoCnae(c.getDescricao());
-			}
+			
+			
 			nfs.setDescricao(dlp.getDiscriminacaoServico());
 			if (util.isEmptyOrNull(nfs.getDescricao().trim())) {
 				nfs.setDescricao("Serviços Diversos");
