@@ -121,6 +121,7 @@ public class NotasMaeThread implements Runnable {
 																				// cmm
 		nf.setInscricaoPrestador(inscricaoPrestador);
 		String inscricaoTomador = util.getCpfCnpj(dlp.getCnpjTomador());
+		
 		if ("F".equals(util.getTipoPessoa(inscricaoTomador))) {
 			if (Util.validarCpf(inscricaoTomador)) {
 				nf.setInscricaoTomador(inscricaoTomador);
@@ -186,7 +187,9 @@ public class NotasMaeThread implements Runnable {
 		if (nf.getValorLiquido().compareTo(BigDecimal.ZERO) == -1) {
 			nf.setValorLiquido(nf.getValorLiquido().multiply(BigDecimal.valueOf(-1)));
 		}
-
+		if (!util.isEmptyOrNull(nf.getNomeTomador())){
+			nf.setNomeTomador("Não informado.");
+		}
 		try {
 			nf = notasFiscaisDao.save(nf);
 		} catch (Exception e) {
@@ -205,28 +208,31 @@ public class NotasMaeThread implements Runnable {
 				}
 			} catch (Exception e1) {
 			}
+			return;
 		}
 
 		// tomadores
 		Tomadores t = null;
+		
 
-		if (!util.isEmptyOrNull(nf.getInscricaoTomador()) && !util.isEmptyOrNull(dlp.getRazaoSocialTomador())) {
+		
+		if (!util.isEmptyOrNull(nf.getInscricaoTomador())) {
 
 			t = tomadoresDao.findByInscricao(inscricaoTomador, nf.getInscricaoPrestador());
 			if (t == null || t.getId() == null) {
 				try {
 					t = new Tomadores();
 					t.setOptanteSimples(util.getOptantePeloSimplesNacional("N"));
-					t.setNome(dlp.getRazaoSocialTomador());
-					t.setNomeFantasia(dlp.getRazaoSocialTomador());
+					t.setNome(nf.getNomeTomador());
+					t.setNomeFantasia(nf.getNomeTomador());
 					t.setPrestadores(nf.getPrestadores());
 					t.setTipoPessoa(util.getTipoPessoa(inscricaoTomador));
 					t.setInscricaoTomador(inscricaoTomador);
-					t.setBairro(dlp.getEnderecoBairroTomador());
+					t.setBairro(util.getNullIfEmpty(dlp.getEnderecoBairroTomador()));
 					t.setCep(util.trataCep(dlp.getCepTomador()));
-					t.setComplemento(dlp.getEnderecoComplementoTomador());
+					t.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoTomador()));
 					t.setEmail(util.trataEmail(dlp.getEmailTomador()));
-					t.setEndereco(dlp.getEnderecoTomador());
+					t.setEndereco(util.getNullIfEmpty(dlp.getEnderecoTomador()));
 					t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
 					t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
 					t.setMunicipio(dlp.getMunicipioTomador());
@@ -260,10 +266,9 @@ public class NotasMaeThread implements Runnable {
 			if (util.isEmptyOrNull(nf.getInscricaoTomador())) {
 				String nomeTomador = dlp.getRazaoSocialTomador();
 				if (util.isEmptyOrNull(nomeTomador)) {
-					nomeTomador = "Não Informado";
+					nomeTomador = "Não Informado.";
 				}
-
-				t = tomadoresDao.findByNome(nomeTomador);
+				//t = tomadoresDao.findByNome(nomeTomador);
 
 				if (t == null || t.getId() == null) { // incluindo tomador
 														// ficticio
@@ -275,11 +280,11 @@ public class NotasMaeThread implements Runnable {
 					t.setPrestadores(nf.getPrestadores());
 					t.setTipoPessoa("O");
 					t.setInscricaoTomador(util.getCpfCnpj(inscricaoTomadorFicticio));
-					t.setBairro(dlp.getEnderecoBairroTomador());
+					t.setBairro(util.getNullIfEmpty(dlp.getEnderecoBairroTomador()));
 					t.setCep(util.trataCep(dlp.getCepTomador()));
-					t.setComplemento(dlp.getEnderecoComplementoTomador());
+					t.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoTomador()));
 					t.setEmail(util.trataEmail(dlp.getEmailTomador()));
-					t.setEndereco(dlp.getEnderecoTomador());
+					t.setEndereco(util.getNullIfEmpty(dlp.getEnderecoTomador()));
 					t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
 					t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
 					t.setMunicipio(dlp.getMunicipioTomador());
@@ -357,6 +362,9 @@ public class NotasMaeThread implements Runnable {
 			nft.setCep(dlp.getCepTomador());
 			nft.setComplemento(dlp.getEnderecoComplementoTomador());
 			nft.setEmail(util.trataEmail(dlp.getEmailTomador()));
+			if (!util.isEmptyOrNull(nft.getEmail()) && nft.getEmail().length()>80){
+				nft.setEmail(nft.getEmail().substring(0,80));
+			}
 			nft.setEndereco(dlp.getEnderecoBairroTomador());
 			nft.setInscricaoEstadual(t.getInscricaoEstadual());
 			nft.setInscricaoMunicipal(t.getInscricaoMunicipal());
@@ -412,7 +420,7 @@ public class NotasMaeThread implements Runnable {
 			nfp.setBairro(dlp.getEnderecoBairroPrestador());
 			nfp.setTelefone(p.getTelefone());
 			nfp.setCep(dlp.getCepPrestador());
-			nfp.setComplemento(dlp.getEnderecoComplementoPrestador());
+			nfp.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoPrestador()));
 			nfp.setEmail(p.getEmail());
 			nfp.setEndereco(dlp.getEnderecoPrestador());
 			nfp.setInscricaoPrestador(p.getInscricaoPrestador());

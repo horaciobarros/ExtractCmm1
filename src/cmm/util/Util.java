@@ -610,6 +610,10 @@ public class Util {
 		if (isEmptyOrNull(t.getTipoPessoa())) {
 			t.setTipoPessoa(null);
 		}
+		
+		if (!isEmptyOrNull(t.getEndereco()) && t.getEndereco().contains("DIVERSOS")){
+			t.setEndereco(null);
+		}
 		return t;
 	}
 
@@ -736,6 +740,15 @@ public class Util {
 		}
 		else{
 			return itemListaServico;
+		}
+	}
+
+	public String getNullIfEmpty(String texto) {
+		if (isEmptyOrNull(texto)){
+			return null;
+		}
+		else{
+			return texto.trim();
 		}
 	}
 }
