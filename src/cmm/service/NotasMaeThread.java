@@ -143,7 +143,7 @@ public class NotasMaeThread implements Runnable {
 
 		nf.setNomePrestador(dlp.getRazaoSocialPrestador());
 		nf.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
-		nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
+		nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
 		nf.setPrestadores(p);
 		if ("J".equals(util.getTipoPessoa(p.getInscricaoPrestador()))) {
 			nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
@@ -169,7 +169,7 @@ public class NotasMaeThread implements Runnable {
 		} else {
 			nf.setNumeroVerificacao(util.completarZerosEsquerda(dlp.getIdCodigo().toString(), 9));
 		}
-		nf.setOptanteSimples(dlp.getOptantePeloSimplesNacional().trim().substring(0, 1));
+		
 		nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
 		nf.setValorTotalDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
 		if ("EXTERIOR/EX".equals(dlp.getMunicipioTomador().trim())) {

@@ -136,8 +136,14 @@ public class ContribuinteThread implements Runnable {
 							inicioAtividade = dc.getDataInclusaoRegistro();
 
 						}
+						// --
 						pos.setDataEfeito(util.getStringToDate(inicioAtividade));
 						pos.setDataInicio(pos.getDataEfeito());
+						// --
+						if (pos.getDataInicio().getTime() < util.getStringToDate("2007-07-01").getTime()) {
+							pos.setDataEfeito(util.getStringToDate("2007-07-01"));
+							pos.setDataInicio(util.getStringToDate("2007-07-01"));
+						}
 						pos.setInscricaoPrestador(cnpjCpf);
 						pos.setDescricao(dc.getRegimeTributacao());
 						pos.setMei("N"); // ver com cmm
