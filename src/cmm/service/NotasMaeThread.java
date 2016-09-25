@@ -460,10 +460,16 @@ public class NotasMaeThread implements Runnable {
 			String linha, String tipoNotaFilha) {
 		try {
 			NotasFiscaisCanceladas nfc = new NotasFiscaisCanceladas();
-			nfc.setDatahoracancelamento(util.getStringToDateHoursMinutes(dlp.getDataCancelamento()));
-			if (nfc.getDatahoracancelamento().getTime() < nf.getDataHoraEmissao().getTime()) {
+			if (!util.isEmptyOrNull(dlp.getDataCancelamento())){
+				nfc.setDatahoracancelamento(util.getStringToDateHoursMinutes(dlp.getDataCancelamento()));
+				if (nfc.getDatahoracancelamento().getTime() < nf.getDataHoraEmissao().getTime()) {
+					nfc.setDatahoracancelamento(nf.getDataHoraEmissao());
+				}
+			}
+			else{
 				nfc.setDatahoracancelamento(nf.getDataHoraEmissao());
 			}
+			
 			nfc.setInscricaoPrestador(util.getCpfCnpj(dlp.getCnpjPrestador()));
 			nfc.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 			nfc.setMotivo(dlp.getMotivoCancelamento());
