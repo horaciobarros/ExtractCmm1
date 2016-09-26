@@ -140,7 +140,7 @@ public class ContribuinteThread implements Runnable {
 						pos.setDataEfeito(util.getStringToDate(inicioAtividade));
 						pos.setDataInicio(pos.getDataEfeito());
 						// --
-						if (pos.getDataInicio().getTime() < util.getStringToDate("2007-07-01").getTime()) {
+						if (pos.getDataInicio().getTime() < util.getStringToDate("2007-07-01").getTime()) { // data do início da lei
 							pos.setDataEfeito(util.getStringToDate("2007-07-01"));
 							pos.setDataInicio(util.getStringToDate("2007-07-01"));
 						}

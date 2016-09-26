@@ -34,7 +34,8 @@ public class DadosLivroPrestadorDao {
 	}
 
 	public DadosLivroPrestador findByPrestadorAndCodigoAtividade(String inscricaoPrestador, String codigoAtividade) {
-		Query query = sessionFactory.openSession().createQuery("from DadosLivroPrestador dlp  " + " where dlp.cnpjPrestador like :cnpj and dlp.codigoAtividadeMunipal like :codigoAtividade ")
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from DadosLivroPrestador dlp  " + " where dlp.cnpjPrestador like :cnpj and dlp.codigoAtividadeMunipal like :codigoAtividade ")
 				.setParameter("cnpj", inscricaoPrestador)
 				.setParameter("codigoAtividade", codigoAtividade);
 
@@ -47,11 +48,15 @@ public class DadosLivroPrestadorDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		finally{
+			session.close();
+		}
 		return null;
 	}
 	
 	public DadosLivroPrestador findById(Long id) {
-		Query query = sessionFactory.openSession().createQuery("from DadosLivroPrestador dlp  " + " where dlp.idCodigo = " + id);
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from DadosLivroPrestador dlp  " + " where dlp.idCodigo = " + id);
 
 		try {
 			List<DadosLivroPrestador> dlps = query.list();
@@ -62,11 +67,15 @@ public class DadosLivroPrestadorDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		finally{
+			session.close();
+		}
 		return null;
 	}
 
 	public boolean exists(Long id) {
-		Query query = sessionFactory.openSession().createQuery("from DadosLivroPrestador dlp  where dlp.idCodigo = " + id);
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from DadosLivroPrestador dlp  where dlp.idCodigo = " + id);
 
 		try {
 			List<DadosLivroPrestador> dlps = query.list();
@@ -76,6 +85,9 @@ public class DadosLivroPrestadorDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return false;
 	}

@@ -20,7 +20,8 @@ public class PrestadoresDao {
 	}
 
 	public Prestadores findByInscricao(String inscricao) {
-		Query query = sessionFactory.openSession().createQuery("from Prestadores p  " + " where p.inscricaoPrestador like '%" + inscricao.trim() + "%'");
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from Prestadores p  " + " where p.inscricaoPrestador like '%" + inscricao.trim() + "%'");
 
 		try {
 			List<Prestadores> prestadores = query.list();
@@ -30,6 +31,9 @@ public class PrestadoresDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 	}

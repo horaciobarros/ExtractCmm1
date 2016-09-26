@@ -20,7 +20,8 @@ public class PessoaDao {
 	}
 
 	public Pessoa findByCnpjCpf(String cnpjCpf) {
-		Query query = sessionFactory.openSession().createQuery("from Pessoa p  " + " where p.cnpjCpf like '%" + cnpjCpf.trim() + "%'");
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from Pessoa p  " + " where p.cnpjCpf like '%" + cnpjCpf.trim() + "%'");
 
 		try {
 			List<Pessoa> pessoa = query.list();
@@ -30,6 +31,9 @@ public class PessoaDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 	}

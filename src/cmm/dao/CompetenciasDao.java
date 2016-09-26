@@ -20,7 +20,8 @@ public class CompetenciasDao {
 	}
 
 	public Competencias findByDescricao(String descricao) {
-		Query query = sessionFactory.openSession().createQuery("from Competencias cp  " + " where cp.descricao like '%" + descricao.trim() + "%'");
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from Competencias cp  " + " where cp.descricao like '%" + descricao.trim() + "%'");
 
 		try {
 			List<Competencias> competencias = query.list();
@@ -30,6 +31,9 @@ public class CompetenciasDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 	}
