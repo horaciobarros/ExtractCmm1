@@ -9,6 +9,7 @@ import org.hibernate.cfg.AnnotationConfiguration;
 
 import cmm.entidadesOrigem.DadosGuia;
 import cmm.entidadesOrigem.DadosLivroPrestador;
+import cmm.entidadesOrigem.Servicos;
 import cmm.model.Cnae;
 import cmm.model.GuiasNumeracaoCmm;
 import cmm.model.ListaServicos;
@@ -75,6 +76,8 @@ public class HibernateUtil {
 				configuration.addAnnotatedClass(ListaServicos.class);
 				
 				configuration.addAnnotatedClass(DadosGuia.class);
+				
+				configuration.addAnnotatedClass(Servicos.class);
 
 				SessionFactory sessionFactory = configuration.configure(file).buildSessionFactory();
 				return sessionFactory;

@@ -19,8 +19,10 @@ import cmm.dao.NotasFiscaisTomadoresDao;
 import cmm.dao.PessoaDao;
 import cmm.dao.PrestadoresAtividadesDao;
 import cmm.dao.PrestadoresDao;
+import cmm.dao.ServicosDao;
 import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosLivroPrestador;
+import cmm.entidadesOrigem.Servicos;
 import cmm.model.Cnae;
 import cmm.model.Guias;
 import cmm.model.GuiasNotasFiscais;
@@ -562,6 +564,16 @@ public class NotasMaeThread implements Runnable {
 				nfs.setAliquota(BigDecimal.valueOf(1));
 			}
 			notasFiscaisServicosDao.save(nfs);
+			ServicosDao dao = new ServicosDao();
+			Servicos serv = dao.findByCodigoServicoCodigoCnae(nfs.getItemListaServico(), nfs.getIcnaes());
+			if (serv ==null || serv.getId()==0){
+				Servicos s = new Servicos();
+				s.setAliquota(""+nfs.getAliquota().doubleValue());
+				s.setCnaes(nfs.getIcnaes());
+				s.setCodigo(nfs.getItemListaServico());
+				s.setNome(nfs.getDescricaoCnae());
+				dao.save(s);
+			}
 		} catch (Exception e) {
 			log.fillError(linha, "Nota Fiscal Serviço ", e);
 			e.printStackTrace();
