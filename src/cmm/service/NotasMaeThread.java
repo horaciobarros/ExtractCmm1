@@ -137,6 +137,7 @@ public class NotasMaeThread implements Runnable {
 		}
 		if (util.isEmptyOrNull(nf.getInscricaoTomador())) {
 			nf.setInscricaoTomador(util.CPF_TOMADOR_FICTICIO);
+			nf.setNomeTomador(dlp.getRazaoSocialTomador());
 		}
 
 		if ("Tributação no municipio".equals(dlp.getNaturezaOperacao().trim())) {
@@ -163,14 +164,16 @@ public class NotasMaeThread implements Runnable {
 		nf.setValorTotalIss(BigDecimal.valueOf(dlp.getValorIss()));
 		nf.setSituacaoOriginal(dlp.getStatusNota().trim().substring(0, 1));
 
-		
-		Guias g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
-		if (g != null) {
+		Guias g = null;
+		if (dlp.getNossoNumero() != null && !dlp.getNossoNumero().trim().isEmpty()) {
+			g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
+		}
+		if (g != null && g.getId() != null) {
 			nf.setSituacao("E");
 		} else {
 			nf.setSituacao("N");
 		}
-		
+
 		nf.setSituacaoTributaria(util.getSituacaoTributaria(dlp));
 
 		if (dlp.getCodigoVerificacao() != null && !dlp.getCodigoVerificacao().trim().isEmpty()) {
@@ -228,7 +231,7 @@ public class NotasMaeThread implements Runnable {
 
 		if (!util.isEmptyOrNull(nf.getInscricaoTomador())) {
 
-			t = tomadoresDao.findByInscricao(inscricaoTomador, nf.getInscricaoPrestador());
+			t = tomadoresDao.findByInscricao(nf.getInscricaoTomador(), nf.getInscricaoPrestador());
 			if (t == null || t.getId() == null) {
 				try {
 					t = new Tomadores();
@@ -237,7 +240,7 @@ public class NotasMaeThread implements Runnable {
 					t.setNomeFantasia(nf.getNomeTomador());
 					t.setPrestadores(nf.getPrestadores());
 					t.setTipoPessoa(util.getTipoPessoa(inscricaoTomador));
-					t.setInscricaoTomador(inscricaoTomador);
+					t.setInscricaoTomador(nf.getInscricaoTomador());
 					t.setBairro(util.getNullIfEmpty(dlp.getEnderecoBairroTomador()));
 					t.setCep(util.trataCep(dlp.getCepTomador()));
 					t.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoTomador()));
@@ -296,20 +299,20 @@ public class NotasMaeThread implements Runnable {
 
 		// guias x notas fiscais
 
-		if (dlp.getNossoNumero() != null && !dlp.getNossoNumero().trim().isEmpty()) {
-			if (nf.getSituacao().equals("E")) {
-				processaNotasFilhaGuias(p, nf, dlp, log, linha, "G", g);
+		if (nf.getSituacao().equals("E")) { // guia emitida
+			processaNotasFilhaGuias(p, nf, dlp, log, linha, "G", g);
 
-			} else {
-				// log.fillError(linha, "Numero de guia nÃ£o encontrado: " +
-				// dlp.getNossoNumero());
+		} else {
+			// log.fillError(linha, "Numero de guia nÃ£o encontrado: " +
+			// dlp.getNossoNumero());
 
-			}
 		}
 
 		// notas fiscais tomadores
 
-		if (t != null && t.getId() != null) {
+		if (t != null && t.getId() != null)
+
+		{
 			processaNotasFilhaTomadores(p, nf, dlp, log, linha, "T", g, t);
 		}
 
@@ -463,7 +466,7 @@ public class NotasMaeThread implements Runnable {
 					nfs.setMunicipioIbge(
 							municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador()));
 					if (util.isEmptyOrNull(nfs.getMunicipioIbge())) {
-						throw new Exception();
+						throw new Exception("Município Ibge não encontrado:" + dlp.getMunicipioTomador() + "-" + dlp.getUfTomador());
 					}
 				} catch (Exception e) {
 					log.fillError("Erro: nota fiscal de serviço sem codigo ibge valido. " + dlp.getMunicipioTomador()

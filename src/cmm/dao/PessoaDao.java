@@ -24,9 +24,10 @@ public class PessoaDao {
 		Query query = session.createQuery("from Pessoa p  " + " where p.cnpjCpf like '%" + cnpjCpf.trim() + "%'");
 
 		try {
-			Pessoa pessoa = (Pessoa) query.uniqueResult();
-
-			return pessoa;
+			List<Pessoa> pessoas = (List<Pessoa>) query.list();
+			if (pessoas.size() > 0) {
+				return pessoas.get(0);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
