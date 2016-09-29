@@ -4,10 +4,13 @@ import java.math.BigDecimal;
 
 import cmm.dao.CnaeDao;
 import cmm.dao.DadosLivroPrestadorDao;
+import cmm.dao.NotasFiscaisServicosDao;
 import cmm.dao.PrestadoresAtividadesDao;
 import cmm.dao.PrestadoresDao;
+import cmm.dao.ServicosDao;
 import cmm.entidadesOrigem.DadosCadastroAtividade;
 import cmm.entidadesOrigem.DadosLivroPrestador;
+import cmm.entidadesOrigem.Servicos;
 import cmm.model.Cnae;
 import cmm.model.Prestadores;
 import cmm.model.PrestadoresAtividades;
@@ -60,6 +63,15 @@ public class CadastroAtividadeThread implements Runnable {
 						}
 					}
 					prestadoresAtividadesDao.save(pa);
+					ServicosDao dao = new ServicosDao();
+					Servicos serv = dao.findByCodigoServicoCodigoCnae(pa.getIlistaservicos(), pa.getIcnaes());
+					if (serv ==null || serv.getId()==0){
+						Servicos s = new Servicos();
+						s.setAliquota(""+pa.getAliquota().doubleValue());
+						s.setCnaes(pa.getIcnaes());
+						s.setCodigo(pa.getIlistaservicos());
+						dao.save(s);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("Linha: "+linha);

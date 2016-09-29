@@ -43,6 +43,17 @@ public class NotasFiscaisServicosDao {
 
 		return lista;
 	}
+	
+	public List<NotasFiscaisServicos> findAll() {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session.createQuery("from NotasFiscaisServicos c");
+		List<NotasFiscaisServicos> lista = query.list();
+		tx.commit();
+		session.close();
+
+		return lista;
+	}
 
 	public void saveHash(List<NotasFiscaisServicos> listaAtualizados, String hash) {
 		Session session = sessionFactory.openSession();

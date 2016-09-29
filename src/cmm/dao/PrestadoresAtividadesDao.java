@@ -43,6 +43,17 @@ public class PrestadoresAtividadesDao {
 
 		return lista;
 	}
+	
+	public List<PrestadoresAtividades> findAll() {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session.createQuery("from PrestadoresAtividades pa");
+		List<PrestadoresAtividades> lista = query.list();
+		tx.commit();
+		session.close();
+
+		return lista;
+	}
 
 	public void saveHash(List<PrestadoresAtividades> listaAtualizados, String hash) {
 		Session session = sessionFactory.openSession();
