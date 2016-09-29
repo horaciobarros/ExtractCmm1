@@ -29,6 +29,7 @@ public class ContribuinteThread implements Runnable {
 
 	@Override
 	public void run() {
+		
 		try {
 			// linha = preparaParaSplit(linha);
 			String[] arrayLinha = linha.split("@@\\|");
@@ -38,12 +39,13 @@ public class ContribuinteThread implements Runnable {
 			// incluindo pessoa
 			String cnpjCpf = util.getCpfCnpj(dc.getCnpj());
 			Pessoa pessoa = pessoaDao.findByCnpjCpf(cnpjCpf);
+			
 			try {
 				if (pessoa == null || pessoa.getId() == null) {
 					pessoa = new Pessoa();
 					pessoa.setPessoaId(Long.valueOf(dc.getIdCodigo()));
 					pessoa.setEmail(util.trataEmail(dc.getEmail()));
-					pessoa.setCnpjCpf(cnpjCpf);
+					pessoa.setCnpjCpf(cnpjCpf.trim());
 					pessoa.setBairro(dc.getEnderecoBairro());
 					pessoa.setEndereco(dc.getEndereco());
 					pessoa.setCep(dc.getEnderecoCep());

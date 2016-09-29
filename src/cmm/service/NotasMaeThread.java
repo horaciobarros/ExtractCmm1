@@ -123,7 +123,7 @@ public class NotasMaeThread implements Runnable {
 																				// cmm
 		nf.setInscricaoPrestador(inscricaoPrestador);
 		String inscricaoTomador = util.getCpfCnpj(dlp.getCnpjTomador());
-		
+
 		if ("F".equals(util.getTipoPessoa(inscricaoTomador))) {
 			if (Util.validarCpf(inscricaoTomador)) {
 				nf.setInscricaoTomador(inscricaoTomador);
@@ -163,7 +163,14 @@ public class NotasMaeThread implements Runnable {
 		nf.setValorTotalIss(BigDecimal.valueOf(dlp.getValorIss()));
 		nf.setSituacaoOriginal(dlp.getStatusNota().trim().substring(0, 1));
 
-		nf.setSituacao("N");
+		
+		Guias g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
+		if (g != null) {
+			nf.setSituacao("E");
+		} else {
+			nf.setSituacao("N");
+		}
+		
 		nf.setSituacaoTributaria(util.getSituacaoTributaria(dlp));
 
 		if (dlp.getCodigoVerificacao() != null && !dlp.getCodigoVerificacao().trim().isEmpty()) {
@@ -175,7 +182,7 @@ public class NotasMaeThread implements Runnable {
 		} else {
 			nf.setNumeroVerificacao(util.completarZerosEsquerda(dlp.getIdCodigo().toString(), 9));
 		}
-		
+
 		nf.setValorTotalBaseCalculo(BigDecimal.valueOf(dlp.getValorBaseCalculo()));
 		nf.setValorTotalDeducao(BigDecimal.valueOf(dlp.getValorDeducao()));
 		if ("EXTERIOR/EX".equals(dlp.getMunicipioTomador().trim())) {
@@ -192,7 +199,7 @@ public class NotasMaeThread implements Runnable {
 		if (nf.getValorLiquido().compareTo(BigDecimal.ZERO) == -1) {
 			nf.setValorLiquido(nf.getValorLiquido().multiply(BigDecimal.valueOf(-1)));
 		}
-		if (!util.isEmptyOrNull(nf.getNomeTomador())){
+		if (!util.isEmptyOrNull(nf.getNomeTomador())) {
 			nf.setNomeTomador("Não informado.");
 		}
 		try {
@@ -218,9 +225,7 @@ public class NotasMaeThread implements Runnable {
 
 		// tomadores
 		Tomadores t = null;
-		
 
-		
 		if (!util.isEmptyOrNull(nf.getInscricaoTomador())) {
 
 			t = tomadoresDao.findByInscricao(inscricaoTomador, nf.getInscricaoPrestador());
@@ -290,10 +295,9 @@ public class NotasMaeThread implements Runnable {
 		processaNotasFilhaPrestadores(p, nf, dlp, log, linha, "P");
 
 		// guias x notas fiscais
-		Guias g = new Guias();
+
 		if (dlp.getNossoNumero() != null && !dlp.getNossoNumero().trim().isEmpty()) {
-			g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
-			if (g != null) {
+			if (nf.getSituacao().equals("E")) {
 				processaNotasFilhaGuias(p, nf, dlp, log, linha, "G", g);
 
 			} else {
@@ -320,8 +324,8 @@ public class NotasMaeThread implements Runnable {
 			nft.setCep(dlp.getCepTomador());
 			nft.setComplemento(dlp.getEnderecoComplementoTomador());
 			nft.setEmail(util.trataEmail(dlp.getEmailTomador()));
-			if (!util.isEmptyOrNull(nft.getEmail()) && nft.getEmail().length()>80){
-				nft.setEmail(nft.getEmail().substring(0,80));
+			if (!util.isEmptyOrNull(nft.getEmail()) && nft.getEmail().length() > 80) {
+				nft.setEmail(nft.getEmail().substring(0, 80));
 			}
 			nft.setEndereco(dlp.getEnderecoBairroTomador());
 			nft.setInscricaoEstadual(t.getInscricaoEstadual());
@@ -344,7 +348,7 @@ public class NotasMaeThread implements Runnable {
 			nft.setTipoPessoa(t.getTipoPessoa());
 			notasFiscaisTomadoresDao.save(nft);
 		} catch (Exception e) {
-			
+
 			e.printStackTrace();
 			log.fillError(linha, "Nota Fiscal Tomadores ", e);
 		}
@@ -418,16 +422,15 @@ public class NotasMaeThread implements Runnable {
 			String linha, String tipoNotaFilha) {
 		try {
 			NotasFiscaisCanceladas nfc = new NotasFiscaisCanceladas();
-			if (!util.isEmptyOrNull(dlp.getDataCancelamento())){
+			if (!util.isEmptyOrNull(dlp.getDataCancelamento())) {
 				nfc.setDatahoracancelamento(util.getStringToDateHoursMinutes(dlp.getDataCancelamento()));
 				if (nfc.getDatahoracancelamento().getTime() < nf.getDataHoraEmissao().getTime()) {
 					nfc.setDatahoracancelamento(nf.getDataHoraEmissao());
 				}
-			}
-			else{
+			} else {
 				nfc.setDatahoracancelamento(nf.getDataHoraEmissao());
 			}
-			
+
 			nfc.setInscricaoPrestador(util.getCpfCnpj(dlp.getCnpjPrestador()));
 			nfc.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 			nfc.setMotivo(dlp.getMotivoCancelamento());
@@ -472,33 +475,30 @@ public class NotasMaeThread implements Runnable {
 			}
 
 			PrestadoresAtividades pa = prestadoresAtividadesDao.findByInscricao(nfs.getInscricaoPrestador());
-			
-			
-			nfs.setItemListaServico(
-					util.completarZerosEsquerda(util.converteItemListaServico(dlp.getCodigoAtividadeMunipal()).replaceAll("\\.", ""), 4));
-			
+
+			nfs.setItemListaServico(util.completarZerosEsquerda(
+					util.converteItemListaServico(dlp.getCodigoAtividadeMunipal()).replaceAll("\\.", ""), 4));
+
 			if (nfs.getItemListaServico() == null) {
 				if (pa == null || pa.getId() == null) {
 					nfs.setItemListaServico(null);
 				} else {
 					nfs.setItemListaServico(util.completarZerosEsquerda(pa.getCodigoAtividade(), 4));
 				}
-				
+
 			}
 			String cnae = util.getStringLimpa(dlp.getCodigoCnae());
-			
+
 			if (!util.isEmptyOrNull(cnae)) {
 				Cnae c = new CnaeDao().findByCodigo(cnae);
 				if (c != null && !util.isEmptyOrNull(c.getDescricao())) {
 					nfs.setDescricaoCnae(c.getDescricao());
 					nfs.setIcnaes(c.getCnae());
-				}
-				else{
+				} else {
 					nfs.setIcnaes(util.completarZerosDireita(cnae, 7));
 				}
 			}
-			
-			
+
 			nfs.setDescricao(dlp.getDiscriminacaoServico());
 			if (util.isEmptyOrNull(nfs.getDescricao().trim())) {
 				nfs.setDescricao("Serviços Diversos");
@@ -522,9 +522,9 @@ public class NotasMaeThread implements Runnable {
 			notasFiscaisServicosDao.save(nfs);
 			ServicosDao dao = new ServicosDao();
 			Servicos serv = dao.findByCodigoServicoCodigoCnae(nfs.getItemListaServico(), nfs.getIcnaes());
-			if (serv ==null || serv.getId()==0){
+			if (serv == null || serv.getId() == 0) {
 				Servicos s = new Servicos();
-				s.setAliquota(""+nfs.getAliquota().doubleValue());
+				s.setAliquota("" + nfs.getAliquota().doubleValue());
 				s.setCnaes(nfs.getIcnaes());
 				s.setCodigo(nfs.getItemListaServico());
 				s.setNome(nfs.getDescricaoCnae());

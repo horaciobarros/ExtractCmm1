@@ -54,7 +54,7 @@ public class ExtractorService {
 
 	public void processaDadosCadastro(List<String> dadosList) {
 		FileLog log = new FileLog("dados_cadastro");
-		ExecutorService executor = Executors.newFixedThreadPool(400);
+		ExecutorService executor = Executors.newFixedThreadPool(1);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
 				break;
