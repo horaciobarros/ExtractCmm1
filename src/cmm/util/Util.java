@@ -32,6 +32,8 @@ public class Util {
 	private GeraCPF geraCPF = new GeraCPF();
 	
 	private ListaServicosDao listaServicosDao = new ListaServicosDao();
+	
+	public static final String CPF_TOMADOR_FICTICIO = "78400987110";
 
 	public static Long castToLong(Object value, Long defaultValue) {
 		if (value != null) {

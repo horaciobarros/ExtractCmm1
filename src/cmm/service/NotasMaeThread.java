@@ -133,6 +133,9 @@ public class NotasMaeThread implements Runnable {
 				nf.setNomeTomador(dlp.getRazaoSocialTomador());
 			}
 		}
+		if (util.isEmptyOrNull(nf.getInscricaoTomador())) {
+			nf.setInscricaoTomador(util.CPF_TOMADOR_FICTICIO);
+		}
 
 		if ("Tributação no municipio".equals(dlp.getNaturezaOperacao().trim())) {
 			nf.setNaturezaOperacao("1");
@@ -260,53 +263,6 @@ public class NotasMaeThread implements Runnable {
 					t = null;
 				}
 
-			}
-		} else {
-
-			if (util.isEmptyOrNull(nf.getInscricaoTomador())) {
-				String nomeTomador = dlp.getRazaoSocialTomador();
-				if (util.isEmptyOrNull(nomeTomador)) {
-					nomeTomador = "Não Informado.";
-				}
-				//t = tomadoresDao.findByNome(nomeTomador);
-
-				if (t == null || t.getId() == null) { // incluindo tomador
-														// ficticio
-					String inscricaoTomadorFicticio = util.geraCpfFicticio();
-
-					t = new Tomadores();
-					t.setOptanteSimples(util.getOptantePeloSimplesNacional("N"));
-					t.setNome(nomeTomador);
-					t.setPrestadores(nf.getPrestadores());
-					t.setTipoPessoa("O");
-					t.setInscricaoTomador(util.getCpfCnpj(inscricaoTomadorFicticio));
-					t.setBairro(util.getNullIfEmpty(dlp.getEnderecoBairroTomador()));
-					t.setCep(util.trataCep(dlp.getCepTomador()));
-					t.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoTomador()));
-					t.setEmail(util.trataEmail(dlp.getEmailTomador()));
-					t.setEndereco(util.getNullIfEmpty(dlp.getEnderecoTomador()));
-					t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
-					t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
-					t.setMunicipio(dlp.getMunicipioTomador());
-					t.setTelefone(util.getLimpaTelefone(dlp.getTelefoneTomador()));
-					try {
-						t.setMunicipioIbge(Long.valueOf(
-								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
-					} catch (Exception e) {
-						t.setMunicipioIbge(Long.valueOf(util.CODIGO_IBGE));
-						e.printStackTrace();
-					}
-
-					util.trataNumerosTelefones(t);
-					util.anulaCamposVazios(t);
-
-					t.setTomadorFicticio("S");
-
-					t = tomadoresDao.save(t);
-
-					// log.fillError(linha, "Warn: foi gravado gerado um cpf
-					// ficticio para o tomador " + nomeTomador);
-				}
 			}
 		}
 
