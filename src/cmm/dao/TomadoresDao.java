@@ -59,14 +59,16 @@ public class TomadoresDao {
 	public Tomadores update(Tomadores t) {
 
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
 		try {
+			session.beginTransaction();
 			session.update(t);
+			session.getTransaction().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw e;
+		} finally {
+			session.close();
 		}
-		session.beginTransaction().commit();
-		session.close();
 		return t;
 	}
 
