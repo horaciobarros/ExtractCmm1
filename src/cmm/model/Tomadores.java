@@ -98,6 +98,10 @@ public class Tomadores implements Serializable {
 
 	@Column(name = "tomador_ficticio")
 	private String tomadorFicticio;
+	
+	@Column(name = "data_atualizacao")
+	private Date dataAtualizacao;
+
 
 	public Long getId() {
 		return id;
@@ -313,4 +317,14 @@ public class Tomadores implements Serializable {
 	public void setHash(String hash) {
 		this.hash = hash;
 	}
+
+	public Date getDataAtualizacao() {
+		return dataAtualizacao;
+	}
+
+	public void setDataAtualizacao(Date dataAtualizacao) {
+		this.dataAtualizacao = dataAtualizacao;
+	}
+	
+	
 }

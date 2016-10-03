@@ -61,7 +61,7 @@ public class NotasMaeThread implements Runnable {
 	private GuiasNotasFiscaisDao guiasNotasFiscaisDao = new GuiasNotasFiscaisDao();
 	private PrestadoresAtividadesDao prestadoresAtividadesDao = new PrestadoresAtividadesDao();
 	private PagamentosDao pagamentosDao = new PagamentosDao();
-	
+
 	public NotasMaeThread(String linha, Util util, FileLog log) {
 		this.linha = linha;
 		this.util = util;
@@ -162,30 +162,28 @@ public class NotasMaeThread implements Runnable {
 		nf.setValorOutrasRetencoes(BigDecimal.valueOf(dlp.getValorOutrasRetencoes()));
 		nf.setValorTotalIssOptante(BigDecimal.valueOf(dlp.getValorIss()));
 		nf.setValorTotalServico(BigDecimal.valueOf(dlp.getValorTotalNfse()));
-		if (nf.getValorTotalServico()!=null && nf.getValorTotalServico().doubleValue()<0){
-			nf.setValorTotalServico(BigDecimal.valueOf(nf.getValorTotalServico().doubleValue()*-1));
+		if (nf.getValorTotalServico() != null && nf.getValorTotalServico().doubleValue() < 0) {
+			nf.setValorTotalServico(BigDecimal.valueOf(nf.getValorTotalServico().doubleValue() * -1));
 		}
 		nf.setValorTotalIss(BigDecimal.valueOf(dlp.getValorIss()));
 		nf.setSituacaoOriginal(dlp.getStatusNota().trim().substring(0, 1));
 		nf.setSituacaoTributaria(util.getSituacaoTributaria(dlp));
-		
+
 		Guias g = null;
 		if (dlp.getNossoNumero() != null && !dlp.getNossoNumero().trim().isEmpty()) {
 			g = guiasDao.findByNumeroGuia(dlp.getNossoNumero());
-		}/*
-		// Não gerar guia para notas retidas - Passado por Sandro por email e telefone 30/09
-		if (nf.getSituacaoTributaria().equals("R")){
-			/*log.fillError(linha,
-					"Guia com status de retenção não gravada de acordo com definição da cmm. " + "contribuinte:"
-							+ nf.getNomePrestador() + " - " + p.getInscricaoPrestador() + " nota:" + nf.getNumeroNota() + " status:"
-							+ nf.getSituacaoTributaria());
-			if (g != null && g.getId() != null) {
-				pagamentosDao.deleteByGuia(g);
-				guiasDao.delete(g);
-				g = null;
-			}
-		}*/
-		
+		} /*
+			 * // Não gerar guia para notas retidas - Passado por Sandro por
+			 * email e telefone 30/09 if
+			 * (nf.getSituacaoTributaria().equals("R")){ /*log.fillError(linha,
+			 * "Guia com status de retenção não gravada de acordo com definição da cmm. "
+			 * + "contribuinte:" + nf.getNomePrestador() + " - " +
+			 * p.getInscricaoPrestador() + " nota:" + nf.getNumeroNota() +
+			 * " status:" + nf.getSituacaoTributaria()); if (g != null &&
+			 * g.getId() != null) { pagamentosDao.deleteByGuia(g);
+			 * guiasDao.delete(g); g = null; } }
+			 */
+
 		if (g != null && g.getId() != null && !nf.getSituacaoOriginal().equals("C")) {
 			nf.setSituacao("E");
 		} else {
@@ -220,8 +218,7 @@ public class NotasMaeThread implements Runnable {
 		}
 		if (util.isEmptyOrNull(nf.getNomeTomador())) {
 			nf.setNomeTomador("Não informado.");
-		}
-		else{
+		} else {
 			nf.setNomeTomador(nf.getNomeTomador().trim());
 		}
 		try {
@@ -264,7 +261,7 @@ public class NotasMaeThread implements Runnable {
 					t.setCep(util.trataCep(dlp.getCepTomador()));
 					t.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoTomador()));
 					t.setEmail(util.trataEmail(dlp.getEmailTomador()));
-					if (!util.isEmptyOrNull(t.getEmail()) && t.getEmail().length()>80){
+					if (!util.isEmptyOrNull(t.getEmail()) && t.getEmail().length() > 80) {
 						t.setEmail(t.getEmail().substring(0, 80));
 					}
 					t.setEndereco(util.getNullIfEmpty(dlp.getEnderecoTomador()));
@@ -272,6 +269,7 @@ public class NotasMaeThread implements Runnable {
 					t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
 					t.setMunicipio(dlp.getMunicipioTomador());
 					t.setTelefone(util.getLimpaTelefone(dlp.getTelefoneTomador()));
+					t.setDataAtualizacao(nf.getDataHoraEmissao());
 					try {
 						t.setMunicipioIbge(Long.valueOf(
 								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
@@ -291,8 +289,40 @@ public class NotasMaeThread implements Runnable {
 
 				} catch (Exception e) {
 					e.printStackTrace();
-					log.fillError(linha, "Nota Fiscal Tomadores ", e);
+					log.fillError(linha, "Tomadores ", e);
 					t = null;
+				}
+
+			} else {
+
+				if (nf.getDataHoraEmissao().getTime() > t.getDataAtualizacao().getTime()) {
+					try {
+						t.setBairro(util.getNullIfEmpty(dlp.getEnderecoBairroTomador()));
+						t.setCep(util.trataCep(dlp.getCepTomador()));
+						t.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoTomador()));
+						t.setEmail(util.trataEmail(dlp.getEmailTomador()));
+						if (!util.isEmptyOrNull(t.getEmail()) && t.getEmail().length() > 80) {
+							t.setEmail(t.getEmail().substring(0, 80));
+						}
+						t.setEndereco(util.getNullIfEmpty(dlp.getEnderecoTomador()));
+						t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
+						t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
+						t.setMunicipio(dlp.getMunicipioTomador());
+						t.setTelefone(util.getLimpaTelefone(dlp.getTelefoneTomador()));
+
+						util.trataNumerosTelefones(t);
+						util.anulaCamposVazios(t);
+						
+						t.setDataAtualizacao(nf.getDataHoraEmissao());
+
+						if (!"".equals(t.getInscricaoTomador().replace("0", "").trim())) {
+							t = tomadoresDao.update(t);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+						log.fillError(linha, "Tomadores - update ", e);
+						t = null;
+					}
 				}
 
 			}
@@ -397,11 +427,11 @@ public class NotasMaeThread implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 			String idGuia = "";
-			String idNota = nf.getId()+"";
-			if (guia!=null && guia.getId()!=null && guia.getId()>0){
-				idGuia = guia.getId()+"";
+			String idNota = nf.getId() + "";
+			if (guia != null && guia.getId() != null && guia.getId() > 0) {
+				idGuia = guia.getId() + "";
 			}
-			log.fillError(linha, "Guia Nota Fiscal: "+idGuia+" - Nota: "+idNota+" - ", e);
+			log.fillError(linha, "Guia Nota Fiscal: " + idGuia + " - Nota: " + idNota + " - ", e);
 		}
 
 	}
@@ -487,7 +517,8 @@ public class NotasMaeThread implements Runnable {
 			nfs.setInscricaoPrestador(util.getCpfCnpj(dlp.getCnpjPrestador()));
 			nfs.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 
-			if (nf.getNaturezaOperacao().equals("1")) { // serviços prestados em lagoa
+			if (nf.getNaturezaOperacao().equals("1")) { // serviços prestados em
+														// lagoa
 				nfs.setMunicipioIbge(util.CODIGO_IBGE);
 			} else if (nf.getNaturezaOperacao().equals("2")) { // fora de lagoa
 				try {
@@ -495,7 +526,9 @@ public class NotasMaeThread implements Runnable {
 							municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador()));
 					if (util.isEmptyOrNull(nfs.getMunicipioIbge())) {
 						nfs.setMunicipioIbge(util.CODIGO_IBGE_XIQUE_XIQUE);
-						//throw new Exception("Município Ibge não encontrado:" + dlp.getMunicipioTomador() + "-" + dlp.getUfTomador());
+						// throw new Exception("Município Ibge não encontrado:"
+						// + dlp.getMunicipioTomador() + "-" +
+						// dlp.getUfTomador());
 					}
 				} catch (Exception e) {
 					log.fillError("Erro: nota fiscal de serviço sem codigo ibge valido. " + dlp.getMunicipioTomador()
@@ -506,7 +539,7 @@ public class NotasMaeThread implements Runnable {
 				if (util.CODIGO_IBGE.equals(nfs.getMunicipioIbge().trim())) {
 					nfs.setMunicipioIbge(util.CODIGO_IBGE_XIQUE_XIQUE);
 				}
-					
+
 			} else if (nf.getNaturezaOperacao().equals("3")) {
 				nfs.setMunicipioIbge(util.CODIGO_IBGE);
 			}
