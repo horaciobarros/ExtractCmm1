@@ -24,6 +24,7 @@ import cmm.model.Tomadores;
 public class Util {
 
 	public static final String CODIGO_IBGE = "3137205";
+	public static final String CODIGO_IBGE_XIQUE_XIQUE = "2933604";
 
 	private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 

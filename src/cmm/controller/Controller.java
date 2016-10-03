@@ -20,15 +20,15 @@ public class Controller {
 
 	public void importaNfe() {
 
-		String msg = "Confirma Extract de Lagoa da Prata?";
+		int nivelProcessamento = 5;
+		
+		String msg = "Confirma Extract de Lagoa da Prata no nível " + nivelProcessamento + "?";
 		int op = JOptionPane.showConfirmDialog(null, msg, "", JOptionPane.YES_NO_OPTION);
 		if (op != JOptionPane.YES_OPTION) {
 			System.exit(0);
 		}
 
-		int nivelProcessamento = 5;
-
-		System.out.println("Lagoa da Prata - Limpando o banco...");
+		System.out.println("Lagoa da Prata - Limpando o banco no nível " + nivelProcessamento);
 
 		List<String> entidades = null;
 		if (nivelProcessamento == 2) {

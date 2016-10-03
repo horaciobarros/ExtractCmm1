@@ -186,7 +186,7 @@ public class NotasMaeThread implements Runnable {
 			}
 		}*/
 		
-		if (g != null && g.getId() != null) {
+		if (g != null && g.getId() != null && !nf.getSituacaoOriginal().equals("C")) {
 			nf.setSituacao("E");
 		} else {
 			nf.setSituacao("N");
@@ -487,22 +487,26 @@ public class NotasMaeThread implements Runnable {
 			nfs.setInscricaoPrestador(util.getCpfCnpj(dlp.getCnpjPrestador()));
 			nfs.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 
-			if (nf.getNaturezaOperacao().equals("1")) {
+			if (nf.getNaturezaOperacao().equals("1")) { // serviços prestados em lagoa
 				nfs.setMunicipioIbge(util.CODIGO_IBGE);
-			} else if (nf.getNaturezaOperacao().equals("2")) {
+			} else if (nf.getNaturezaOperacao().equals("2")) { // fora de lagoa
 				try {
 					nfs.setMunicipioIbge(
 							municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador()));
 					if (util.isEmptyOrNull(nfs.getMunicipioIbge())) {
-						nfs.setMunicipioIbge("2933604");
+						nfs.setMunicipioIbge(util.CODIGO_IBGE_XIQUE_XIQUE);
 						//throw new Exception("Município Ibge não encontrado:" + dlp.getMunicipioTomador() + "-" + dlp.getUfTomador());
 					}
 				} catch (Exception e) {
 					log.fillError("Erro: nota fiscal de serviço sem codigo ibge valido. " + dlp.getMunicipioTomador()
 							+ "/" + dlp.getUfTomador() + " Conteúdo da linha: " + linha, "Nota Fiscal Serviço ", e);
 					e.printStackTrace();
-					nfs.setMunicipioIbge("2933604");
+					nfs.setMunicipioIbge(util.CODIGO_IBGE_XIQUE_XIQUE);
 				}
+				if (util.CODIGO_IBGE.equals(nfs.getMunicipioIbge().trim())) {
+					nfs.setMunicipioIbge(util.CODIGO_IBGE_XIQUE_XIQUE);
+				}
+					
 			} else if (nf.getNaturezaOperacao().equals("3")) {
 				nfs.setMunicipioIbge(util.CODIGO_IBGE);
 			}
