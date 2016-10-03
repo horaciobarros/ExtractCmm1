@@ -35,7 +35,8 @@ public class DadosGuiaDao {
 
 	
 	public DadosGuia findByCodigo(Long codigo) {
-		Query query = sessionFactory.openSession().createQuery("from DadosGuia dg  " + " where dg.codigo = " + codigo);
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from DadosGuia dg  " + " where dg.codigo = " + codigo);
 
 		try {
 			List<DadosGuia> dgs = query.list();
@@ -45,6 +46,9 @@ public class DadosGuiaDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 	}

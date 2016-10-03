@@ -55,6 +55,13 @@ public class GuiaThread implements Runnable {
 			try {
 				if ("GUIA_PRESTADOR".equals(dg.getTipoGuia().trim())) {
 					String inscricaoPrestador = util.getCpfCnpj(dg.getCnpj());
+					Prestadores prestadores = prestadoresDao.findByInscricao(inscricaoPrestador);
+					Pessoa pessoa = pessoaDao.findByCnpjCpf(inscricaoPrestador);
+					
+					if (pessoa != null && pessoa.getOptanteSimples().equals("S")) {
+						//log.fillError(linha, "Guia não gerada. Prestador Simples. " +inscricaoPrestador);
+						return;
+					}
 					Guias guias = new Guias();
 					guias.setCompetencias(cp);
 					guias.setDataVencimento(util.getStringToDateHoursMinutes(dg.getDataVencimento()));
@@ -66,12 +73,8 @@ public class GuiaThread implements Runnable {
 					guias.setNumeroGuia(Long.valueOf(proximoNumeroGuia));
 					guias.setNumeroGuiaOrigem(dg.getNossoNumero());
 
-					Prestadores prestadores = prestadoresDao.findByInscricao(inscricaoPrestador);
-					Pessoa pessoa = pessoaDao.findByCnpjCpf(inscricaoPrestador);
-					if (pessoa != null && pessoa.getOptanteSimples().equals("S")) {
-						//log.fillError(linha, "Guia não gerada. Prestador Simples. " +inscricaoPrestador);
-						return;
-					}
+
+					
 					if (prestadores == null) {
 						log.fillError(linha, "Prestador nï¿½o encontrado:" + dg.getInscMunicipal());
 					} else {

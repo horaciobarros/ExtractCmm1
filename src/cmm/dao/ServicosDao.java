@@ -19,8 +19,8 @@ public class ServicosDao {
 	}
 
 	public Servicos findByIdOrigem(Long id) {
-		Query query = sessionFactory.openSession().createQuery("from Servicos s where s.idOrigem = :id")
-				.setParameter("id", id);
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from Servicos s where s.idOrigem = :id").setParameter("id", id);
 
 		try {
 			List<Servicos> servicos = query.list();
@@ -30,64 +30,62 @@ public class ServicosDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			session.close();
 		}
 		return null;
 	}
 
 	public Servicos findByCodigo(String codigo) {
-		try {
-			Query query = sessionFactory.openSession().createQuery("from Servicos e where e.codigo = :codigo")
-					.setParameter("codigo", codigo);
-
-			try {
-				List<Servicos> servicos = query.list();
-
-				if (servicos.size() > 0) {
-					return servicos.get(0);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public Servicos findByCodigoServicoCodigoCnae(String codigoServico, String codigoCnae) {
-
-		try {
-			Query query = sessionFactory.openSession().createQuery("from Servicos e where e.codigo = :codigoServico and e.cnaes = :codigoCnae")
-					.setParameter("codigoServico", codigoServico)
-					.setParameter("codigoCnae", codigoCnae);
-
-			try {
-				List<Servicos> servicos = query.list();
-
-				if (servicos.size() > 0) {
-					return servicos.get(0);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public Servicos save(Servicos s){
 		Session session = sessionFactory.openSession();
-		try{
+		try {
+
+			Query query = session.createQuery("from Servicos e where e.codigo = :codigo").setParameter("codigo", codigo);
+
+			List<Servicos> servicos = query.list();
+
+			if (servicos.size() > 0) {
+				return servicos.get(0);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return null;
+	}
+
+	public Servicos findByCodigoServicoCodigoCnae(String codigoServico, String codigoCnae) {
+		Session session = sessionFactory.openSession();
+		try {
+			Query query = session.createQuery("from Servicos e where e.codigo = :codigoServico and e.cnaes = :codigoCnae")
+					.setParameter("codigoServico", codigoServico).setParameter("codigoCnae", codigoCnae);
+
+			List<Servicos> servicos = query.list();
+
+			if (servicos.size() > 0) {
+				return servicos.get(0);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return null;
+	}
+
+	public Servicos save(Servicos s) {
+		Session session = sessionFactory.openSession();
+		try {
 			session.beginTransaction();
 			session.save(s);
 			session.getTransaction().commit();
-		}
-		catch(Exception e2){
+		} catch (Exception e2) {
 			e2.printStackTrace();
 			throw e2;
-		}
-		finally{
+		} finally {
 			session.close();
 		}
 		return s;

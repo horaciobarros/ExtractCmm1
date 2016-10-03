@@ -74,7 +74,8 @@ public class PrestadoresAtividadesDao {
 	}
 
 	public PrestadoresAtividades findByInscricao(String inscricao) {
-		Query query = sessionFactory.openSession().createQuery("from PrestadoresAtividades pa  " + " where pa.inscricaoPrestador like '%" + inscricao.trim() + "%'");
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from PrestadoresAtividades pa  " + " where pa.inscricaoPrestador like '%" + inscricao.trim() + "%'");
 
 		try {
 			List<PrestadoresAtividades> prestadoresAtividadesList = query.list();
@@ -84,6 +85,9 @@ public class PrestadoresAtividadesDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 

@@ -20,7 +20,8 @@ public class BairrosDao {
 	}
 
 	public Bairros findByDescricao(String descricao) {
-		Query query = sessionFactory.openSession().createQuery("from Bairros cp  " + " where cp.descricao like '%" + descricao.trim() + "%'");
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from Bairros cp  " + " where cp.descricao like '%" + descricao.trim() + "%'");
 
 		try {
 			List<Bairros> entidade = query.list();
@@ -30,6 +31,9 @@ public class BairrosDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 	}

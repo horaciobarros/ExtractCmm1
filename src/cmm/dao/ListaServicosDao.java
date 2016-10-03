@@ -3,6 +3,7 @@ package cmm.dao;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import cmm.model.Cnae;
@@ -24,8 +25,8 @@ public class ListaServicosDao {
 		if (lc127 == null || lc127.trim().isEmpty()) {
 			return null;
 		}
-		
-		Query query = sessionFactory.openSession().createQuery("from ListaServicos s where s.lc127 like :lc127").setParameter("lc127", lc127);
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from ListaServicos s where s.lc127 like :lc127").setParameter("lc127", lc127);
 		
 
 		try {
@@ -36,6 +37,9 @@ public class ListaServicosDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 	}

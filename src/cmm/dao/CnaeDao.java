@@ -3,6 +3,7 @@ package cmm.dao;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import cmm.model.Cnae;
@@ -39,7 +40,8 @@ public class CnaeDao {
 		if (codigo!=null && codigo.length()>=caracteres){
 			codigo = codigo.substring(0, caracteres);
 		}
-		Query query = sessionFactory.openSession().createQuery("from Cnae c where c.cnae like :cnae").setParameter("cnae", codigo+"%");
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from Cnae c where c.cnae like :cnae").setParameter("cnae", codigo+"%");
 		
 
 		try {
@@ -50,6 +52,9 @@ public class CnaeDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 	}

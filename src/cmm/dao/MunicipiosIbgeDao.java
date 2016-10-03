@@ -3,6 +3,7 @@ package cmm.dao;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import cmm.model.MunicipiosIbge;
@@ -18,7 +19,8 @@ public class MunicipiosIbgeDao {
 	}
 
 	public String getCodigoIbge(String nomeMunicipio, String uf) {
-		Query query = sessionFactory.openSession().createQuery("from MunicipiosIbge m  where upper(m.municipio) like :nomemun" + " and upper(m.uf) like :uf")
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from MunicipiosIbge m  where upper(m.municipio) like :nomemun" + " and upper(m.uf) like :uf")
 				.setParameter("nomemun", "%" + nomeMunicipio.trim().toUpperCase() + "%").setParameter("uf", "%" + uf.trim().toUpperCase() + "%");
 
 		try {
@@ -29,6 +31,9 @@ public class MunicipiosIbgeDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 	}

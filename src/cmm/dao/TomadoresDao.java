@@ -20,7 +20,8 @@ public class TomadoresDao {
 	}
 
 	public Tomadores findByInscricao(String inscricaoTomador, String inscricaoPrestador) {
-		Query query = sessionFactory.openSession().createQuery(
+		Session session = sessionFactory.openSession(); 
+		Query query = session.createQuery(
 				"select t from Tomadores t  inner join t.prestadores p " + " where t.inscricaoTomador like '%" + inscricaoTomador.trim() + "%' "
 						+ " and p.inscricaoPrestador like '%" + inscricaoPrestador + "%'");
 
@@ -32,6 +33,9 @@ public class TomadoresDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 	}
@@ -67,7 +71,8 @@ public class TomadoresDao {
 	}
 
 	public Tomadores findByInscricaoMunicipal(String inscMunicipal) {
-		Query query = sessionFactory.openSession().createQuery("from Tomadores t  " + " where t.inscricaoMunicipal like '%" + inscMunicipal.trim() + "%'");
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from Tomadores t  " + " where t.inscricaoMunicipal like '%" + inscMunicipal.trim() + "%'");
 
 		try {
 			List<Tomadores> tomadores = query.list();
@@ -77,6 +82,9 @@ public class TomadoresDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 	}
@@ -111,7 +119,8 @@ public class TomadoresDao {
 	}
 
 	public List<Tomadores> findAll() {
-		Query query = sessionFactory.openSession().createQuery("from Tomadores t  ");
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from Tomadores t  ");
 
 		try {
 			List<Tomadores> tomadores = query.list();
@@ -122,11 +131,15 @@ public class TomadoresDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		finally{
+			session.close();
+		}
 		return null;
 	}
 
 	public Tomadores findByNome(String nomeTomador) {
-		Query query = sessionFactory.openSession().createQuery("from Tomadores t  " + " where t.nome like :nome")
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from Tomadores t  " + " where t.nome like :nome")
 				.setParameter("nome", "%" + nomeTomador.trim() + "%");
 
 		try {
@@ -137,6 +150,9 @@ public class TomadoresDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally{
+			session.close();
 		}
 		return null;
 	}

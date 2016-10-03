@@ -41,6 +41,9 @@ public class GuiasNotasFiscais implements Serializable {
 
 	@Column(name = "hash")
 	private String hash;
+	
+	@Column(name = "situacao_tributaria")
+	private String situacaoTributaria;
 
 	public Long getId() {
 		return id;
@@ -97,4 +100,13 @@ public class GuiasNotasFiscais implements Serializable {
 	public void setHash(String hash) {
 		this.hash = hash;
 	}
+
+	public String getSituacaoTributaria() {
+		return situacaoTributaria;
+	}
+
+	public void setSituacaoTributaria(String situacaoTributaria) {
+		this.situacaoTributaria = situacaoTributaria;
+	}
+	
 }

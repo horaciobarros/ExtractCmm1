@@ -36,7 +36,7 @@ public class GuiasNotasFiscaisDao {
 	public List<GuiasNotasFiscais> findNaoEnviados() {
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		Query query = session.createQuery("from GuiasNotasFiscais gnf where hash is null").setFirstResult(0).setMaxResults(1000);
+		Query query = session.createQuery("from GuiasNotasFiscais gnf where hash is null").setFirstResult(0).setMaxResults(1200);
 		List<GuiasNotasFiscais> lista = query.list();
 		tx.commit();
 		session.close();
@@ -71,6 +71,14 @@ public class GuiasNotasFiscaisDao {
 		session.close();
 
 		return lista;
+	}
+
+	public void deleteGuiasRetidas() {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session.createQuery("delete from GuiasNotasFiscais g where g.situacaoTributaria like 'R'");
+		query.executeUpdate();
+		tx.commit();session.close();	
 	}
 
 }

@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import cmm.dao.CompetenciasDao;
 import cmm.dao.Dao;
 import cmm.dao.GuiasDao;
+import cmm.dao.GuiasNotasFiscaisDao;
 import cmm.dao.PessoaDao;
 import cmm.dao.PrestadoresAtividadesDao;
 import cmm.dao.PrestadoresDao;
@@ -157,7 +158,7 @@ public class ExtractorService {
 	public void processaDadosNotasFiscais(List<String> dadosList) {
 		FileLog log = new FileLog("dados_livro_prestador_notas_fiscais");
 		Util.pausar(5000);
-		ExecutorService executor = Executors.newFixedThreadPool(300);
+		ExecutorService executor = Executors.newFixedThreadPool(350);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
 				break;
@@ -238,9 +239,15 @@ public class ExtractorService {
 	public void excluiGuiasSemNotas() {
 		
 		GuiasDao guiasDao = new GuiasDao();
-
-		System.out.println("Excluindo guias " );
-		ExecutorService executor = Executors.newFixedThreadPool(300);
+		Util.pausar(3000);
+		
+		System.out.println("Excluindo guias retidas" );
+		GuiasNotasFiscaisDao dao = new GuiasNotasFiscaisDao();
+		dao.deleteGuiasRetidas();
+		
+		Util.pausar(3000);
+		System.out.println("Excluindo guias sem notas" );
+		ExecutorService executor = Executors.newFixedThreadPool(200);
 		for (Guias guias : guiasDao.findAll()) {
 			ExcluirGuiasThread thread = new ExcluirGuiasThread(guias);
 			executor.execute(thread);
