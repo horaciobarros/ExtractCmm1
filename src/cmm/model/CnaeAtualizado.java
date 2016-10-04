@@ -13,8 +13,52 @@ public class CnaeAtualizado {
 	@Column(name = "id")
 	private Long id;
 	
+	private String secao;
+	private String divisao;
+	private String grupo;
+	private String classe;
+	private String subclasse;
+	public String getSecao() {
+		return secao;
+	}
+
+	public void setSecao(String secao) {
+		this.secao = secao;
+	}
+
+	public String getDivisao() {
+		return divisao;
+	}
+
+	public void setDivisao(String divisao) {
+		this.divisao = divisao;
+	}
+
+	public String getGrupo() {
+		return grupo;
+	}
+
+	public void setGrupo(String grupo) {
+		this.grupo = grupo;
+	}
+
+	public String getClasse() {
+		return classe;
+	}
+
+	public void setClasse(String classe) {
+		this.classe = classe;
+	}
+
+	public String getSubclasse() {
+		return subclasse;
+	}
+
+	public void setSubclasse(String subclasse) {
+		this.subclasse = subclasse;
+	}
+
 	private String denominacao;
-	
 	private String cnae;
 
 	public Long getId() {

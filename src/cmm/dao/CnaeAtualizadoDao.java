@@ -23,27 +23,13 @@ public class CnaeAtualizadoDao {
 
 	public CnaeAtualizado findByCodigo(String codigo) {
 		
-		if (util.isEmptyOrNull(codigo)) {
-			return null;
-		}
+		String codigo4 = codigo.substring(0,4);
+		String codigo2 = codigo.substring(4);
 		
-		CnaeAtualizado c = null;
-		int caracteres = codigo.length();
-		while (caracteres>=4 && c == null){
-			c = findByCodigo(codigo, caracteres);
-			caracteres--;
-		}
-		return c;
-	}
-
-	private CnaeAtualizado findByCodigo(String codigo, int caracteres){
-		if (codigo!=null && codigo.length()>=caracteres){
-			codigo = codigo.substring(0, caracteres);
-		}
 		Session session = sessionFactory.openSession();
-		Query query = session.createQuery("from Cnae c where c.cnae like :cnae").setParameter("cnae", codigo+"%");
+		Query query = session.createQuery("from Cnae c where c.cnae like :cnae4 and c.cnae like :cnae2 ")
+				.setParameter("cnae4", codigo4 +"%").setParameter("cnae2", "%" + codigo2);
 		
-
 		try {
 			List<CnaeAtualizado> cnaes = query.list();
 
