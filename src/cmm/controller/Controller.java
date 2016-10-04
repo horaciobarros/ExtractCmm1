@@ -21,7 +21,7 @@ public class Controller {
 	public void importaNfe() {
 
 		int nivelProcessamento = 5;
-		
+
 		String msg = "Confirma Extract de Lagoa da Prata no nível " + nivelProcessamento + "?";
 		int op = JOptionPane.showConfirmDialog(null, msg, "", JOptionPane.YES_NO_OPTION);
 		if (op != JOptionPane.YES_OPTION) {
@@ -41,6 +41,8 @@ public class Controller {
 			entidades = extractorService.excluiParaProcessarNivel1();
 		} else if (nivelProcessamento == 5) {
 			entidades = extractorService.excluiParaProcessarNivel5();
+		} else if (nivelProcessamento == 6) {
+			entidades = extractorService.excluiParaProcessarNivel6();
 		}
 
 		// limpando o banco
@@ -56,6 +58,7 @@ public class Controller {
 				"Lagoa da Prata - Leitura de arquivos txt - Início Processando no nível: " + nivelProcessamento);
 		List<String> dadosList;
 
+		// pessoa e prestadores
 		if (nivelProcessamento == 1) {
 
 			System.out.println("Lendo contribuintes " + Util.getDataHoraAtual());
@@ -72,6 +75,7 @@ public class Controller {
 
 		}
 
+		// competencias e guias
 		if (nivelProcessamento <= 3) {
 			// competencias e guias
 			System.out.println("Gravando competencias " + Util.getDataHoraAtual());
@@ -85,6 +89,7 @@ public class Controller {
 
 		}
 
+		// atividades prestador
 		if (nivelProcessamento <= 4) {
 			// atividades prestador
 			System.out.println("Lendo atividades prestador " + Util.getDataHoraAtual());
@@ -95,8 +100,17 @@ public class Controller {
 
 		}
 
-		if (nivelProcessamento <= 5) {
+		// tomadores
+		if (nivelProcessamento <= 5) { // só tomadores
 			// notas fiscais
+			System.out.println("Lendo dados de tomadores - " + Util.getDateHourMinutes(new Date()));
+			dadosList = extractorService.lerArquivo("dados_livro_prestador");
+			System.out.println("Gravando tomadores - " + Util.getDateHourMinutes(new Date()));
+			extractorService.processaDadosTomadores(dadosList);
+		}
+
+		// notas fiscais e todos os relacionamentos
+		if (nivelProcessamento <= 6) {
 			System.out.println("Lendo notas fiscais - " + Util.getDateHourMinutes(new Date()));
 			dadosList = extractorService.lerArquivo("dados_livro_prestador");
 			System.out.println("Gravando notas fiscais - " + Util.getDateHourMinutes(new Date()));
@@ -104,7 +118,8 @@ public class Controller {
 			System.out.println("--- Fim de notas fiscais ---" + Util.getDateHourMinutes(new Date()));
 		}
 
-		if (nivelProcessamento <= 6) {
+		// ajustes na base já gravada
+		if (nivelProcessamento <= 7) {
 
 			System.out.println("Iniciando processo de excluir guias sem notas... ");
 			extractorService.excluiGuiasSemNotas();
@@ -112,7 +127,7 @@ public class Controller {
 			System.out.println("Limpando Prestadores Sem Notas");
 			extractorService.processaExclusaoPrestadoresSemNotas();
 		}
-		
+
 		System.out.println("--- Processo encerrado. " + Util.getDataHoraAtual() + " Registros gravados: ");
 
 		for (String nomeEntidade : entidades) {

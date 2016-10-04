@@ -247,85 +247,7 @@ public class NotasMaeThread implements Runnable {
 
 		if (!util.isEmptyOrNull(nf.getInscricaoTomador())) {
 
-			t = tomadoresDao.findByInscricao(nf.getInscricaoTomador(), nf.getInscricaoPrestador());
-			if (t == null || t.getId() == null) {
-				try {
-					t = new Tomadores();
-					t.setOptanteSimples(util.getOptantePeloSimplesNacional("N"));
-					t.setNome(nf.getNomeTomador());
-					t.setNomeFantasia(nf.getNomeTomador());
-					t.setPrestadores(nf.getPrestadores());
-					t.setTipoPessoa(util.getTipoPessoa(inscricaoTomador));
-					t.setInscricaoTomador(nf.getInscricaoTomador());
-					t.setBairro(util.getNullIfEmpty(dlp.getEnderecoBairroTomador()));
-					t.setCep(util.trataCep(dlp.getCepTomador()));
-					t.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoTomador()));
-					t.setEmail(util.trataEmail(dlp.getEmailTomador()));
-					if (!util.isEmptyOrNull(t.getEmail()) && t.getEmail().length() > 80) {
-						t.setEmail(t.getEmail().substring(0, 80));
-					}
-					t.setEndereco(util.getNullIfEmpty(dlp.getEnderecoTomador()));
-					t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
-					t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
-					t.setMunicipio(dlp.getMunicipioTomador());
-					t.setTelefone(util.getLimpaTelefone(dlp.getTelefoneTomador()));
-					t.setDataAtualizacao(nf.getDataHoraEmissao());
-					try {
-						t.setMunicipioIbge(Long.valueOf(
-								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
-					} catch (Exception e) {
-						// log.fillError(linha,"Nota Fiscal Tomadores ", e);
-						// e.printStackTrace();
-					}
-
-					util.trataNumerosTelefones(t);
-					util.anulaCamposVazios(t);
-
-					// S� salvar tomador se a inscri��o n�o for =
-					// 00000000000;
-					if (!"".equals(t.getInscricaoTomador().replace("0", "").trim())) {
-						t = tomadoresDao.save(t);
-					}
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					log.fillError(linha, "Tomadores ", e);
-					t = null;
-				}
-
-			} else {
-
-				if (nf.getDataHoraEmissao().getTime() > t.getDataAtualizacao().getTime()) {
-					try {
-						t.setBairro(util.getNullIfEmpty(dlp.getEnderecoBairroTomador()));
-						t.setCep(util.trataCep(dlp.getCepTomador()));
-						t.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoTomador()));
-						t.setEmail(util.trataEmail(dlp.getEmailTomador()));
-						if (!util.isEmptyOrNull(t.getEmail()) && t.getEmail().length() > 80) {
-							t.setEmail(t.getEmail().substring(0, 80));
-						}
-						t.setEndereco(util.getNullIfEmpty(dlp.getEnderecoTomador()));
-						t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
-						t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
-						t.setMunicipio(dlp.getMunicipioTomador());
-						t.setTelefone(util.getLimpaTelefone(dlp.getTelefoneTomador()));
-
-						util.trataNumerosTelefones(t);
-						util.anulaCamposVazios(t);
-						
-						t.setDataAtualizacao(nf.getDataHoraEmissao());
-
-						if (!"".equals(t.getInscricaoTomador().replace("0", "").trim())) {
-							t = tomadoresDao.update(t);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-						log.fillError(linha, "Tomadores - update ", e);
-						t = null;
-					}
-				}
-
-			}
+			t = tomadoresDao.findByInscricao(nf.getInscricaoTomador(), nf.getPrestadores().getId());
 		}
 
 		// -- serviços
@@ -363,7 +285,6 @@ public class NotasMaeThread implements Runnable {
 		// notas fiscais tomadores
 
 		if (t != null && t.getId() != null)
-
 		{
 			processaNotasFilhaTomadores(p, nf, dlp, log, linha, "T", g, t);
 		}

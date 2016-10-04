@@ -19,18 +19,16 @@ public class TomadoresDao {
 		sessionFactory = HibernateUtil.getSessionFactory();
 	}
 
-	public Tomadores findByInscricao(String inscricaoTomador, String inscricaoPrestador) {
+	public Tomadores findByInscricao(String inscricaoTomador, Long idPrestador) {
 		Session session = sessionFactory.openSession(); 
 		Query query = session.createQuery(
-				"select t from Tomadores t  inner join t.prestadores p " + " where t.inscricaoTomador like '%" + inscricaoTomador.trim() + "%' "
-						+ " and p.inscricaoPrestador like '%" + inscricaoPrestador + "%'");
+				"select t from Tomadores t  inner join t.prestadores pr " + " where t.inscricaoTomador like '%" + inscricaoTomador.trim() + "%' "
+						+ " and pr.id = " + idPrestador );
 
 		try {
-			List<Tomadores> tomadores = query.list();
+			Tomadores tomadores = (Tomadores) query.uniqueResult();
 
-			if (tomadores.size() > 0) {
-				return tomadores.get(0);
-			}
+			return tomadores;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
