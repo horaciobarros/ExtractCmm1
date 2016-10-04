@@ -20,7 +20,7 @@ public class Controller {
 
 	public void importaNfe() {
 
-		int nivelProcessamento = 5;
+		int nivelProcessamento = 1; // a partir de notas
 
 		String msg = "Confirma Extract de Lagoa da Prata no nível " + nivelProcessamento + "?";
 		int op = JOptionPane.showConfirmDialog(null, msg, "", JOptionPane.YES_NO_OPTION);
