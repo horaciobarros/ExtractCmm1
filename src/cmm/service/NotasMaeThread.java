@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-import cmm.dao.CnaeDao;
+import cmm.dao.CnaeAtualizadoDao;
 import cmm.dao.DadosLivroPrestadorDao;
 import cmm.dao.GuiasDao;
 import cmm.dao.GuiasNotasFiscaisDao;
@@ -24,7 +24,7 @@ import cmm.dao.ServicosDao;
 import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosLivroPrestador;
 import cmm.entidadesOrigem.Servicos;
-import cmm.model.Cnae;
+import cmm.model.CnaeAtualizado;
 import cmm.model.Guias;
 import cmm.model.GuiasNotasFiscais;
 import cmm.model.ListaServicos;
@@ -487,9 +487,9 @@ public class NotasMaeThread implements Runnable {
 			String cnae = util.getStringLimpa(dlp.getCodigoCnae());
 
 			if (!util.isEmptyOrNull(cnae)) {
-				Cnae c = new CnaeDao().findByCodigo(cnae);
-				if (c != null && !util.isEmptyOrNull(c.getDescricao())) {
-					nfs.setDescricaoCnae(c.getDescricao());
+				CnaeAtualizado c = new CnaeAtualizadoDao().findByCodigo(cnae);
+				if (c != null && !util.isEmptyOrNull(c.getDenominacao())) {
+					nfs.setDescricaoCnae(c.getDenominacao());
 					nfs.setIcnaes(c.getCnae());
 				} else {
 					nfs.setIcnaes(util.completarZerosDireita(cnae, 7));
