@@ -6,10 +6,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import cmm.model.Cnae;
 import cmm.model.ListaServicos;
 import cmm.util.HibernateUtil;
-import cmm.util.Util;
 
 public class ListaServicosDao {
 	

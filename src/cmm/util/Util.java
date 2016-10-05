@@ -754,4 +754,10 @@ public class Util {
 			return texto.trim();
 		}
 	}
+
+	public Date getDataPosteriorAtual(int dias) {
+			Date dataAux = new Date(); 
+			dataAux.setDate(dataAux.getDate() + dias);
+			return dataAux;
+	}
 }

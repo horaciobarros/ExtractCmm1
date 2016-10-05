@@ -43,39 +43,40 @@ public class PrestadorThread implements Runnable {
 			}
 
 			String inscricaoPrestador = util.getCpfCnpj(dlp.getCnpjPrestador());
-			Prestadores p = prestadoresDao.findByInscricao(inscricaoPrestador);
+			Prestadores pr = prestadoresDao.findByInscricao(inscricaoPrestador);
 			try {
-				if (p == null || p.getId() == 0 || p.getId() == null) {
+				if (pr == null || pr.getId() == 0 || pr.getId() == null) {
 					// na hora de processar dados_cadastro estas
 					// informa��es
 					// tem que ser verificadas
-					p = new Prestadores();
-					p.setAutorizado("N");
+					pr = new Prestadores();
+					pr.setAutorizado("N");
 					dlp.setTelefonePrestador(util.getLimpaTelefone(dlp.getTelefonePrestador()));
-					p.setEmail(util.trataEmail(dlp.getEmailPrestador()));
-					p.setEnquadramento("N");
-					p.setInscricaoPrestador(inscricaoPrestador);
-					p.setTelefone(util.getLimpaTelefone(dlp.getTelefonePrestador()));
-					p = util.trataNumerosTelefones(p);
-					p = util.anulaCamposVazios(p);
-					p = prestadoresDao.save(p);
+					pr.setEmail(util.trataEmail(dlp.getEmailPrestador()));
+					pr.setEnquadramento("N");
+					pr.setInscricaoPrestador(inscricaoPrestador);
+					pr.setTelefone(util.getLimpaTelefone(dlp.getTelefonePrestador()));
+					pr = util.trataNumerosTelefones(pr);
+					pr = util.anulaCamposVazios(pr);
+					pr.setInscricaoMunicipal(dlp.getInscricaoMunicipalPrestador());
+					pr = prestadoresDao.save(pr);
 				} else { // preencher campos vazios
-					if (util.isEmptyOrNull(p.getTelefone())) {
-						p.setTelefone(util.getLimpaTelefone(dlp.getTelefonePrestador()));
+					if (util.isEmptyOrNull(pr.getTelefone())) {
+						pr.setTelefone(util.getLimpaTelefone(dlp.getTelefonePrestador()));
 					}
-					String email = util.trataEmail(p.getEmail());
+					String email = util.trataEmail(pr.getEmail());
 					if (Util.validarEmail(email)){
-						p.setEmail(email);
+						pr.setEmail(email);
 					}
 					else{
-						if (Util.validarEmail(p.getEmail())){
-							p.setEmail(dlp.getEmailPrestador());
+						if (Util.validarEmail(pr.getEmail())){
+							pr.setEmail(dlp.getEmailPrestador());
 						}
 					}
 
-					p = util.trataNumerosTelefones(p);
-					p = util.anulaCamposVazios(p);
-					p = prestadoresDao.update(p);
+					pr = util.trataNumerosTelefones(pr);
+					pr = util.anulaCamposVazios(pr);
+					pr = prestadoresDao.update(pr);
 
 				}
 

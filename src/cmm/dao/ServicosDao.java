@@ -90,5 +90,26 @@ public class ServicosDao {
 		}
 		return s;
 	}
+	
+	public List<Servicos> findAll() {
+		
+		Session session = sessionFactory.openSession();
+		try {
+			Query query = session.createQuery("from Servicos ");
+
+			List<Servicos> servicos = query.list();
+			
+			return servicos;
+
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return null;
+		
+	}
+
 
 }

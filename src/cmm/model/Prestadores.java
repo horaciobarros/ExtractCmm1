@@ -50,6 +50,18 @@ public class Prestadores implements Serializable {
 
 	@Column(name = "hash")
 	private String hash;
+	
+	@Column(name = "inscricao_municipal")
+	private String inscricaoMunicipal;
+	
+
+	public String getInscricaoMunicipal() {
+		return inscricaoMunicipal;
+	}
+
+	public void setInscricaoMunicipal(String inscricaoMunicipal) {
+		this.inscricaoMunicipal = inscricaoMunicipal;
+	}
 
 	public Long getId() {
 		return id;

@@ -10,7 +10,7 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import cmm.entidadesOrigem.DadosGuia;
 import cmm.entidadesOrigem.DadosLivroPrestador;
 import cmm.entidadesOrigem.Servicos;
-import cmm.model.Cnae;
+import cmm.model.CnaeAtualizado;
 import cmm.model.GuiasNumeracaoCmm;
 import cmm.model.ListaServicos;
 
@@ -71,7 +71,7 @@ public class HibernateUtil {
 
 				configuration.addAnnotatedClass(DadosLivroPrestador.class);
 				
-				configuration.addAnnotatedClass(Cnae.class);
+				configuration.addAnnotatedClass(CnaeAtualizado.class);
 				
 				configuration.addAnnotatedClass(ListaServicos.class);
 				

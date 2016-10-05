@@ -2,7 +2,7 @@ package cmm.service;
 
 import java.math.BigDecimal;
 
-import cmm.dao.CnaeDao;
+import cmm.dao.CnaeAtualizadoDao;
 import cmm.dao.DadosLivroPrestadorDao;
 import cmm.dao.NotasFiscaisServicosDao;
 import cmm.dao.PrestadoresAtividadesDao;
@@ -11,7 +11,7 @@ import cmm.dao.ServicosDao;
 import cmm.entidadesOrigem.DadosCadastroAtividade;
 import cmm.entidadesOrigem.DadosLivroPrestador;
 import cmm.entidadesOrigem.Servicos;
-import cmm.model.Cnae;
+import cmm.model.CnaeAtualizado;
 import cmm.model.Prestadores;
 import cmm.model.PrestadoresAtividades;
 import cmm.util.FileLog;
@@ -57,7 +57,7 @@ public class CadastroAtividadeThread implements Runnable {
 					DadosLivroPrestador dlp = new DadosLivroPrestadorDao().findByPrestadorAndCodigoAtividade(inscricaoPrestador, dca.getAtividadeMunicipio());
 					
 					if (dlp != null && !util.isEmptyOrNull(util.getStringLimpa(dlp.getCodigoCnae()))){
-						Cnae cnae = new CnaeDao().findByCodigo(dlp.getCodigoCnae());
+						CnaeAtualizado cnae = new CnaeAtualizadoDao().findByCodigo(dlp.getCodigoCnae());
 						if (cnae!=null && !util.isEmptyOrNull(cnae.getCnae())){
 							pa.setIcnaes(util.getStringLimpa(cnae.getCnae()));
 						}
@@ -65,11 +65,12 @@ public class CadastroAtividadeThread implements Runnable {
 					prestadoresAtividadesDao.save(pa);
 					ServicosDao dao = new ServicosDao();
 					Servicos serv = dao.findByCodigoServicoCodigoCnae(pa.getIlistaservicos(), pa.getIcnaes());
-					if (serv ==null || serv.getId()==0){
+					if (serv == null || serv.getId() == null){
 						Servicos s = new Servicos();
 						s.setAliquota(""+pa.getAliquota().doubleValue());
 						s.setCnaes(pa.getIcnaes());
 						s.setCodigo(pa.getIlistaservicos());
+						s.setDataAtualizacao(util.getDataPosteriorAtual(10));
 						dao.save(s);
 					}
 				} catch (Exception e) {

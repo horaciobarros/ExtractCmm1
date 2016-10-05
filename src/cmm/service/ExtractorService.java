@@ -6,7 +6,9 @@ import java.io.InputStreamReader;
 import java.security.Provider.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,8 +22,10 @@ import cmm.dao.PessoaDao;
 import cmm.dao.PrestadoresAtividadesDao;
 import cmm.dao.PrestadoresDao;
 import cmm.dao.PrestadoresOptanteSimplesDao;
+import cmm.dao.ServicosDao;
 import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosLivroPrestador;
+import cmm.entidadesOrigem.Servicos;
 import cmm.model.Competencias;
 import cmm.model.Guias;
 import cmm.model.Prestadores;
@@ -47,7 +51,7 @@ public class ExtractorService {
 
 	public void processaDadosCadastroAtividade(List<String> dadosList) {
 		FileLog log = new FileLog("dados_cadastro_atividade");
-		ExecutorService executor = Executors.newFixedThreadPool(350);
+		ExecutorService executor = Executors.newFixedThreadPool(100);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
 				break;
@@ -233,21 +237,22 @@ public class ExtractorService {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
 				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais", "Tomadores",
-				"PrestadoresAtividades");
+				"PrestadoresAtividades", "Servicos");
 	}
 
 	public List<String> excluiParaProcessarNivel5() {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
-				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais", "Tomadores");
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais", "Tomadores",
+				"Servicos");
 	}
-	
+
 	public List<String> excluiParaProcessarNivel6() {
 		return Arrays.asList("GuiasNotasFiscais", "NotasFiscaisCanceladas", "NotasFiscaisCondPagamentos",
 				"NotasFiscaisEmails", "NotasFiscaisObras", "NotasFiscaisPrestadores", "NotasFiscaisServicos",
-				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais");
+				"NotasFiscaisSubst", "NotasFiscaisTomadores", "NotasFiscaisXml", "NotasFiscais", "Servicos");
 	}
-	
+
 	public void processaExclusaoPrestadoresSemNotas() {
 		System.out.println("Excluindo Prestadores Atividades");
 		new PrestadoresAtividadesDao().excluiPrestadoresSemNotas();
@@ -403,5 +408,37 @@ public class ExtractorService {
 				}
 			
 		}
+	}
+
+	public void processaAjustesEmServicos() {
+
+		try {
+			Map<String, Servicos> mapServicos = new HashMap<String, Servicos>();
+			ServicosDao dao = new ServicosDao();
+
+			for (Servicos servico : dao.findAll()) {
+				if (!mapServicos.containsKey(servico.getCodigo() + "-" + servico.getCnaes())) {
+					mapServicos.put(servico.getCodigo() + "-" + servico.getCnaes(), servico);
+				} else {
+					Servicos servAux = mapServicos.get(servico.getCodigo() + "-" + servico.getCnaes());
+					if (servico.getDataAtualizacao().getTime() > servAux.getDataAtualizacao().getTime()) {
+						mapServicos.put(servico.getCodigo() + "-" + servico.getCnaes(), servico);
+					}
+				}
+			}
+
+			Dao daoMae = new Dao();
+			daoMae.excluiDados("Servicos");
+
+			for (String key : mapServicos.keySet()) {
+				Servicos s = mapServicos.get(key);
+				dao.save(s);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		}
+
 	}
 }

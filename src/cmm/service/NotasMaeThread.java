@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-import cmm.dao.CnaeDao;
+import cmm.dao.CnaeAtualizadoDao;
 import cmm.dao.DadosLivroPrestadorDao;
 import cmm.dao.GuiasDao;
 import cmm.dao.GuiasNotasFiscaisDao;
@@ -24,7 +24,7 @@ import cmm.dao.ServicosDao;
 import cmm.dao.TomadoresDao;
 import cmm.entidadesOrigem.DadosLivroPrestador;
 import cmm.entidadesOrigem.Servicos;
-import cmm.model.Cnae;
+import cmm.model.CnaeAtualizado;
 import cmm.model.Guias;
 import cmm.model.GuiasNotasFiscais;
 import cmm.model.ListaServicos;
@@ -141,12 +141,17 @@ public class NotasMaeThread implements Runnable {
 			nf.setNomeTomador(dlp.getRazaoSocialTomador());
 		}
 
-		if ("Tributação no municipio".equals(dlp.getNaturezaOperacao().trim())) {
-			nf.setNaturezaOperacao("1");
-		} else if ("Tributação fora do municipio".equals(dlp.getNaturezaOperacao().trim())) {
-			nf.setNaturezaOperacao("2");
-		} else if ("Isenção".equals(dlp.getNaturezaOperacao().trim())) {
+		if ("Isenção".equals(dlp.getRegimeTributacao().trim())) {
 			nf.setNaturezaOperacao("3");
+		} else {
+
+			if ("Tributação no municipio".equals(dlp.getNaturezaOperacao().trim())) {
+				nf.setNaturezaOperacao("1");
+			} else if ("Tributação fora do municipio".equals(dlp.getNaturezaOperacao().trim())) {
+				nf.setNaturezaOperacao("2");
+			} else if ("Isenção".equals(dlp.getNaturezaOperacao().trim())) {
+				nf.setNaturezaOperacao("3");
+			}
 		}
 
 		nf.setNomePrestador(dlp.getRazaoSocialPrestador());
@@ -157,6 +162,7 @@ public class NotasMaeThread implements Runnable {
 			nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
 			nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
 		}
+		nf.setValorPisPasep(BigDecimal.valueOf(dlp.getValorPis()));
 		nf.setValorInss(BigDecimal.valueOf(dlp.getValorInss()));
 		nf.setValorIr(BigDecimal.valueOf(dlp.getValorIr()));
 		nf.setValorOutrasRetencoes(BigDecimal.valueOf(dlp.getValorOutrasRetencoes()));
@@ -184,7 +190,8 @@ public class NotasMaeThread implements Runnable {
 			 * guiasDao.delete(g); g = null; } }
 			 */
 
-		if (g != null && g.getId() != null && !nf.getSituacaoOriginal().equals("C")) {
+		if (g != null && g.getId() != null && !nf.getSituacaoOriginal().equals("C")
+				&& !nf.getNaturezaOperacao().equals("3") && !dlp.getOptantePeloSimplesNacional().trim().substring(0, 1).equals("S")) {
 			nf.setSituacao("E");
 		} else {
 			nf.setSituacao("N");
@@ -210,9 +217,8 @@ public class NotasMaeThread implements Runnable {
 
 		List<BigDecimal> lista = Arrays.asList(nf.getValorCofins(), nf.getValorCsll(), nf.getValorInss(),
 				nf.getValorIr());
-		BigDecimal descontos = util.getSumOfBigDecimal(lista);
 
-		nf.setValorLiquido(util.getSubtract(BigDecimal.valueOf(dlp.getValorTotalNfse()), descontos));
+		nf.setValorLiquido(BigDecimal.valueOf(dlp.getValorTotalNfse()));
 		if (nf.getValorLiquido().compareTo(BigDecimal.ZERO) == -1) {
 			nf.setValorLiquido(nf.getValorLiquido().multiply(BigDecimal.valueOf(-1)));
 		}
@@ -284,8 +290,7 @@ public class NotasMaeThread implements Runnable {
 
 		// notas fiscais tomadores
 
-		if (t != null && t.getId() != null)
-		{
+		if (t != null && t.getId() != null) {
 			processaNotasFilhaTomadores(p, nf, dlp, log, linha, "T", g, t);
 		}
 
@@ -333,10 +338,10 @@ public class NotasMaeThread implements Runnable {
 	private void processaNotasFilhaGuias(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
 			String linha, String string, Guias guia) {
 		try {
-			Pessoa pessoa = new PessoaDao().findByCnpjCpf(p.getInscricaoPrestador());
-			if (pessoa != null && pessoa.getOptanteSimples().equals("S")) {
+			if (dlp.getOptantePeloSimplesNacional().trim().substring(0, 1).equals("S")) {
 				return;
 			}
+			
 			GuiasNotasFiscais gnf = new GuiasNotasFiscais();
 			gnf.setGuias(guia);
 			gnf.setInscricaoPrestador(p.getInscricaoPrestador());
@@ -357,24 +362,25 @@ public class NotasMaeThread implements Runnable {
 
 	}
 
-	private void processaNotasFilhaPrestadores(Prestadores p, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
+	private void processaNotasFilhaPrestadores(Prestadores pr, NotasFiscais nf, DadosLivroPrestador dlp, FileLog log,
 			String linha, String tipoNotaFilha) {
 		try {
 			NotasFiscaisPrestadores nfp = new NotasFiscaisPrestadores();
 			nfp.setBairro(dlp.getEnderecoBairroPrestador());
-			nfp.setTelefone(p.getTelefone());
+			nfp.setTelefone(pr.getTelefone());
 			nfp.setCep(dlp.getCepPrestador());
 			nfp.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoPrestador()));
-			nfp.setEmail(p.getEmail());
+			nfp.setEmail(pr.getEmail());
 			nfp.setEndereco(dlp.getEnderecoPrestador());
-			nfp.setInscricaoPrestador(p.getInscricaoPrestador());
+			nfp.setInscricaoPrestador(pr.getInscricaoPrestador());
 			nfp.setNome(dlp.getRazaoSocialPrestador());
 			nfp.setNomeFantasia(dlp.getNomeFantasiaPrestador());
 			nfp.setNotasFiscais(nf);
 			nfp.setNumero(dlp.getEnderecoNumeroPrestador());
 			nfp.setNumeroNota(Long.valueOf(dlp.getNumeroNota()));
 			nfp.setOptanteSimples(dlp.getOptantePeloSimplesNacional().substring(0, 1));
-			nfp.setTipoPessoa(util.getTipoPessoa(p.getInscricaoPrestador()));
+			nfp.setTipoPessoa(util.getTipoPessoa(pr.getInscricaoPrestador()));
+			nfp.setInscricaoMunicipal(pr.getInscricaoMunicipal());
 			notasFiscaisPrestadoresDao.save(nfp);
 
 		} catch (Exception e) {
@@ -481,9 +487,9 @@ public class NotasMaeThread implements Runnable {
 			String cnae = util.getStringLimpa(dlp.getCodigoCnae());
 
 			if (!util.isEmptyOrNull(cnae)) {
-				Cnae c = new CnaeDao().findByCodigo(cnae);
-				if (c != null && !util.isEmptyOrNull(c.getDescricao())) {
-					nfs.setDescricaoCnae(c.getDescricao());
+				CnaeAtualizado c = new CnaeAtualizadoDao().findByCodigo(cnae);
+				if (c != null && !util.isEmptyOrNull(c.getDenominacao())) {
+					nfs.setDescricaoCnae(c.getDenominacao());
 					nfs.setIcnaes(c.getCnae());
 				} else {
 					nfs.setIcnaes(util.completarZerosDireita(cnae, 7));
@@ -513,12 +519,13 @@ public class NotasMaeThread implements Runnable {
 			notasFiscaisServicosDao.save(nfs);
 			ServicosDao dao = new ServicosDao();
 			Servicos serv = dao.findByCodigoServicoCodigoCnae(nfs.getItemListaServico(), nfs.getIcnaes());
-			if (serv == null || serv.getId() == 0) {
+			if (serv == null || serv.getId() == null) {
 				Servicos s = new Servicos();
 				s.setAliquota("" + nfs.getAliquota().doubleValue());
 				s.setCnaes(nfs.getIcnaes());
 				s.setCodigo(nfs.getItemListaServico());
 				s.setNome(nfs.getDescricaoCnae());
+				s.setDataAtualizacao(nf.getDataHoraEmissao());
 				dao.save(s);
 			}
 		} catch (Exception e) {

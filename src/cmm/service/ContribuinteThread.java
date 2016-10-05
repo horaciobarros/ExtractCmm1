@@ -29,17 +29,19 @@ public class ContribuinteThread implements Runnable {
 
 	@Override
 	public void run() {
-		
+
 		try {
 			// linha = preparaParaSplit(linha);
 			String[] arrayLinha = linha.split("@@\\|");
-			DadosCadastro dc = new DadosCadastro(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3], arrayLinha[4], arrayLinha[5], arrayLinha[6],
-					arrayLinha[7], arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14], arrayLinha[15],
-					arrayLinha[16], arrayLinha[17], arrayLinha[18], arrayLinha[19], arrayLinha[20], arrayLinha[21], arrayLinha[22]);
+			DadosCadastro dc = new DadosCadastro(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3],
+					arrayLinha[4], arrayLinha[5], arrayLinha[6], arrayLinha[7], arrayLinha[8], arrayLinha[9],
+					arrayLinha[10], arrayLinha[11], arrayLinha[12], arrayLinha[13], arrayLinha[14], arrayLinha[15],
+					arrayLinha[16], arrayLinha[17], arrayLinha[18], arrayLinha[19], arrayLinha[20], arrayLinha[21],
+					arrayLinha[22]);
 			// incluindo pessoa
 			String cnpjCpf = util.getCpfCnpj(dc.getCnpj());
 			Pessoa pessoa = pessoaDao.findByCnpjCpf(cnpjCpf);
-			
+
 			try {
 				if (pessoa == null || pessoa.getId() == null) {
 					pessoa = new Pessoa();
@@ -70,7 +72,8 @@ public class ContribuinteThread implements Runnable {
 					}
 					pessoa = util.trataNumerosTelefones(pessoa);
 					pessoa.setUf(dc.getEnderecoUf());
-					pessoa.setMunicipioIbge(Long.valueOf(municipiosIbgeDao.getCodigoIbge(pessoa.getMunicipio(), pessoa.getUf())));
+					pessoa.setMunicipioIbge(
+							Long.valueOf(municipiosIbgeDao.getCodigoIbge(pessoa.getMunicipio(), pessoa.getUf())));
 
 					if ("F".equals(pessoa.getTipoPessoa())) {
 						pessoa.setSexo("M");
@@ -88,7 +91,8 @@ public class ContribuinteThread implements Runnable {
 					if (pessoa.getMunicipio() == null) {
 						pessoa.setMunicipio(dc.getMunicipio());
 					}
-					pessoa.setMunicipioIbge(Long.valueOf(municipiosIbgeDao.getCodigoIbge(pessoa.getMunicipio(), pessoa.getUf())));
+					pessoa.setMunicipioIbge(
+							Long.valueOf(municipiosIbgeDao.getCodigoIbge(pessoa.getMunicipio(), pessoa.getUf())));
 					pessoa.setInscricaoMunicipal(dc.getInscricaoMunicipal());
 
 					pessoa = util.trataNumerosTelefones(pessoa);
@@ -98,33 +102,33 @@ public class ContribuinteThread implements Runnable {
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				log.fillError(linha,"Contribuinte - Pessoa ", e);
+				log.fillError(linha, "Contribuinte - Pessoa ", e);
 			}
 
 			// ajustando prestadores
-			Prestadores p = prestadoresDao.findByInscricao(cnpjCpf);
+			Prestadores pr = prestadoresDao.findByInscricao(cnpjCpf);
 			try {
-				if (p == null || p.getId() == 0 || p.getId() == null) {
+				if (pr == null || pr.getId() == 0 || pr.getId() == null) {
 					try {
-						p = new Prestadores();
-						p.setAutorizado("N");
+						pr = new Prestadores();
+						pr.setAutorizado("N");
 						dc.setTelefone(util.getLimpaTelefone(dc.getTelefone()));
-						p.setEmail(util.trataEmail(dc.getEmail()));
-						p.setEnquadramento("N");
-						p.setInscricaoPrestador(cnpjCpf);
-						p.setMotivo("Solicitar cadastro"); // Pedido do
-															// Sandro de
-															// enviar como
-															// Não
-															// autorizadi
-															// Necessita
-															// deste campo
-															// preenchido
-						p = util.trataNumerosTelefones(p);
-						p = util.anulaCamposVazios(p);
-						p = prestadoresDao.save(p);
+						pr.setEmail(util.trataEmail(dc.getEmail()));
+						pr.setEnquadramento("N");
+						pr.setInscricaoPrestador(cnpjCpf);
+						pr.setInscricaoMunicipal(pessoa.getInscricaoMunicipal());
+
+						/**
+						 * // Pedido do // Sandro de // enviar como // Não //
+						 * autorizado // Necessita // deste campo // preenchido
+						 */
+						pr.setMotivo("Solicitar cadastro");
+						
+						pr = util.trataNumerosTelefones(pr);
+						pr = util.anulaCamposVazios(pr);
+						pr = prestadoresDao.save(pr);
 					} catch (Exception e) {
-						log.fillError(linha,"Contribuinte - Prestador", e);
+						log.fillError(linha, "Contribuinte - Prestador", e);
 						e.printStackTrace();
 					}
 				}
@@ -142,7 +146,11 @@ public class ContribuinteThread implements Runnable {
 						pos.setDataEfeito(util.getStringToDate(inicioAtividade));
 						pos.setDataInicio(pos.getDataEfeito());
 						// --
-						if (pos.getDataInicio().getTime() < util.getStringToDate("2007-07-01").getTime()) { // data do início da lei
+						if (pos.getDataInicio().getTime() < util.getStringToDate("2007-07-01").getTime()) { // data
+																											// do
+																											// início
+																											// da
+																											// lei
 							pos.setDataEfeito(util.getStringToDate("2007-07-01"));
 							pos.setDataInicio(util.getStringToDate("2007-07-01"));
 						}
@@ -152,16 +160,16 @@ public class ContribuinteThread implements Runnable {
 						pos.setMotivo("Opção do Contribuinte");
 						pos.setOptante("S");
 						pos.setOrgao("M");
-						pos.setPrestadores(p);
+						pos.setPrestadores(pr);
 						prestadoresOptanteSimplesDao.save(pos);
 					} catch (Exception e) {
-						log.fillError(linha,"Contribuinte - Optante Simples ", e);
+						log.fillError(linha, "Contribuinte - Optante Simples ", e);
 						e.printStackTrace();
 					}
 				}
 
 			} catch (Exception e) {
-				log.fillError(linha,"Contribuinte - Prestador ou optante simples ", e);
+				log.fillError(linha, "Contribuinte - Prestador ou optante simples ", e);
 				e.printStackTrace();
 			}
 

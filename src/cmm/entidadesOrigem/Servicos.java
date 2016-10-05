@@ -1,5 +1,7 @@
 package cmm.entidadesOrigem;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,13 +16,16 @@ public class Servicos {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
-	private long id;
+	private Long id;
 	private String codigo;
 	private String nome;
 	private String aliquota;
 	private String cnaes;
 	@Column(name = "data_de_criacao")
 	private String dataDeCriacao;
+	@Column(name = "data_atualizacao")
+	private Date dataAtualizacao;
+	
 	@Column(name = "id_origem")
 	private long idOrigem;
 	
@@ -31,10 +36,10 @@ public class Servicos {
 	public void setIdOrigem(long idOrigem) {
 		this.idOrigem = idOrigem;
 	}
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public String getCodigo() {
@@ -67,6 +72,14 @@ public class Servicos {
 	public void setDataDeCriacao(String dataDeCriacao) {
 		this.dataDeCriacao = dataDeCriacao;
 	}
+	public Date getDataAtualizacao() {
+		return dataAtualizacao;
+	}
+	public void setDataAtualizacao(Date dataAtualizacao) {
+		this.dataAtualizacao = dataAtualizacao;
+	}
+	
+	
 	
 
 }
