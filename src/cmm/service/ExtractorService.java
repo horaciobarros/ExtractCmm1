@@ -168,7 +168,7 @@ public class ExtractorService {
 	public void processaDadosNotasFiscais(List<String> dadosList) {
 		FileLog log = new FileLog("dados_livro_prestador_notas_fiscais");
 		Util.pausar(5000);
-		ExecutorService executor = Executors.newFixedThreadPool(100);
+		ExecutorService executor = Executors.newFixedThreadPool(250);
 		for (String linha : dadosList) {
 			if (linha == null || linha.trim().isEmpty()) {
 				break;
@@ -319,52 +319,50 @@ public class ExtractorService {
 
 			String inscricaoPrestador = util.getCpfCnpj(dlp.getCnpjPrestador());
 			String inscricaoTomador = util.getCpfCnpj(dlp.getCnpjTomador());
-
+			if (util.isEmptyOrNull(inscricaoTomador)){
+				inscricaoTomador = Util.CPF_TOMADOR_FICTICIO;
+			}
 			Prestadores pr = prestadoresDao.findByInscricao(inscricaoPrestador);
 			Tomadores t = null;
 
-			if (!util.isEmptyOrNull(dlp.getCnpjTomador())) {
-
-				t = tomadoresDao.findByInscricao(inscricaoTomador, pr.getId());
-				if (t == null || t.getId() == null) {
+			t = tomadoresDao.findByInscricao(inscricaoTomador, pr.getId());
+			if (t == null || t.getId() == null) {
+				try {
+					t = new Tomadores();
+					t.setOptanteSimples(util.getOptantePeloSimplesNacional("N"));
+					t.setNome(dlp.getRazaoSocialTomador());
+					t.setNomeFantasia(dlp.getRazaoSocialTomador());
+					t.setPrestadores(pr);
+					t.setTipoPessoa(util.getTipoPessoa(inscricaoTomador));
+					t.setInscricaoTomador(inscricaoTomador);
+					t.setBairro(util.getNullIfEmpty(dlp.getEnderecoBairroTomador()));
+					t.setCep(util.trataCep(dlp.getCepTomador()));
+					t.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoTomador()));
+					t.setEmail(util.trataEmail(dlp.getEmailTomador()));
+					if (!util.isEmptyOrNull(t.getEmail()) && t.getEmail().length() > 80) {
+						t.setEmail(t.getEmail().substring(0, 80));
+					}
+					t.setEndereco(util.getNullIfEmpty(dlp.getEnderecoTomador()));
+					t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
+					t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
+					t.setMunicipio(dlp.getMunicipioTomador());
+					t.setTelefone(util.getLimpaTelefone(dlp.getTelefoneTomador()));
+					t.setDataAtualizacao(util.getStringToDate(dlp.getDataCompetencia()));
 					try {
-						t = new Tomadores();
-						t.setOptanteSimples(util.getOptantePeloSimplesNacional("N"));
-						t.setNome(dlp.getRazaoSocialTomador());
-						t.setNomeFantasia(dlp.getRazaoSocialTomador());
-						t.setPrestadores(pr);
-						t.setTipoPessoa(util.getTipoPessoa(inscricaoTomador));
-						t.setInscricaoTomador(inscricaoTomador);
-						t.setBairro(util.getNullIfEmpty(dlp.getEnderecoBairroTomador()));
-						t.setCep(util.trataCep(dlp.getCepTomador()));
-						t.setComplemento(util.getNullIfEmpty(dlp.getEnderecoComplementoTomador()));
-						t.setEmail(util.trataEmail(dlp.getEmailTomador()));
-						if (!util.isEmptyOrNull(t.getEmail()) && t.getEmail().length() > 80) {
-							t.setEmail(t.getEmail().substring(0, 80));
-						}
-						t.setEndereco(util.getNullIfEmpty(dlp.getEnderecoTomador()));
-						t.setInscricaoEstadual(dlp.getInscricaoEstadualTomador());
-						t.setInscricaoMunicipal(dlp.getInscricaoMunicipalTomador());
-						t.setMunicipio(dlp.getMunicipioTomador());
-						t.setTelefone(util.getLimpaTelefone(dlp.getTelefoneTomador()));
-						t.setDataAtualizacao(util.getStringToDate(dlp.getDataCompetencia()));
-						try {
-							t.setMunicipioIbge(Long.valueOf(
-									municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
-						} catch (Exception e) {
-							// log.fillError(linha,"Nota Fiscal Tomadores ", e);
-							// e.printStackTrace();
-						}
+						t.setMunicipioIbge(Long.valueOf(
+								municipiosIbgeDao.getCodigoIbge(dlp.getMunicipioTomador(), dlp.getUfTomador())));
+					} catch (Exception e) {
+						// log.fillError(linha,"Nota Fiscal Tomadores ", e);
+						// e.printStackTrace();
+					}
+					util.trataNumerosTelefones(t);
+					util.anulaCamposVazios(t);
 
-						util.trataNumerosTelefones(t);
-						util.anulaCamposVazios(t);
-
-						// S� salvar tomador se a inscri��o n�o for =
-						// 00000000000;
-						if (!"".equals(t.getInscricaoTomador().replace("0", "").trim())) {
-							t = tomadoresDao.save(t);
-						}
-
+					// S� salvar tomador se a inscri��o n�o for =
+					// 00000000000;
+					if (!"".equals(t.getInscricaoTomador().replace("0", "").trim())) {
+						t = tomadoresDao.save(t);
+					}
 					} catch (Exception e) {
 						e.printStackTrace();
 						log.fillError(linha, "Tomadores ", e);
@@ -403,7 +401,7 @@ public class ExtractorService {
 						}
 					}
 				}
-			}
+			
 		}
 	}
 }
