@@ -65,11 +65,12 @@ public class CadastroAtividadeThread implements Runnable {
 					prestadoresAtividadesDao.save(pa);
 					ServicosDao dao = new ServicosDao();
 					Servicos serv = dao.findByCodigoServicoCodigoCnae(pa.getIlistaservicos(), pa.getIcnaes());
-					if (serv ==null || serv.getId()==0){
+					if (serv == null || serv.getId() == null){
 						Servicos s = new Servicos();
 						s.setAliquota(""+pa.getAliquota().doubleValue());
 						s.setCnaes(pa.getIcnaes());
 						s.setCodigo(pa.getIlistaservicos());
+						s.setDataAtualizacao(util.getDataPosteriorAtual(10));
 						dao.save(s);
 					}
 				} catch (Exception e) {

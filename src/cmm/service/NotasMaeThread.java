@@ -519,12 +519,13 @@ public class NotasMaeThread implements Runnable {
 			notasFiscaisServicosDao.save(nfs);
 			ServicosDao dao = new ServicosDao();
 			Servicos serv = dao.findByCodigoServicoCodigoCnae(nfs.getItemListaServico(), nfs.getIcnaes());
-			if (serv == null || serv.getId() == 0) {
+			if (serv == null || serv.getId() == null) {
 				Servicos s = new Servicos();
 				s.setAliquota("" + nfs.getAliquota().doubleValue());
 				s.setCnaes(nfs.getIcnaes());
 				s.setCodigo(nfs.getItemListaServico());
 				s.setNome(nfs.getDescricaoCnae());
+				s.setDataAtualizacao(nf.getDataHoraEmissao());
 				dao.save(s);
 			}
 		} catch (Exception e) {

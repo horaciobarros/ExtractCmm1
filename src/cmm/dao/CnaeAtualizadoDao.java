@@ -27,7 +27,7 @@ public class CnaeAtualizadoDao {
 		String codigo2 = codigo.substring(4);
 		
 		Session session = sessionFactory.openSession();
-		Query query = session.createQuery("from Cnae c where c.cnae like :cnae4 and c.cnae like :cnae2 ")
+		Query query = session.createQuery("from CnaeAtualizado c where c.cnae like :cnae4 and c.cnae like :cnae2 ")
 				.setParameter("cnae4", codigo4 +"%").setParameter("cnae2", "%" + codigo2);
 		
 		try {

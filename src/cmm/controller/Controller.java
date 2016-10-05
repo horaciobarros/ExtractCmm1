@@ -126,6 +126,9 @@ public class Controller {
 
 			System.out.println("Limpando Prestadores Sem Notas");
 			extractorService.processaExclusaoPrestadoresSemNotas();
+			
+			System.out.println("Ajustando Servicos");
+			extractorService.processaAjustesEmServicos();
 		}
 
 		System.out.println("--- Processo encerrado. " + Util.getDataHoraAtual() + " Registros gravados: ");
