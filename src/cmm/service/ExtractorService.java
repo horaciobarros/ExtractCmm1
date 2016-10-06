@@ -336,6 +336,9 @@ public class ExtractorService {
 					inscricaoTomador = Util.CPF_TOMADOR_FICTICIO;
 				}
 			}
+			else{
+				inscricaoTomador = Util.CPF_TOMADOR_FICTICIO;
+			}
 			Prestadores pr = prestadoresDao.findByInscricao(inscricaoPrestador);
 			Tomadores t = null;
 
