@@ -140,7 +140,7 @@ public class Util {
 	}
 
 	public String getTipoPessoa(String inscricao) {
-		if (inscricao == null || inscricao.trim().isEmpty()) {
+		if (inscricao == null || inscricao.trim().isEmpty() || inscricao.equals(CPF_TOMADOR_FICTICIO)) {
 			return "O";
 		} else if (inscricao.trim().length() == 11) {
 			return "F";

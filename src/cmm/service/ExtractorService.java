@@ -327,6 +327,15 @@ public class ExtractorService {
 			if (util.isEmptyOrNull(inscricaoTomador)){
 				inscricaoTomador = Util.CPF_TOMADOR_FICTICIO;
 			}
+			if (util.getTipoPessoa(inscricaoTomador).equals("F")){
+				if (!Util.validarCpf(inscricaoTomador)){
+					inscricaoTomador = Util.CPF_TOMADOR_FICTICIO;
+				}
+			} else if (util.getTipoPessoa(inscricaoTomador).equals("J")){
+				if (!Util.validarCnpj(inscricaoTomador)){
+					inscricaoTomador = Util.CPF_TOMADOR_FICTICIO;
+				}
+			}
 			Prestadores pr = prestadoresDao.findByInscricao(inscricaoPrestador);
 			Tomadores t = null;
 
@@ -335,8 +344,14 @@ public class ExtractorService {
 				try {
 					t = new Tomadores();
 					t.setOptanteSimples(util.getOptantePeloSimplesNacional("N"));
-					t.setNome(dlp.getRazaoSocialTomador());
-					t.setNomeFantasia(dlp.getRazaoSocialTomador());
+					if (!util.isEmptyOrNull(dlp.getRazaoSocialTomador())){
+						t.setNome(dlp.getRazaoSocialTomador());
+						t.setNomeFantasia(dlp.getRazaoSocialTomador());
+					}
+					else{
+						t.setNome("Não informado");
+						t.setNomeFantasia("Não informado");
+					}
 					t.setPrestadores(pr);
 					t.setTipoPessoa(util.getTipoPessoa(inscricaoTomador));
 					t.setInscricaoTomador(inscricaoTomador);
@@ -417,13 +432,18 @@ public class ExtractorService {
 			ServicosDao dao = new ServicosDao();
 
 			for (Servicos servico : dao.findAll()) {
-				if (!mapServicos.containsKey(servico.getCodigo() + "-" + servico.getCnaes())) {
-					mapServicos.put(servico.getCodigo() + "-" + servico.getCnaes(), servico);
-				} else {
-					Servicos servAux = mapServicos.get(servico.getCodigo() + "-" + servico.getCnaes());
-					if (servico.getDataAtualizacao().getTime() > servAux.getDataAtualizacao().getTime()) {
+				try{
+					if (!mapServicos.containsKey(servico.getCodigo() + "-" + servico.getCnaes())) {
 						mapServicos.put(servico.getCodigo() + "-" + servico.getCnaes(), servico);
+					} else {
+						Servicos servAux = mapServicos.get(servico.getCodigo() + "-" + servico.getCnaes());
+						if (servico.getDataAtualizacao().getTime() > servAux.getDataAtualizacao().getTime()) {
+							mapServicos.put(servico.getCodigo() + "-" + servico.getCnaes(), servico);
+						}
 					}
+				}
+				catch(Exception e){
+					
 				}
 			}
 
