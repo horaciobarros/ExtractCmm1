@@ -3,6 +3,7 @@ package cmm.service;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.security.Provider.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import cmm.dao.PrestadoresDao;
 import cmm.dao.PrestadoresOptanteSimplesDao;
 import cmm.dao.ServicosDao;
 import cmm.dao.TomadoresDao;
+import cmm.entidadesOrigem.DadosCadastroAtividade;
 import cmm.entidadesOrigem.DadosLivroPrestador;
 import cmm.entidadesOrigem.Servicos;
 import cmm.model.Competencias;
@@ -463,5 +465,27 @@ public class ExtractorService {
 
 		}
 
+		List<String> dados = lerArquivo("dados_cadastro_atividade");
+		ServicosDao dao = new ServicosDao();
+		for (String linha : dados){
+			if (linha == null || linha.trim().isEmpty()) {
+				break;
+			}
+			String[] arrayLinha = linha.split("@@\\|");
+			DadosCadastroAtividade dca = new DadosCadastroAtividade(arrayLinha[0], arrayLinha[1], arrayLinha[2], arrayLinha[3], arrayLinha[4],
+					util.corrigeDouble(arrayLinha[5]), arrayLinha[6], arrayLinha[7], arrayLinha[8], arrayLinha[9], arrayLinha[10], arrayLinha[11], arrayLinha[12]);
+			try{
+				if (util.isEmptyOrNull(dca.getAnoFim())){
+					String iListaServicos = util.converteItemListaServico(dca.getAtividadeMunicipio());
+					iListaServicos = util.completarZerosEsquerda(iListaServicos.replace(".", ""), 4);
+					double aliquota = BigDecimal.valueOf(dca.getAliquota()).doubleValue();
+					dao.updateAliquotaPorCodigo(aliquota, iListaServicos);
+					System.out.println("Serviço: "+iListaServicos+" alíquota: "+aliquota);
+				}
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+		}
 	}
 }

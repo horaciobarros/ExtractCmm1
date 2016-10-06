@@ -1,5 +1,6 @@
 package cmm.dao;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -109,6 +110,16 @@ public class ServicosDao {
 		}
 		return null;
 		
+	}
+
+	public void updateAliquotaPorCodigo(double aliquota, String ilistaservicos) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		Query query = session.createSQLQuery("update servicos set aliquota="+aliquota+" where codigo like '"+ilistaservicos+"'");
+		query.executeUpdate();
+		session.getTransaction().commit();
+		session.close();
 	}
 
 
