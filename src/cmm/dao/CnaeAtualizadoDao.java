@@ -1,5 +1,6 @@
 package cmm.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -22,17 +23,25 @@ public class CnaeAtualizadoDao {
 	}
 
 	public CnaeAtualizado findByCodigo(String codigo) {
-		
-		String codigo4 = codigo.substring(0,4);
-		String codigo2 = codigo.substring(4);
-		
 		Session session = sessionFactory.openSession();
-		Query query = session.createQuery("from CnaeAtualizado c where c.cnae like :cnae4 and c.cnae like :cnae2 ")
-				.setParameter("cnae4", codigo4 +"%").setParameter("cnae2", "%" + codigo2);
+		List<CnaeAtualizado> cnaes = new ArrayList<>();
 		
+		if (codigo.length() == 5){
+			codigo = "0"+codigo;
+		}
+		if (codigo.length()==6){
+			String codigo4 = codigo.substring(0,4);
+			String codigo2 = codigo.substring(4);
+			Query query = session.createQuery("from CnaeAtualizado c where c.cnae like :cnae4 and c.cnae like :cnae2 ")
+					.setParameter("cnae4", codigo4 +"%").setParameter("cnae2", "%" + codigo2);
+			cnaes = query.list();
+		} 
+		else{
+			Query query = session.createQuery("from CnaeAtualizado c where c.cnae like :cnae")
+					.setParameter("cnae", codigo);
+			cnaes = query.list();
+		}		
 		try {
-			List<CnaeAtualizado> cnaes = query.list();
-
 			if (cnaes.size() > 0) {
 				return cnaes.get(0);
 			}
