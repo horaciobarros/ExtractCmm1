@@ -33,6 +33,9 @@ public class Pagamentos implements Serializable {
 
 	@Column(name = "numero_pagamento")
 	private Long numeroPagamento;
+	
+	@Column(name = "numero_pagamento_origem")
+	private Long numeroPagamentoOrigem;
 
 	@Column(name = "data_pagamento")
 	private Date dataPagamento;
@@ -164,4 +167,14 @@ public class Pagamentos implements Serializable {
 	public void setHash(String hash) {
 		this.hash = hash;
 	}
+
+	public Long getNumeroPagamentoOrigem() {
+		return numeroPagamentoOrigem;
+	}
+
+	public void setNumeroPagamentoOrigem(Long numeroPagamentoOrigem) {
+		this.numeroPagamentoOrigem = numeroPagamentoOrigem;
+	}
+	
+	
 }

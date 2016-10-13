@@ -32,6 +32,20 @@ public class GuiasNotasFiscaisDao {
 			session.close();
 		}
 	}
+	
+	public void update(GuiasNotasFiscais gnf) {
+		Session session = sessionFactory.openSession();
+		try {
+			session.beginTransaction();
+			session.update(gnf);
+			session.getTransaction().commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			session.close();
+		}
+	}
 
 	public List<GuiasNotasFiscais> findNaoEnviados() {
 		Session session = sessionFactory.openSession();

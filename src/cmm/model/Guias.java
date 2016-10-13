@@ -70,6 +70,9 @@ public class Guias implements Serializable {
 
 	@Column(name = "numero_guia_origem")
 	private String numeroGuiaOrigem;
+	
+	@Column(name = "numero_guia_gerada")
+	private Long numeroGuiaGerada;
 
 	public String getNumeroGuiaOrigem() {
 		return numeroGuiaOrigem;
@@ -198,4 +201,14 @@ public class Guias implements Serializable {
 	public void setHash(String hash) {
 		this.hash = hash;
 	}
+
+	public Long getNumeroGuiaGerada() {
+		return numeroGuiaGerada;
+	}
+
+	public void setNumeroGuiaGerada(Long numeroGuiaGerada) {
+		this.numeroGuiaGerada = numeroGuiaGerada;
+	}
+	
+	
 }

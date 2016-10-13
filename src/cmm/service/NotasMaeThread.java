@@ -161,8 +161,9 @@ public class NotasMaeThread implements Runnable {
 		if ("J".equals(util.getTipoPessoa(p.getInscricaoPrestador()))) {
 			nf.setValorCofins(BigDecimal.valueOf(dlp.getValorCofins()));
 			nf.setValorCsll(BigDecimal.valueOf(dlp.getValorCsll()));
+			nf.setValorPisPasep(BigDecimal.valueOf(dlp.getValorPis()));
 		}
-		nf.setValorPisPasep(BigDecimal.valueOf(dlp.getValorPis()));
+		
 		nf.setValorInss(BigDecimal.valueOf(dlp.getValorInss()));
 		nf.setValorIr(BigDecimal.valueOf(dlp.getValorIr()));
 		nf.setValorOutrasRetencoes(BigDecimal.valueOf(dlp.getValorOutrasRetencoes()));
