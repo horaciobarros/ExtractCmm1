@@ -20,7 +20,7 @@ public class Controller {
 
 	public void importaNfe() {
 
-		int nivelProcessamento = 5; // a partir de notas
+		int nivelProcessamento = 1; // a partir de notas
 
 		String msg = "Confirma Extract de Lagoa da Prata no nível " + nivelProcessamento + "?";
 		int op = JOptionPane.showConfirmDialog(null, msg, "", JOptionPane.YES_NO_OPTION);
@@ -65,13 +65,13 @@ public class Controller {
 			dadosList = extractorService.lerArquivo("dados_cadastro");
 			System.out.println("Gravando contribuintes " + Util.getDataHoraAtual());
 			extractorService.processaDadosCadastro(dadosList);
-			System.out.println("--- Fim de ajustes ---" + Util.getDataHoraAtual());
-
+			System.out.println("--- Fim de contribuintes ---" + Util.getDataHoraAtual());
+			Util.pausar(5000);
 			System.out.println("Lendo prestador " + Util.getDataHoraAtual()); // prestador
 			dadosList = extractorService.lerArquivo("dados_livro_prestador");
 			System.out.println("Gravando prestador " + Util.getDataHoraAtual()); // prestador
 			extractorService.processaDadosLivroPrestador(dadosList);
-			System.out.println("--- Fim de prestador --- " + Util.getDataHoraAtual());
+			System.out.println("--- Fim de prestador --- " + Util.getDataHoraAtual());Util.pausar(5000);
 
 		}
 
@@ -79,12 +79,12 @@ public class Controller {
 		if (nivelProcessamento <= 3) {
 			// competencias e guias
 			System.out.println("Gravando competencias " + Util.getDataHoraAtual());
-			extractorService.incluiCompetencias();
+			extractorService.incluiCompetencias();Util.pausar(5000);
 			System.out.println("--- Fim de competencias ---");
 			System.out.println("Lendo guias " + Util.getDataHoraAtual());
 			dadosList = extractorService.lerArquivo("dados_guia");
 			System.out.println("Gravando guias " + Util.getDataHoraAtual());
-			extractorService.processaDadosGuiaCompetencias(dadosList);
+			extractorService.processaDadosGuiaCompetencias(dadosList);Util.pausar(5000);
 			System.out.println("--- Fim de guias --- " + Util.getDataHoraAtual());
 
 		}
@@ -95,7 +95,7 @@ public class Controller {
 			System.out.println("Lendo atividades prestador " + Util.getDataHoraAtual());
 			dadosList = extractorService.lerArquivo("dados_cadastro_atividade");
 			System.out.println("Gravando atividades prestador " + Util.getDataHoraAtual());
-			extractorService.processaDadosCadastroAtividade(dadosList);
+			extractorService.processaDadosCadastroAtividade(dadosList);Util.pausar(5000);
 			System.out.println("--- Fim de atividades prestador ---");
 
 		}
@@ -106,7 +106,7 @@ public class Controller {
 			System.out.println("Lendo dados de tomadores - " + Util.getDateHourMinutes(new Date()));
 			dadosList = extractorService.lerArquivo("dados_livro_prestador");
 			System.out.println("Gravando tomadores - " + Util.getDateHourMinutes(new Date()));
-			extractorService.processaDadosTomadores(dadosList);
+			extractorService.processaDadosTomadores(dadosList);Util.pausar(5000);
 		}
 
 		// notas fiscais e todos os relacionamentos
@@ -114,7 +114,7 @@ public class Controller {
 			System.out.println("Lendo notas fiscais - " + Util.getDateHourMinutes(new Date()));
 			dadosList = extractorService.lerArquivo("dados_livro_prestador");
 			System.out.println("Gravando notas fiscais - " + Util.getDateHourMinutes(new Date()));
-			extractorService.processaDadosNotasFiscais(dadosList);
+			extractorService.processaDadosNotasFiscais(dadosList);Util.pausar(5000);
 			System.out.println("--- Fim de notas fiscais ---" + Util.getDateHourMinutes(new Date()));
 		}
 

@@ -108,5 +108,35 @@ public class GuiasNotasFiscais implements Serializable {
 	public void setSituacaoTributaria(String situacaoTributaria) {
 		this.situacaoTributaria = situacaoTributaria;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((dhEnvio == null) ? 0 : dhEnvio.hashCode());
+		result = prime * result + ((guias == null) ? 0 : guias.hashCode());
+		result = prime * result + ((hash == null) ? 0 : hash.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((inscricaoPrestador == null) ? 0 : inscricaoPrestador.hashCode());
+		result = prime * result + ((numeroGuia == null) ? 0 : numeroGuia.hashCode());
+		result = prime * result + ((numeroNota == null) ? 0 : numeroNota.hashCode());
+		result = prime * result + ((situacaoTributaria == null) ? 0 : situacaoTributaria.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GuiasNotasFiscais other = (GuiasNotasFiscais) obj;
+		if (this.getNumeroNota() == other.getNumeroNota() && this.getInscricaoPrestador().equals(other.getInscricaoPrestador())){
+			return true;
+		}
+		return false;
+	}
 	
 }

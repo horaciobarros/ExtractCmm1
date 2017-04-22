@@ -1,5 +1,6 @@
 package cmm.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -7,6 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import cmm.model.Competencias;
 import cmm.model.Guias;
 import cmm.util.HibernateUtil;
 
@@ -109,6 +111,22 @@ public class GuiasDao {
 		session.delete(guias);
 		session.beginTransaction().commit();
 		session.close();
+		
+	}
+
+	public Guias findByPrestadorCompetencia(String inscricaoPrestador, Competencias competencias) {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session.createQuery("from Guias g join fetch g.competencias c where g.inscricaoPrestador='"+inscricaoPrestador+"' and c.id="+competencias.getId());
+		List<Guias> lista = query.list();
+		tx.commit();
+		session.close();
+		if (lista!=null && lista.size()>0){
+			return lista.get(0);	
+		}
+		else{
+			return null;
+		}
 		
 	}
 

@@ -1,5 +1,6 @@
 package cmm.dao;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -60,6 +61,17 @@ public class NotasFiscaisEmailsDao {
 		query.executeUpdate();
 		tx.commit();
 		session.close();
+	}
+
+	public List<NotasFiscaisEmails> findByPrestadorNumeroNota(String inscricao, String numero) {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session.createQuery("from NotasFiscaisEmails n where n.inscricaoPrestador like '"+inscricao+"' and n.numeroNota="+numero);
+		List<NotasFiscaisEmails> lista = query.list();
+		tx.commit();
+		session.close();
+
+		return lista;
 	}
 
 }

@@ -51,6 +51,22 @@ public class CompetenciasDao {
 			session.close();
 		}
 	}
+	
+	public Competencias findById(Long id) {
+		Query query = sessionFactory.openSession()
+				.createQuery("from Competencias cp where cp.id="+id);
+
+		try {
+			List<Competencias> competencias = query.list();
+
+			if (competencias.size() > 0) {
+				return competencias.get(0);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	public List<Competencias> findNaoEnviados() {
 		Session session = sessionFactory.openSession();

@@ -85,4 +85,14 @@ public class NotasFiscaisDao {
 		return (!lista.isEmpty()) ? lista.get(0) : null;
 	}
 
+	public List<NotasFiscais> findByPrestador(String inscricao) {
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Query query = session.createQuery("from NotasFiscais nf where nf.inscricaoPrestador like '%"+inscricao+"'");
+		List<NotasFiscais> lista = query.list();
+		tx.commit();
+		session.close();
+		return lista;
+	}
+
 }
